@@ -1,5 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
+// Common constant definitions
+static const unsigned long MAX_SIZE_8BIT = 256;
 
 // Integer typedefs to give the native C types more convenient names
 typedef signed char        int8;

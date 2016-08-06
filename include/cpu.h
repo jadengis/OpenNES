@@ -3,8 +3,10 @@
 
 #ifndef CPU_H
 #define CPU_H
-class CPU_6502 {
-  private:
-    reg
+template<class Arch> class CPU {
+  public:
+    CPU() {};
+    virtual ~CPU() {};
+    virtual void execute(Arch opcode) = 0;
 };
 #endif // CPU_H //:~

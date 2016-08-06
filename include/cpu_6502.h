@@ -1,11 +1,56 @@
+// OsNES Project | include/cpu_6502.h
+// Description:
+// Functional specification for the MOS 6502 CPU.
+// Any and all details related to the overall operation ofthe 6502 should
+// be declared here.
+//
+// Authors: 
+// John Dengis
+//
 #ifndef CPU_6502_H
 #define CPU_6502_H
 #include "common.h"
+#include "cpu_array_stack.h"
+
+class CPU_6502 : public CPU<uint8> {
+  public:
+    void execute(uint8 opcode);
+
+    // CPU Instruction emulation inline functions
+    void exec_ADC(uint8 opcode);
+    void exec_AND(uint8 opcode);
+    void exec_ASL(uint8 opcode);
+    void exec_BCC(uint8 opcode);
+    void exec_BCS(uint8 opcode);
+  private:
+    
+    // Register structure
+    struct {
+      uint16 PC; // Program Counter
+      uint8  AC; // Accumulator
+      uint8  X;  // X Register
+      uint8  Y;  // Y Register
+      uint8  SR; // Status Register [NV-BDIZC]
+      uint8  SP; // Stack Pointer
+    } reg;
+
+    // Interal stack interface object
+    CPU_Array_Stack<uint8> stack;
+};
+
+// SR Flag Masks
+static const SR_N = 0x80; // Negative
+static const SR_V = 0x40; // Overflow
+static const SR_B = 0x10; // Break
+static const SR_D = 0x08; // Decimal (use BCD for arithmetics)
+static const SR_I = 0x04; // Interrupt (IRQ disable)
+static const SR_Z = 0x02; // Zero
+static const SR_C = 0x01; // Carry
 
 // Instruction Opcodes for the MOS 6502 CPU.
 // This list is in increasing order, and the addressing mode is included
 // in the opname.
-// Note: imm is used instead of # to list immediate addressing.
+// Note: immed is used instead of # to list immediate addressing.
 
 // HI-NIBBLE == 0x00
 static const uint8 op_BRK_impl  = 0x00;
