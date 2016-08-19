@@ -8,5 +8,6 @@ template<class Arch> class CPU {
     CPU() {};
     virtual ~CPU() {};
     virtual void execute(Arch opcode) = 0;
+    virtual Arch fetch() = 0;
 };
 #endif // CPU_H //:~
