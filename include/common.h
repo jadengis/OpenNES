@@ -1,14 +1,22 @@
 #ifndef COMMON_H
 #define COMMON_H
-// Integer typedefs to give the native C types more convenient names
-typedef signed char        int8;
-typedef signed short       int16;
-typedef signed int         int32;
-typedef signed long long   int64;
-typedef unsigned char      uint8;
-typedef unsigned short     uint16;
-typedef unsigned int       uint32;
-typedef unsigned long long uint64;
+// Common includes
+#include <memory>
+
+// Integer aliases to give the native C types more convenient names
+using int8   = signed char;
+using int16  = signed short;
+using int32  = signed int;
+using int64  = signed long long;
+using uint8  = unsigned char;
+using uint16 = unsigned short;
+using uint32 = unsigned int;
+using uint64 = unsigned long long;
+
+// use the type 'byte' when referring to arbitary bytes of data, i.e
+// data that is not necessarily signed int or unsigned int; the only
+// important thing is that it is 8 bits.
+using byte   = unsigned char;
 
 // com - The common namespace for all common helper functions and
 //       constant values used throughout the source.
@@ -26,7 +34,7 @@ namespace com {
   };
 
   // Common constant definitions
-  static const uint64 MAX_SIZE_8BIT = 256;
+  static const uint64 MAX_SIZE_BYTE = 256;
   static const uint8  ONE_BIT_MASK  = 0x01;
 
   // Common helper functions

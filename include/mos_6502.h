@@ -1,4 +1,4 @@
-// OsNES Project | include/cpu_6502.h
+// OsNES Project | include/mos_6502.h
 // Description:
 // Functional specification for the MOS 6502 CPU.
 // Any and all details related to the overall operation ofthe 6502 should
@@ -14,20 +14,31 @@
 
 class MOS_6502 : public CPU<uint8> {
   public:
-    void  execute(uint8 opcode);
-    uint8 fetch();
+    void  execute(uint8 opcode) override;
+    uint8 fetch() override;
 
     // CPU Instruction emulation inline functions
-    void ADC(uint8 opcode);
-    void AND(uint8 opcode);
-    void ASL(uint8 opcode);
-    void BCC(uint8 opcode);
-    void BCS(uint8 opcode);
+    void ADC(uint8*);
+    void AND(uint8*);
+    void ASL(uint8*);
+    void BCC(uint8*);
+    void BCS(uint8*);
+
   private:
-    
     // Register structure
     struct {
-      uint16 PC; // Program Counter
+      union {
+        uint16 PC; // Program Counter
+        struct {
+#ifdef __BIG_ENDIAN__
+          uint8 PCH;
+          uint8 PCL;
+#else // Little Endian
+          uint8 PCL;
+          uint8 PCH;
+#endif // __BIG_ENDIAN__
+        };
+      };
       uint8  AC; // Accumulator
       uint8  X;  // X Register
       uint8  Y;  // Y Register

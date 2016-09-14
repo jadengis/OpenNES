@@ -17,7 +17,7 @@ template <class T> class CPU_Array_Stack {
     // An Array_Stack can be initialized with a pointer or an initial size
     // where the memory for the array is dynamically alocatted. Memory is
     // is assumed to have been previously allocated if a pointer is used.
-    CPU_Array_Stack(T size = MAX_SIZE_8BIT) {
+    CPU_Array_Stack(T size = MAX_SIZE_BYTE) {
       memory_allocated = true;
       base = new T[size];
     }
