@@ -27,7 +27,7 @@ void Mem::Bank::Page::set_name(uint8 nam) {
   name = nam;
 }
 
-inline byte& Mem::Bank::Page::operator[](const uint8 index) {
+inline auto& Mem::Bank::Page::operator[](const uint8 index) {
   // fall back on the pointer index operator. Not array
   // out of bounds is not possible due to type limit on index.
   return byte_p[index];
@@ -39,6 +39,8 @@ inline byte& Mem::Bank::Page::operator[](const uint8 index) {
 Mem::Bank::Bank(uint8 nam) : name{nam} {
   // A memory bank consists of 256 Pages containing 256 bytes
   // allocate this memory and set appropriate names
+  // TODO: I think this can be improved. Dont like this atm.
+  // Ideally i can remove set name
   page_p = new Page[MAX_SIZE_BYTE];
   for(long i = 0; i < MAX_SIZE_BYTE; i++) {
     page_p[i].set_name(i);
@@ -54,8 +56,22 @@ void Mem::Bank::set_name(uint8 nam) {
   name = nam;
 }
 
-Mem::Bank::Page& Mem::Bank::operator[](const uint8 index) {
+inline auto& Mem::Bank::operator[](const uint8 index) {
   // fall back on the pointer index operator. Not array
   // out of bounds is not possible due to type limit on index.
   return page_p[index];
+}
+
+// ----------------------------------------------------------------------------
+// Mem::Ref Implementations
+// ----------------------------------------------------------------------------
+Mem::Ref::Ref(byte * bse, uint8 index) : base{bse}, disp{index} {}
+
+Mem::Ref::Ref(Mem::Bank::Page page, uint8 index) : base{page.byte_p}, disp{index} {}
+
+Mem::Ref::~Ref() {}
+
+inline auto& Mem::Ref::operator*() {
+  // Computer the return value from the base ptr and displacement
+  return base[disp];
 }
