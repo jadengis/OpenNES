@@ -34,7 +34,8 @@ namespace Mem {
           void set_name(uint8 nam);
 
           // Page element access
-          auto& operator[](const uint8 index);
+          byte&       operator[](const uint8 index);
+          const byte& operator[](const uint8 index) const;
 
         private:
           uint8 name;       // integer from 0 - 255
@@ -49,7 +50,8 @@ namespace Mem {
       void set_name(uint8 nam);
 
       // Page pointer access
-      auto& operator[](const uint8 index);
+      Page&       operator[](const uint8 index);
+      const Page& operator[](const uint8 index) const;
 
     private:
       uint8 name;    // integer from 0 - 255
@@ -68,7 +70,8 @@ namespace Mem {
       virtual ~Ref();
 
       // reference access
-      auto& operator*();
+      byte&       operator*();
+      const byte& operator*() const;
 
     private:
       byte * base;

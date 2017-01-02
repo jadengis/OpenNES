@@ -27,9 +27,14 @@ void Mem::Bank::Page::set_name(uint8 nam) {
   name = nam;
 }
 
-inline auto& Mem::Bank::Page::operator[](const uint8 index) {
+inline byte& Mem::Bank::Page::operator[](const uint8 index) {
   // fall back on the pointer index operator. Not array
   // out of bounds is not possible due to type limit on index.
+  return byte_p[index];
+}
+
+inline const byte& Mem::Bank::Page::operator[](const uint8 index) const{
+  // const version returns const reference to respect object constness
   return byte_p[index];
 }
 
@@ -56,9 +61,14 @@ void Mem::Bank::set_name(uint8 nam) {
   name = nam;
 }
 
-inline auto& Mem::Bank::operator[](const uint8 index) {
+inline Mem::Bank::Page& Mem::Bank::operator[](const uint8 index) {
   // fall back on the pointer index operator. Not array
   // out of bounds is not possible due to type limit on index.
+  return page_p[index];
+}
+
+inline const Mem::Bank::Page& Mem::Bank::operator[](const uint8 index) const {
+  // const version returns const reference to respect object constness
   return page_p[index];
 }
 
@@ -71,7 +81,12 @@ Mem::Ref::Ref(Mem::Bank::Page page, uint8 index) : base{page.byte_p}, disp{index
 
 Mem::Ref::~Ref() {}
 
-inline auto& Mem::Ref::operator*() {
-  // Computer the return value from the base ptr and displacement
+inline byte& Mem::Ref::operator*() {
+  // Compute the return value from the base ptr and displacement
+  return base[disp];
+}
+
+inline const byte& Mem::Ref::operator*() const {
+  // const version returns const reference to respect object constness
   return base[disp];
 }
