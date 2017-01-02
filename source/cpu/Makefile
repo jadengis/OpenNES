@@ -5,7 +5,7 @@
 ###############################################################################
 
 ifndef TOP
-	TOP := ..
+	TOP := ../..
 endif
 # For including common make utility commands
 # include $(TOP)/Makefile.util
@@ -14,7 +14,7 @@ endif
 # Flags and Definitions
 ###############################################################################
 
-INCLUDE = ../include
+INCLUDE = $(TOP)/include $(TOP)/include/cpu
 LIB =
 
 AR  		= /usr/bin/ar
