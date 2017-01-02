@@ -36,15 +36,30 @@ class MOS_6502 : public CPU<byte> {
       byte  AC; // Accumulator
       byte  X;  // X Register
       byte  Y;  // Y Register
-      struct {
-        byte N; // Negative
-        byte V; // Overflow
-        byte B; // Break
-        byte D; // Decimal (use BCD for arithmetic)
-        byte I; // Interrupt (IRQ diable)
-        byte Z; // Zero
-        byte C; // Carry
-      }      SR; // Status Register [NV-BDIZC]
+      union {
+        byte SR; // Status Register [NV-BDIZC]
+        struct {
+#ifdef __BIG_ENDIAN__
+          byte N       : 1; // Negative
+          byte V       : 1; // Overflow
+          byte ignored : 1; // Ignored
+          byte B       : 1; // Break
+          byte D       : 1; // Decimal (use BCD for arithmetic)
+          byte I       : 1; // Interrupt (IRQ diable)
+          byte Z       : 1; // Zero
+          byte C       : 1; // Carry
+#else // Little Endian
+          byte C       : 1; // Carry
+          byte Z       : 1; // Zero
+          byte I       : 1; // Interrupt (IRQ diable)
+          byte D       : 1; // Decimal (use BCD for arithmetic)
+          byte B       : 1; // Break
+          byte ignored : 1; // Ignored
+          byte V       : 1; // Overflow
+          byte N       : 1; // Negative
+#endif // __BIG_ENDIAN__
+        }      SRF; // Status Register Fields
+      }
       byte  SP; // Stack Pointer
     } reg;
 
