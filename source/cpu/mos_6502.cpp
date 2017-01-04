@@ -14,6 +14,9 @@
 #include "mos_6502.h"
 
 // Static Functions
+static inline uint8  Check_Zero(uint8 x);
+static inline uint8  Check_Not_Zero(uint8 x);
+static inline uint8  Check_Nth_Bit(uint8 x, Bit_Position N);
 static inline uint16 Compute_Branch(uint16 PC, uint8 M);
 
 using namespace com;
@@ -28,7 +31,7 @@ void MOS_6502::LDA(const Mem::Ref M) {
   reg.AC = *M;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
   return;
 }
 
@@ -38,7 +41,7 @@ void MOS_6502::LDX(const Mem::Ref M) {
   reg.X = *M;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
   return;
 }
 
@@ -48,7 +51,7 @@ void MOS_6502::LDY(const Mem::Ref M) {
   reg.Y = *M;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
   return;
 }
 
@@ -88,8 +91,7 @@ void MOS_6502::ADC(const Mem::Ref M) {
   // Set the carry bit ( 1 if the add overflowed, 0 otherwise
   reg.SRF.C = (reg.AC < AC);
   // Set overflow flag
-  reg.SRF.V = (static_cast<int8> (AC) < static_cast<int8>(reg.AC)) | 
-              (static_cast<int8> (reg)
+  reg.SRF.V = Check_Integer_Overflow(
   // Set zero flag
   reg.SRF.Z = Check_Zero(reg.AC);
   // TODO: Set the N, V.
@@ -106,7 +108,7 @@ void MOS_6502::INC(Mem::Ref M) {
   *M = *M + 1;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(*M);
-  reg.SRF.N = Check_Nth_Bit(*M, BIT7);
+  reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
   return;
 }
 
@@ -115,7 +117,7 @@ void MOS_6502::INX() {
   reg.X = reg.X + 1;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.X);
-  reg.SRF.N = Check_Nth_Bit(reg.X, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.X, Bit_Position::bit7);
   return;
 }
 
@@ -124,7 +126,7 @@ void MOS_6502::INY() {
   reg.Y = reg.Y + 1;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.Y);
-  reg.SRF.N = Check_Nth_Bit(reg.Y, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.Y, Bit_Position::bit7);
   return;
 }
 
@@ -133,7 +135,7 @@ void MOS_6502::DEC(Mem::Ref M) {
   *M = *M - 1;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(*M);
-  reg.SRF.N = Check_Nth_Bit(*M, BIT7);
+  reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
   return;
 }
 
@@ -142,7 +144,7 @@ void MOS_6502::DEX() {
   reg.X = reg.X - 1;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.X);
-  reg.SRF.N = Check_Nth_Bit(reg.X, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.X, Bit_Position::bit7);
   return;
 }
 
@@ -151,7 +153,7 @@ void MOS_6502::DEY() {
   reg.Y = reg.Y - 1;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.Y);
-  reg.SRF.N = Check_Nth_Bit(reg.Y, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.Y, Bit_Position::bit7);
   return;
 }
 
@@ -166,7 +168,7 @@ void MOS_6502::AND(const Mem::Ref M) {
   reg.AC = reg.AC & *M;
   // Set the remaining status register flags
   reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
   return;
 }
 
@@ -176,7 +178,7 @@ void MOS_6502::EOR(const Mem::Ref M) {
   reg.AC = reg.AC ^ *M;
   // Set the remaining status register flags
   reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
   return;
 }
 
@@ -186,7 +188,7 @@ void MOS_6502::ORA(const Mem::Ref M) {
   reg.AC = reg.AC | *M;
   // Set the remaining status register flags
   reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
   return;
 }
 
@@ -311,8 +313,8 @@ void MOS_6502::BIT(const Mem::Ref M) {
   // zero flag is set to result of A AND M
   reg.SRF.Z = Check_Not_Zero(reg.AC & *M);
   // M7 -> N, M6 -> V
-  reg.SRF.N = Check_Nth_Bit(*M, BIT7);
-  reg.SRF.V = Check_Nth_Bit(*M, BIT6);
+  reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
+  reg.SRF.V = Check_Nth_Bit(*M, Bit_Position::bit6);
   return;
 }
 
@@ -324,12 +326,12 @@ void MOS_6502::BIT(const Mem::Ref M) {
 // Shift Left One Bit (Memory or Accumulator)
 void MOS_6502::ASL(Mem::Ref M) {
   // Set the carry bit.
-  reg.SRF.C = Check_Nth_Bit(*M, BIT7);
+  reg.SRF.C = Check_Nth_Bit(*M, Bit_Position::bit7);
   // Shift memory (or accumulator) left 1
   *M = *M << 1;
   // Set the remaining SR flags
   reg.SRF.Z = Check_Zero(*M);
-  reg.SRF.N = Check_Nth_Bit(*M, BIT7);
+  reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
   return;
 }
 
@@ -344,7 +346,7 @@ void MOS_6502::TAX() {
   reg.X = reg.AC;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.X);
-  reg.SRF.N = Check_Nth_Bit(reg.X, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.X, Bit_Position::bit7);
   return;
 }
 
@@ -354,7 +356,7 @@ void MOS_6502::TAY() {
   reg.Y = reg.AC;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.Y);
-  reg.SRF.N = Check_Nth_Bit(reg.Y, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.Y, Bit_Position::bit7);
   return;
 }
 
@@ -364,7 +366,7 @@ void MOS_6502::TXA() {
   reg.AC = reg.X;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
   return;
 }
 
@@ -374,7 +376,7 @@ void MOS_6502::TAY() {
   reg.AC = reg.Y;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
   return;
 }
 
@@ -389,7 +391,7 @@ void MOS_6502::TSX() {
   reg.X = reg.SP;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.X);
-  reg.SRF.N = Check_Nth_Bit(reg.X, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.X, Bit_Position::bit7);
   return;
 }
 
@@ -399,7 +401,7 @@ void MOS_6502::TXS() {
   reg.SP = reg.X;
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.SP);
-  reg.SRF.N = Check_Nth_Bit(reg.SP, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.SP, Bit_Position::bit7);
   return;
 }
 
@@ -420,7 +422,7 @@ void MOS_6502::PLA() {
   reg.AC = stack.pull();
   // set appropriate status register flags
   reg.SRF.Z = Check_Zero(reg.SP);
-  reg.SRF.N = Check_Nth_Bit(reg.SP, BIT7);
+  reg.SRF.N = Check_Nth_Bit(reg.SP, Bit_Position::bit7);
   return;
 }
 
@@ -541,6 +543,21 @@ void MOS_6502::BRK() {
 // ----------------------------------------------------------------------------
 // Static Function Definitions
 // ----------------------------------------------------------------------------
+
+static inline uint8 Check_Zero(uint8 x) {
+  // Returns 1 if 0, 0 otherwise
+  return x == 0;
+}
+
+static inline uint8 Check_Not_Zero(uint8 x) {
+  // Returns 1 if not 0, 0 otherwise
+  return x != 0;
+}
+
+static inline uint8 Check_Nth_Bit(uint8 x, Bit_Position N) {
+  // Returns 1 if Nth bit 1, 0 otherwise. Bit indexing it 0 - 7.
+  return (x >> static_cast<uint8>(N)) & ONE_BIT_MASK;
+}
 
 static inline uint16 Compute_Branch(uint16 PC, uint8 M) {
   // Cast the memory M to a signed int and then add to the program counter to

@@ -22,35 +22,21 @@ using byte   = unsigned char;
 //       constant values used throughout the source.
 namespace com {
   // Common enum type for referencing bit positions
-  enum bits {
-    BIT0 = 0,
-    BIT1,
-    BIT2,
-    BIT3,
-    BIT4,
-    BIT5,
-    BIT6,
-    BIT7
+  enum class Bit_Position {
+    bit0 = 0,
+    bit1 = 1,
+    bit2 = 2,
+    bit3 = 3,
+    bit4 = 4,
+    bit5 = 5,
+    bit6 = 6,
+    bit7 = 7
   };
 
   // Common constant definitions
   static const uint64 MAX_SIZE_BYTE = 256;
+  static const int64  MAX_INT8      = 127;
+  static const int64  MIN_INT8      = -128;
   static const uint8  ONE_BIT_MASK  = 0x01;
-
-  // Common helper functions
-  static inline uint8 Check_Zero(uint8 x) {
-    // Returns 1 if 0, 0 otherwise
-    return x == 0;
-  }
-
-  static inline uint8 Check_Not_Zero(uint8 x) {
-    // Returns 1 if not 0, 0 otherwise
-    return x != 0;
-  }
-
-  static inline uint8 Check_Nth_Bit(uint8 x, uint8 N) {
-    // Returns 1 if Nth bit 1, 0 otherwise. Bit indexing it 0 - 7.
-    return (x >> N) & ONE_BIT_MASK;
-  }
 }
 #endif // COMMON_H //:~
