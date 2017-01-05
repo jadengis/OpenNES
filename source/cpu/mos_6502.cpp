@@ -15,9 +15,8 @@
 
 // Static Functions
 static inline byte   Check_Zero(byte x);
-static inline byte  Check_Not_Zero(byte x);
-static inline byte   Check_Signed_Byte_Overflow(arch_native AC);
-static inline byte  Check_Nth_Bit(byte x, Bit_Position N);
+static inline byte   Check_Not_Zero(byte x);
+static inline byte   Check_Nth_Bit(byte x, Bit_Position N);
 static inline uint16 Compute_Branch(uint16 PC, byte M);
 
 using namespace com;
@@ -82,45 +81,41 @@ void MOS_6502::STY(Mem::Ref M) {
 // Arithmetic Instructions
 // ----------------------------------------------------------------------------
 
-// Add Memory to Accumulator with Carry
-void MOS_6502::ADC(const Mem::Ref M) {
+// Add with Carry / Subtract with Borrow Implementation
+// Notice that SBC(x) == ADC(~x) since a - x - !c == a + ~x + 1 - !c == a + ~x + c
+void MOS_6502::ADC_Impl(const byte M) {
   // To add 2 bytes with carry, we will first widen to native width, perform
   // the add with carry, and mask out the relevant bits.
-
   // ADD the memory M to Accumulator + carry if set
-  arch_native AC = static_cast<arch_native>(reg.AC) + static_cast<arch_native>(*M) + 
-                   static_cast<arch_native>(reg.SRF.C);
+  uint_native sum = static_cast<uint_native>(reg.AC) + static_cast<uint_native>(M) + 
+                   static_cast<uint_native>(reg.SRF.C);
   // Mask out the accumulator value
-  reg.AC = static_cast<byte>(AC & BYTE_MASK);
-  // Set the carry bit ( 1 if the add overflowed, 0 otherwise
-  reg.SRF.C = static_cast<byte>(AC & 0x100);
+  reg.AC = static_cast<byte>(sum & BYTE_MASK);
+  // Set the carry bit ( 1 if the add overflowed, 0 otherwise)
+  // Mask out carry bit (bit 8)
+  reg.SRF.C = static_cast<byte>((sum >> 8) & ONE_BIT_MASK);
   // Set the Negative flag
-  reg.SRF.N = static_cast<byte>(AC & 0x80);
+  // Mask out sign bit (bit 7)
+  reg.SRF.N = static_cast<byte>((sum >> 7) & ONE_BIT_MASK);
   // Set overflow flag
-  reg.SRF.V = Check_Signed_Byte_Overflow(AC);
+  // Notice that a signed overflow will only have occured if the two addends have the
+  // same sign, but the sum has a different sign (implying a rollover). Below is a clever
+  // bit manipulation to check this fact.
+  reg.SRF.V = ((~(reg.AC ^ M) & (reg.AC ^ sum)) >> 7) & ONE_BIT_MASK;
   // Set zero flag
   reg.SRF.Z = Check_Zero(reg.AC);
   return;
 }
 
+// Add Memory to Accumulator with Carry
+void MOS_6502::ADC(const Mem::Ref M) {
+  ADC_Impl(*M);
+  return;
+}
+
 // Subtract Memory from Accumulator with Borrow
 void MOS_6502::SBC(const Mem::Ref M) {
-  // To subtract 2 bytes with borrow, we will first widen to native width, perform
-  // the subtract with borrow, and mask out the relevant bits.
-
-  // ADD the memory M to Accumulator + carry if set
-  arch_native AC = static_cast<arch_native>(reg.AC) - static_cast<arch_native>(*M) - 
-                   static_cast<arch_native>(reg.SRF.C);
-  // Mask out the accumulator value
-  reg.AC = static_cast<byte>(AC & BYTE_MASK);
-  // Set the carry bit ( 1 if the add overflowed, 0 otherwise
-  reg.SRF.C = static_cast<byte>(AC & 0x100);
-  // Set the Negative flag
-  reg.SRF.N = static_cast<byte>(AC & 0x80);
-  // Set overflow flag
-  reg.SRF.V = Check_Signed_Byte_Overflow(AC);
-  // Set zero flag
-  reg.SRF.Z = Check_Zero(reg.AC);
+  ADC_Impl(~(*M));
   return;
 }
 
@@ -578,11 +573,6 @@ static inline byte Check_Zero(byte x) {
 static inline byte Check_Not_Zero(byte x) {
   // Returns 1 if not 0, 0 otherwise
   return x != 0;
-}
-
-static inline byte Check_Signed_Byte_Overflow(arch_native AC) {
-  // TODO: Fix this 64 bit arch assumption
-  return (static_cast<int64>(AC) < MIN_INT8 || static_cast<int64>(AC) > MAX_INT8);
 }
 
 static inline byte Check_Nth_Bit(byte x, Bit_Position N) {

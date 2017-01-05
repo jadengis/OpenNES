@@ -17,8 +17,77 @@ class MOS_6502 : public CPU<byte> {
   public:
     void  execute(byte opcode) override;
     byte fetch() override;
-    
+
+  protected:
+    // Address mode functions
+    Mem::Ref accumulator();
+    Mem::Ref absolute();
+    Mem::Ref absolute_X();
+    Mem::Ref absolute_Y();
+    Mem::Ref immediate();
+    Mem::Ref indirect();
+
+    // CPU Instruction emulation functions
+    void ADC(const Mem::Ref);
+    void AND(const Mem::Ref);
+    void ASL(Mem::Ref);
+    void BCC(const Mem::Ref);
+    void BCS(const Mem::Ref);
+    void BEQ(const Mem::Ref);
+    void BIT(const Mem::Ref);
+    void BMI(const Mem::Ref);
+    void BNE(const Mem::Ref);
+    void BPL(const Mem::Ref);
+    void BRK();
+    void BVC(const Mem::Ref);
+    void BVS(const Mem::Ref);
+    void CLC();
+    void CLD();
+    void CLI();
+    void CLV();
+    void CMP(const Mem::Ref);
+    void CPX(const Mem::Ref);
+    void CPY(const Mem::Ref);
+    void DEC(Mem::Ref);
+    void DEX();
+    void DEY();
+    void EOR(const Mem::Ref);
+    void INC(Mem::Ref);
+    void INX();
+    void INY();
+    void JMP(const Mem::Ref);
+    void JSR(const Mem::Ref);
+    void LDA(const Mem::Ref);
+    void LDX(const Mem::Ref);
+    void LDY(const Mem::Ref);
+    void LSR(Mem::Ref);
+    void NOP();
+    void ORA(const Mem::Ref);
+    void PHA();
+    void PHP();
+    void PLA();
+    void PLP();
+    void ROL(Mem::Ref);
+    void ROR(Mem::Ref);
+    void RTI();
+    void RTS();
+    void SBC(const Mem::Ref);
+    void SEC();
+    void SED();
+    void SEI();
+    void STA(Mem::Ref);
+    void STX(Mem::Ref);
+    void STY(Mem::Ref);
+    void TAX();
+    void TAY();
+    void TSX();
+    void TXA();
+    void TXS();
+    void TYA();
+
   private:
+    void ADC_Impl(const byte);
+
     // Register structure
     struct {
       union {
@@ -65,72 +134,6 @@ class MOS_6502 : public CPU<byte> {
 
     // Interal stack interface object
     //    CPU_Array_Stack<byte> stack;
-
-    // Address mode functions
-    Mem::Ref accumulator();
-    Mem::Ref absolute();
-    Mem::Ref absolute_X();
-    Mem::Ref absolute_Y();
-    Mem::Ref immediate();
-    Mem::Ref indirect();
-
-    // CPU Instruction emulation functions
-    void ADC(Mem::Ref);
-    void AND(Mem::Ref);
-    void ASL(Mem::Ref);
-    void BCC(Mem::Ref);
-    void BCS(Mem::Ref);
-    void BCC(Mem::Ref);
-    void BEQ(Mem::Ref);
-    void BIT(Mem::Ref);
-    void BMI(Mem::Ref);
-    void BNE(Mem::Ref);
-    void BPL(Mem::Ref);
-    void BRK(Mem::Ref);
-    void BVC(Mem::Ref);
-    void BVS(Mem::Ref);
-    void CLC(Mem::Ref);
-    void CLD(Mem::Ref);
-    void CLI(Mem::Ref);
-    void CLV(Mem::Ref);
-    void CMP(Mem::Ref);
-    void CPX(Mem::Ref);
-    void CPY(Mem::Ref);
-    void DEC(Mem::Ref);
-    void DEX(Mem::Ref);
-    void EOR(Mem::Ref);
-    void INC(Mem::Ref);
-    void INX(Mem::Ref);
-    void INY(Mem::Ref);
-    void JMP(Mem::Ref);
-    void JSR(Mem::Ref);
-    void LDA(Mem::Ref);
-    void LDX(Mem::Ref);
-    void LDY(Mem::Ref);
-    void LSR(Mem::Ref);
-    void NOP(Mem::Ref);
-    void ORA(Mem::Ref);
-    void PHA(Mem::Ref);
-    void PHP(Mem::Ref);
-    void PLA(Mem::Ref);
-    void PLP(Mem::Ref);
-    void ROL(Mem::Ref);
-    void ROR(Mem::Ref);
-    void RTI(Mem::Ref);
-    void RTS(Mem::Ref);
-    void SBC(Mem::Ref);
-    void SEC(Mem::Ref);
-    void SED(Mem::Ref);
-    void SEI(Mem::Ref);
-    void STA(Mem::Ref);
-    void STX(Mem::Ref);
-    void STY(Mem::Ref);
-    void TAX(Mem::Ref);
-    void TAY(Mem::Ref);
-    void TSX(Mem::Ref);
-    void TXA(Mem::Ref);
-    void TXS(Mem::Ref);
-    void TYA(Mem::Ref);
 };
 
 // SR Flag Masks
