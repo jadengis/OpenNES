@@ -14,10 +14,11 @@
 #include "mos_6502.h"
 
 // Static Functions
-static inline uint8  Check_Zero(uint8 x);
-static inline uint8  Check_Not_Zero(uint8 x);
-static inline uint8  Check_Nth_Bit(uint8 x, Bit_Position N);
-static inline uint16 Compute_Branch(uint16 PC, uint8 M);
+static inline byte   Check_Zero(byte x);
+static inline byte  Check_Not_Zero(byte x);
+static inline byte   Check_Signed_Byte_Overflow(arch_native AC);
+static inline byte  Check_Nth_Bit(byte x, Bit_Position N);
+static inline uint16 Compute_Branch(uint16 PC, byte M);
 
 using namespace com;
 
@@ -83,18 +84,43 @@ void MOS_6502::STY(Mem::Ref M) {
 
 // Add Memory to Accumulator with Carry
 void MOS_6502::ADC(const Mem::Ref M) {
-  // Store the original value of the accumulator
-  byte AC = reg.AC; 
+  // To add 2 bytes with carry, we will first widen to native width, perform
+  // the add with carry, and mask out the relevant bits.
 
   // ADD the memory M to Accumulator + carry if set
-  reg.AC = AC + *M + reg.SRF.C;
+  arch_native AC = static_cast<arch_native>(reg.AC) + static_cast<arch_native>(*M) + 
+                   static_cast<arch_native>(reg.SRF.C);
+  // Mask out the accumulator value
+  reg.AC = static_cast<byte>(AC & BYTE_MASK);
   // Set the carry bit ( 1 if the add overflowed, 0 otherwise
-  reg.SRF.C = (reg.AC < AC);
+  reg.SRF.C = static_cast<byte>(AC & 0x100);
+  // Set the Negative flag
+  reg.SRF.N = static_cast<byte>(AC & 0x80);
   // Set overflow flag
-  reg.SRF.V = Check_Integer_Overflow(
+  reg.SRF.V = Check_Signed_Byte_Overflow(AC);
   // Set zero flag
   reg.SRF.Z = Check_Zero(reg.AC);
-  // TODO: Set the N, V.
+  return;
+}
+
+// Subtract Memory from Accumulator with Borrow
+void MOS_6502::SBC(const Mem::Ref M) {
+  // To subtract 2 bytes with borrow, we will first widen to native width, perform
+  // the subtract with borrow, and mask out the relevant bits.
+
+  // ADD the memory M to Accumulator + carry if set
+  arch_native AC = static_cast<arch_native>(reg.AC) - static_cast<arch_native>(*M) - 
+                   static_cast<arch_native>(reg.SRF.C);
+  // Mask out the accumulator value
+  reg.AC = static_cast<byte>(AC & BYTE_MASK);
+  // Set the carry bit ( 1 if the add overflowed, 0 otherwise
+  reg.SRF.C = static_cast<byte>(AC & 0x100);
+  // Set the Negative flag
+  reg.SRF.N = static_cast<byte>(AC & 0x80);
+  // Set overflow flag
+  reg.SRF.V = Check_Signed_Byte_Overflow(AC);
+  // Set zero flag
+  reg.SRF.Z = Check_Zero(reg.AC);
   return;
 }
 
@@ -544,22 +570,27 @@ void MOS_6502::BRK() {
 // Static Function Definitions
 // ----------------------------------------------------------------------------
 
-static inline uint8 Check_Zero(uint8 x) {
+static inline byte Check_Zero(byte x) {
   // Returns 1 if 0, 0 otherwise
   return x == 0;
 }
 
-static inline uint8 Check_Not_Zero(uint8 x) {
+static inline byte Check_Not_Zero(byte x) {
   // Returns 1 if not 0, 0 otherwise
   return x != 0;
 }
 
-static inline uint8 Check_Nth_Bit(uint8 x, Bit_Position N) {
-  // Returns 1 if Nth bit 1, 0 otherwise. Bit indexing it 0 - 7.
-  return (x >> static_cast<uint8>(N)) & ONE_BIT_MASK;
+static inline byte Check_Signed_Byte_Overflow(arch_native AC) {
+  // TODO: Fix this 64 bit arch assumption
+  return (static_cast<int64>(AC) < MIN_INT8 || static_cast<int64>(AC) > MAX_INT8);
 }
 
-static inline uint16 Compute_Branch(uint16 PC, uint8 M) {
+static inline byte Check_Nth_Bit(byte x, Bit_Position N) {
+  // Returns 1 if Nth bit 1, 0 otherwise. Bit indexing it 0 - 7.
+  return (x >> static_cast<byte>(N)) & ONE_BIT_MASK;
+}
+
+static inline uint16 Compute_Branch(uint16 PC, byte M) {
   // Cast the memory M to a signed int and then add to the program counter to
   // compute the branch.
   return PC + static_cast<int8>(M);

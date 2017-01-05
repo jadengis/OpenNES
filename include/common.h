@@ -13,10 +13,18 @@ using uint16 = unsigned short;
 using uint32 = unsigned int;
 using uint64 = unsigned long long;
 
+// use the native 'arch_native' to represent the native architecture
+// of the emulating machine. Default to 64 bit architecture.
+#if ARCH == 32
+using arch_native = uint32
+#else
+using arch_native = uint64
+#endif
+
 // use the type 'byte' when referring to arbitary bytes of data, i.e
 // data that is not necessarily signed int or unsigned int; the only
 // important thing is that it is 8 bits.
-using byte   = unsigned char;
+using byte = unsigned char;
 
 // com - The common namespace for all common helper functions and
 //       constant values used throughout the source.
@@ -37,6 +45,9 @@ namespace com {
   static const uint64 MAX_SIZE_BYTE = 256;
   static const int64  MAX_INT8      = 127;
   static const int64  MIN_INT8      = -128;
-  static const uint8  ONE_BIT_MASK  = 0x01;
+
+  // Useful masks
+  static const arch_native BYTE_MASK     = 0xFF;
+  static const byte       ONE_BIT_MASK  = 0x01;
 }
 #endif // COMMON_H //:~
