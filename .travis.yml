@@ -1,9 +1,7 @@
-sudo: required
-
 langauge: cpp
-
-compiler:
-  - clang
+sudo: required
+dist: trusty
+compiler: clang
 
 # Build Steps
 script:
