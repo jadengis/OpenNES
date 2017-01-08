@@ -72,6 +72,9 @@ namespace Mem {
       // reference access
       byte&       operator*();
       const byte& operator*() const;
+      const Ref& operator+(uint8 x) const {
+        return Ref(base, disp + x);
+      }
 
     private:
       byte * base;

@@ -13,13 +13,13 @@
 #include "mem.h"
 #include "mos_6502.h"
 
+using namespace com;
+
 // Static Functions
 static inline byte   Check_Zero(byte x);
 static inline byte   Check_Not_Zero(byte x);
 static inline byte   Check_Nth_Bit(byte x, Bit_Position N);
 static inline uint16 Compute_Branch(uint16 PC, byte M);
-
-using namespace com;
 
 // ----------------------------------------------------------------------------
 // Load and Store Instructons
@@ -374,7 +374,7 @@ void MOS_6502::ROL(Mem::Ref M) {
   // Set the carry bit
   reg.SRF.C = Check_Nth_Bit(*M, Bit_Position::bit7);
   // Shift left by 1 and OR in old carry
-  *M = (M* << 1) & old_C;
+  *M = (*M << 1) & old_C;
   // Set the remaining SR flags
   reg.SRF.Z = Check_Zero(*M);
   reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
@@ -386,9 +386,9 @@ void MOS_6502::ROR(Mem::Ref M) {
   // Store old carry
   byte old_C = reg.SRF.C;
   // Set the carry bit
-  reg.SRF.C = Check_Nth_Bit(*M, Bit_Position::bit);
+  reg.SRF.C = Check_Nth_Bit(*M, Bit_Position::bit0);
   // Shift right by 1 and OR in old carry
-  *M = (M* >> 1) & (old_C << 7);
+  *M = (*M >> 1) & (old_C << 7);
   // Set the remaining SR flags
   reg.SRF.Z = Check_Zero(*M);
   reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
@@ -431,7 +431,7 @@ void MOS_6502::TXA() {
 }
 
 // Transfer Index Y to Accumulator
-void MOS_6502::TAY() {
+void MOS_6502::TYA() {
   // Copy Y register to accumulator
   reg.AC = reg.Y;
   // set appropriate status register flags
@@ -516,9 +516,9 @@ void MOS_6502::JSR(const Mem::Ref M) {
 void MOS_6502::RTI() {
   // pull status register from stack, followed by program counter
   // BRK implementation pushes PCH then PCL then SR so must pull in reverse order
-  reg.SR  = stack.pull()
-  reg.PCL = stack.pull()
-  reg.PCH = stack.pull()
+  reg.SR  = stack.pull();
+  reg.PCL = stack.pull();
+  reg.PCH = stack.pull();
   return;
 }
 

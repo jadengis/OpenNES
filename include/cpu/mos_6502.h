@@ -128,12 +128,20 @@ class MOS_6502 : public CPU<byte> {
           byte N       : 1; // Negative
 #endif // __BIG_ENDIAN__
         }      SRF; // Status Register Fields
-      }
+      };
       byte  SP; // Stack Pointer
     } reg;
 
-    // Interal stack interface object
-    //    CPU_Array_Stack<byte> stack;
+    // Processor stack
+    class Stack {
+      public:
+        inline void push(byte);
+        inline byte pull();
+        Stack();
+        ~Stack();
+      private:
+        byte* data;
+    } stack;
 };
 
 // SR Flag Masks
