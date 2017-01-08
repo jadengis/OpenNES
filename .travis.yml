@@ -7,4 +7,4 @@ compiler:
 
 # Build Steps
 script:
-  - make --evironments-override -C ${TRAVIS_BUILD_DIR}
+  - make --evironment-override -C ${TRAVIS_BUILD_DIR}
