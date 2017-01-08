@@ -1,0 +1,10 @@
+sudo: required
+
+langauge: cpp
+
+compiler:
+  - clang
+
+# Build Steps
+script:
+  - make -C ${TRAVIS_BUILD_DIR}
