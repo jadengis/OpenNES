@@ -9,15 +9,15 @@
 # Definitions
 ################################################################################
 
-AR  		= /usr/bin/ar
-RM  		= /bin/rm -f
-CC  		= /usr/bin/clang
-CXX 		= /usr/bin/clang++
+AR  		?= /usr/bin/ar
+RM  		?= /bin/rm -f
+CC  		?= /usr/bin/clang
+CXX 		?= /usr/bin/clang++
 
 INCLUDE := $(TOP)/include
 
-CFLAGS := -std=c++14 -I $(INCLUDE) -c
-LFLAGS :=
+CFLAGS  := -std=c++14 -I $(INCLUDE) -c
+LFLAGS  :=
 
 ################################################################################
 # Utilities
