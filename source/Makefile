@@ -1,11 +1,11 @@
 ###############################################################################
 # OsNES osnes/source/Makefile
 #
-# This Makefile will be used to build all C++ files in the source directory.
+# This Makefile will build all the OsNES subsystems (CPU, PPU, Memory etc.)
 ###############################################################################
 
 ifndef TOP
-	TOP := ../..
+	TOP := ..
 endif
 # For including common make utility commands
 include $(TOP)/Makefile.util
@@ -14,27 +14,17 @@ include $(TOP)/Makefile.util
 # Flags and Definitions
 ###############################################################################
 
-INCLUDE = $(TOP)/include/cpu
-LIB =
-
-CFLAGS  := $(CFLAGS) -I $(INCLUDE)
-LDFLAGS := 
-
-###############################################################################
-# Source
-###############################################################################
-.KEEP_STATE:
-SOURCES = mem.cpp mos_6502.cpp
-OBJECTS = $(SOURCES:.cpp=.o)
+SUBSYSTEMS := $(sort $(dir $(wildcard */ )))
 
 ###############################################################################
 # Targets
 ###############################################################################
+.PHONY: all $(SUBSYSTEMS)
 
-all: $(OBJECTS)
+all: $(SUBSYSTEMS)
+	
+$(SUBSYSTEMS):
+	$(MAKE) -C $@
 
-%.o : %.cpp
-	$(CXX) $(CFLAGS) $< -o $@
-
-clean:
-	$(RM) *.o *.d
+clean: 
+	$(foreach subsystem, $(SUBSYSTEMS), $(MAKE) -C $(subsystem) clean;)

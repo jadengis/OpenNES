@@ -356,6 +356,45 @@ void MOS_6502::ASL(Mem::Ref M) {
   return;
 }
 
+// Shift One Bit Right (Memory or Accumulator)
+void MOS_6502::LSR(Mem::Ref M) {
+  // Set the carry bit
+  reg.SRF.C = Check_Nth_Bit(*M, Bit_Position::bit0);
+  // Shift memory (or accumulator) left 1
+  *M = *M >> 1;
+  // Set the remaining SR flags
+  reg.SRF.Z = Check_Zero(*M);
+  return;
+}
+
+// Rotate One Bit Left (Memory or Accumulator)
+void MOS_6502::ROL(Mem::Ref M) {
+  // Store old carry
+  byte old_C = reg.SRF.C;
+  // Set the carry bit
+  reg.SRF.C = Check_Nth_Bit(*M, Bit_Position::bit7);
+  // Shift left by 1 and OR in old carry
+  *M = (M* << 1) & old_C;
+  // Set the remaining SR flags
+  reg.SRF.Z = Check_Zero(*M);
+  reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
+  return;
+}
+
+// Rotate One Bit Right (Memory or Accumulator)
+void MOS_6502::ROR(Mem::Ref M) {
+  // Store old carry
+  byte old_C = reg.SRF.C;
+  // Set the carry bit
+  reg.SRF.C = Check_Nth_Bit(*M, Bit_Position::bit);
+  // Shift right by 1 and OR in old carry
+  *M = (M* >> 1) & (old_C << 7);
+  // Set the remaining SR flags
+  reg.SRF.Z = Check_Zero(*M);
+  reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
+  return;
+}
+
 
 // ----------------------------------------------------------------------------
 // Transfer Instructions
