@@ -10,8 +10,8 @@
 // Authors: 
 // John Dengis
 //
-#include "mem.h"
-#include "mos_6502.h"
+#include "cpu/mem.h"
+#include "cpu/mos_6502.h"
 
 using namespace com;
 

@@ -14,10 +14,9 @@ include $(TOP)/Makefile.util
 # Flags and Definitions
 ###############################################################################
 
-INCLUDE = $(TOP)/include/cpu
 LIB =
 
-CFLAGS  := $(CFLAGS) -I $(INCLUDE)
+CFLAGS  := $(CFLAGS)
 LDFLAGS := 
 
 ###############################################################################

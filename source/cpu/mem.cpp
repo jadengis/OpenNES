@@ -5,7 +5,7 @@
 // Authors: 
 // John Dengis
 //
-#include "mem.h"
+#include "cpu/mem.h"
 using namespace com;
 
 // ----------------------------------------------------------------------------
