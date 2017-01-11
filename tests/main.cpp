@@ -2,7 +2,10 @@
 //
 //                           The OsNES Project
 //
-// This file is distributed under GPL v2. See LICENSE.md for details.
+// This file is distributed under GPL v2. See LICENSE.md for details. The Catch
+// framework IN NOT distributed under LICENSE.md.
+// The Catch framework is included in this project under the Boost License
+// simply as a matter of convenience.
 //
 //===----------------------------------------------------------------------===//
 ///
