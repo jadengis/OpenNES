@@ -1,79 +1,81 @@
-// OsNES Project | source/cpu_6502.cpp
-// Description:
-// Functional specification for the MOS 6502 CPU.
-// Any and all details related to the overall operation ofthe 6502 should
-// be implemented here.
+//===-- source/cpu/mos6502.cpp - Mos6502 Cpu Class Impl ---------*- C++ -*-===//
 //
-// Instruction implementation details are based on the descriptions here:
-// http://e-tradition.net/bytes/6502/6502_instruction_set.html
+//                           The OsNES Project
 //
-// Authors: 
-// John Dengis
+// This file is distributed under GPL v2. See LICENSE.md for details.
 //
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// Functional specification for the MOS 6502 CPU.
+/// Any and all details related to the overall operation ofthe 6502 should
+/// be implemented here.
+///
+/// Instruction implementation details are based on the descriptions here:
+/// http://e-tradition.net/bytes/6502/6502_instruction_set.html
+///
+//===----------------------------------------------------------------------===//
 #include "cpu/mem.h"
-#include "cpu/mos_6502.h"
+#include "cpu/mos6502.h"
 
 using namespace com;
 
 // Static Functions
 static inline byte   Check_Zero(byte x);
 static inline byte   Check_Not_Zero(byte x);
-static inline byte   Check_Nth_Bit(byte x, Bit_Position N);
-static inline uint16 Compute_Branch(uint16 PC, byte M);
+static inline byte   Check_Nth_Bit(byte x, Bit_Position n);
+static inline uint16 Compute_Branch(uint16 pc, byte m);
 
 // ----------------------------------------------------------------------------
 // Load and Store Instructons
 // ----------------------------------------------------------------------------
 
 // Load Accumulator with Memory
-void MOS_6502::LDA(const Mem::Ref M) {
+void Mos6502::LDA(const byte opd) {
   // Copy memory to accumulator
-  reg.AC = *M;
+  reg.ac = opd;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.ac);
+  reg.srf.n = Check_Nth_Bit(reg.ac, Bit_Position::bit7);
   return;
 }
 
 // Load Index X with Memory
-void MOS_6502::LDX(const Mem::Ref M) {
+void Mos6502::LDX(const byte opd) {
   // Copy memory to X register
-  reg.X = *M;
+  reg.x = opd;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.x);
+  reg.srf.n = Check_Nth_Bit(reg.x, Bit_Position::bit7);
   return;
 }
 
 // Load Index Y with Memory
-void MOS_6502::LDY(const Mem::Ref M) {
+void Mos6502::LDY(const byte opd) {
   // Copy memory to Y register
-  reg.Y = *M;
+  reg.y = opd;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.y);
+  reg.srf.n = Check_Nth_Bit(reg.y, Bit_Position::bit7);
   return;
 }
 
 // Store Accumulator in Memory
-void MOS_6502::STA(Mem::Ref M) {
-  // Copy accumulator to memory location M
-  *M = reg.AC;
-  return;
+byte Mos6502::STA() {
+  // return accumulator value to be stored
+  return reg.ac;
 }
 
 // Store Index X in Memory
-void MOS_6502::STX(Mem::Ref M) {
-  // Copy X register to memory location M
-  *M = reg.X;
-  return;
+byte Mos6502::STX() {
+  // return X register value to be stored
+  return reg.x;
 }
 
 // Store Index Y in Memory
-void MOS_6502::STY(Mem::Ref M) {
-  // Copy Y register to memory location M
-  *M = reg.Y;
-  return;
+byte Mos6502::STY() {
+  // return Y register value to be stored
+  return reg.y;
 }
 
 
@@ -81,41 +83,35 @@ void MOS_6502::STY(Mem::Ref M) {
 // Arithmetic Instructions
 // ----------------------------------------------------------------------------
 
-// Add with Carry / Subtract with Borrow Implementation
-// Notice that SBC(x) == ADC(~x) since a - x - !c == a + ~x + 1 - !c == a + ~x + c
-void MOS_6502::ADC_Impl(const byte M) {
+// Add Memory to Accumulator with Carry
+void Mos6502::ADC(const byte opd) {
   // To add 2 bytes with carry, we will first widen to native width, perform
   // the add with carry, and mask out the relevant bits.
-  // ADD the memory M to Accumulator + carry if set
-  uint_native sum = static_cast<uint_native>(reg.AC) + static_cast<uint_native>(M) + 
-                   static_cast<uint_native>(reg.SRF.C);
+  // ADD the memory to Accumulator + carry if set
+  uint_native sum = static_cast<uint_native>(reg.ac) + static_cast<uint_native>(opd) + 
+                   static_cast<uint_native>(reg.srf.c);
   // Mask out the accumulator value
-  reg.AC = static_cast<byte>(sum & BYTE_MASK);
+  reg.ac = static_cast<byte>(sum & BYTE_MASK);
   // Set the carry bit ( 1 if the add overflowed, 0 otherwise)
   // Mask out carry bit (bit 8)
-  reg.SRF.C = static_cast<byte>((sum >> 8) & ONE_BIT_MASK);
+  reg.srf.c = static_cast<byte>((sum >> 8) & ONE_BIT_MASK);
   // Set the Negative flag
   // Mask out sign bit (bit 7)
-  reg.SRF.N = static_cast<byte>((sum >> 7) & ONE_BIT_MASK);
+  reg.srf.n = static_cast<byte>((sum >> 7) & ONE_BIT_MASK);
   // Set overflow flag
   // Notice that a signed overflow will only have occured if the two addends have the
   // same sign, but the sum has a different sign (implying a rollover). Below is a clever
   // bit manipulation to check this fact.
-  reg.SRF.V = ((~(reg.AC ^ M) & (reg.AC ^ sum)) >> 7) & ONE_BIT_MASK;
+  reg.srf.v = ((~(reg.ac ^ opd) & (reg.ac ^ sum)) >> 7) & ONE_BIT_MASK;
   // Set zero flag
-  reg.SRF.Z = Check_Zero(reg.AC);
-  return;
-}
-
-// Add Memory to Accumulator with Carry
-void MOS_6502::ADC(const Mem::Ref M) {
-  ADC_Impl(*M);
+  reg.srf.z = Check_Zero(reg.ac);
   return;
 }
 
 // Subtract Memory from Accumulator with Borrow
-void MOS_6502::SBC(const Mem::Ref M) {
-  ADC_Impl(~(*M));
+// Notice that SBC(x) == ADC(~x) since a - x - !c == a + ~x + 1 - !c == a + ~x + c
+void Mos6502::SBC(const byte opd) {
+  ADC(~opd);
   return;
 }
 
@@ -125,56 +121,56 @@ void MOS_6502::SBC(const Mem::Ref M) {
 // ----------------------------------------------------------------------------
 
 // Increment Memory by One
-void MOS_6502::INC(Mem::Ref M) {
-  *M = *M + 1;
+byte Mos6502::INC(byte opd) {
+  opd = opd + 1;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(*M);
-  reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
-  return;
+  reg.srf.z = Check_Zero(opd);
+  reg.srf.n = Check_Nth_Bit(opd, Bit_Position::bit7);
+  return opd;
 }
 
 // Increment Index X by One
-void MOS_6502::INX() {
-  reg.X = reg.X + 1;
+void Mos6502::INX() {
+  reg.x = reg.x + 1;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.X);
-  reg.SRF.N = Check_Nth_Bit(reg.X, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.x);
+  reg.srf.n = Check_Nth_Bit(reg.x, Bit_Position::bit7);
   return;
 }
 
 // Increment Memory by One
-void MOS_6502::INY() {
-  reg.Y = reg.Y + 1;
+void Mos6502::INY() {
+  reg.y = reg.y + 1;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.Y);
-  reg.SRF.N = Check_Nth_Bit(reg.Y, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.y);
+  reg.srf.n = Check_Nth_Bit(reg.y, Bit_Position::bit7);
   return;
 }
 
 // Decrement Memory by One
-void MOS_6502::DEC(Mem::Ref M) {
-  *M = *M - 1;
+byte Mos6502::DEC(byte opd) {
+  opd = opd - 1;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(*M);
-  reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
-  return;
+  reg.srf.z = Check_Zero(opd);
+  reg.srf.n = Check_Nth_Bit(opd, Bit_Position::bit7);
+  return opd;
 }
 
 // Decrement Index X by One
-void MOS_6502::DEX() {
-  reg.X = reg.X - 1;
+void Mos6502::DEX() {
+  reg.x = reg.x - 1;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.X);
-  reg.SRF.N = Check_Nth_Bit(reg.X, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.x);
+  reg.srf.n = Check_Nth_Bit(reg.x, Bit_Position::bit7);
   return;
 }
 
 // Decrement Memory by One
-void MOS_6502::DEY() {
-  reg.Y = reg.Y - 1;
+void Mos6502::DEY() {
+  reg.y = reg.y - 1;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.Y);
-  reg.SRF.N = Check_Nth_Bit(reg.Y, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.y);
+  reg.srf.n = Check_Nth_Bit(reg.y, Bit_Position::bit7);
   return;
 }
 
@@ -184,32 +180,32 @@ void MOS_6502::DEY() {
 // ----------------------------------------------------------------------------
 
 // AND Memory with Accumulator
-void MOS_6502::AND(const Mem::Ref M) {
+void Mos6502::AND(const byte opd) {
   // AND the memory M with the Accumulator
-  reg.AC = reg.AC & *M;
+  reg.ac = reg.ac & opd;
   // Set the remaining status register flags
-  reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.ac);
+  reg.srf.n = Check_Nth_Bit(reg.ac, Bit_Position::bit7);
   return;
 }
 
 // EOR Exclusive-OR Memory with Accumulator
-void MOS_6502::EOR(const Mem::Ref M) {
+void Mos6502::EOR(const byte opd) {
   // XOR the memory M with the Accumulator
-  reg.AC = reg.AC ^ *M;
+  reg.ac = reg.ac ^ opd;
   // Set the remaining status register flags
-  reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.ac);
+  reg.srf.n = Check_Nth_Bit(reg.ac, Bit_Position::bit7);
   return;
 }
 
 // OR Memory with Accumulator
-void MOS_6502::ORA(const Mem::Ref M) {
+void Mos6502::ORA(const byte opd) {
   // OR the memory M with the Accumulator
-  reg.AC = reg.AC | *M;
+  reg.ac = reg.ac | opd;
   // Set the remaining status register flags
-  reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.ac);
+  reg.srf.n = Check_Nth_Bit(reg.ac, Bit_Position::bit7);
   return;
 }
 
@@ -219,123 +215,121 @@ void MOS_6502::ORA(const Mem::Ref M) {
 // ----------------------------------------------------------------------------
 
 // Jump to New Location
-void MOS_6502::JMP(const Mem::Ref M) {
-  // Grab the new PC bytes from memory location M.
-  // (PC+1) -> PCL
-  // (PC+2) -> PCH
-  // Note that after the opcode has been fetched PC is incremented, so by
-  // convention, we have PC+1 = M, PC+2 = M+1.
-  reg.PCL = *M;
-  reg.PCH = *(M+1);
+void Mos6502::JMP(const byte opd_lo, const byte opd_hi) {
+  // opd_lo is the low byte of the new PC and opd_hi is the high byte of new PC
+  // (PC+1 = opd_lo) -> PCL
+  // (PC+2 = opd_hi) -> PCH
+  reg.pcl = opd_lo;
+  reg.pch = opd_hi;
   return;
 }
 
 // Branch on Carry Clear
-void MOS_6502::BCC(const Mem::Ref M) {
-  if(reg.SRF.C == 0) {
+void Mos6502::BCC(const byte opd) {
+  if(reg.srf.c == 0) {
     // Condition true, branch to PC + offset
-    reg.PC = Compute_Branch(reg.PC,*M);
+    reg.pc = Compute_Branch(reg.pc, opd);
   }
   return;
 }
 
 // Branch of Carry Set
-void MOS_6502::BCS(const Mem::Ref M) {
-  if(reg.SRF.C == 1) {
+void Mos6502::BCS(const byte opd) {
+  if(reg.srf.c == 1) {
     // Condition true, branch to PC + offset
-    reg.PC = Compute_Branch(reg.PC,*M);
+    reg.pc = Compute_Branch(reg.pc, opd);
   }
   return;
 }
 
 // Branch on Result Zero
-void MOS_6502::BEQ(const Mem::Ref M) {
-  if(reg.SRF.Z == 1) {
+void Mos6502::BEQ(const byte opd) {
+  if(reg.srf.z == 1) {
     // Condition true, branch to PC + offset
-    reg.PC = Compute_Branch(reg.PC,*M);
+    reg.pc = Compute_Branch(reg.pc,opd);
   }
   return;
 }
 
 // Branch on Result Minus
-void MOS_6502::BMI(const Mem::Ref M) {
-  if(reg.SRF.N == 1) {
+void Mos6502::BMI(const byte opd) {
+  if(reg.srf.n == 1) {
     // Condition true, branch to PC + offset
-    reg.PC = Compute_Branch(reg.PC,*M);
+    reg.pc = Compute_Branch(reg.pc,opd);
   }
   return;
 }
 
 // Branch on Result not Zero
-void MOS_6502::BNE(const Mem::Ref M) {
-  if(reg.SRF.Z == 0) {
+void Mos6502::BNE(const byte opd) {
+  if(reg.srf.z == 0) {
     // Condition true, branch to PC + offset
-    reg.PC = Compute_Branch(reg.PC,*M);
+    reg.pc = Compute_Branch(reg.pc,opd);
   }
   return;
 }
 
 // Branch on Result Plus
-void MOS_6502::BPL(const Mem::Ref M) {
-  if(reg.SRF.N == 0) {
+void Mos6502::BPL(const byte opd) {
+  if(reg.srf.n == 0) {
     // Condition true, branch to PC + offset
-    reg.PC = Compute_Branch(reg.PC,*M);
+    reg.pc = Compute_Branch(reg.pc,opd);
   }
   return;
 }
 
 // Branch on Overflow Clear
-void MOS_6502::BVC(const Mem::Ref M) {
-  if(reg.SRF.V == 0) {
+void Mos6502::BVC(const byte opd) {
+  if(reg.srf.v == 0) {
     // Condition true, branch to PC + offset
-    reg.PC = Compute_Branch(reg.PC,*M);
+    reg.pc = Compute_Branch(reg.pc,opd);
   }
   return;
 }
 
 // Branch on Overflow Set
-void MOS_6502::BVS(const Mem::Ref M) {
-  if(reg.SRF.V == 1) {
+void Mos6502::BVS(const byte opd) {
+  if(reg.srf.v == 1) {
     // Condition true, branch to PC + offset
-    reg.PC = Compute_Branch(reg.PC,*M);
+    reg.pc = Compute_Branch(reg.pc,opd);
   }
   return;
 }
 
 // Compare Memory with Accumulator
-void MOS_6502::CMP(const Mem::Ref M) {
+void Mos6502::CMP(const byte opd) {
   // set appropriate bit flags
-  reg.SRF.N = reg.AC <  *M; 
-  reg.SRF.Z = reg.AC == *M; 
-  reg.SRF.C = reg.AC >= *M; 
+  reg.srf.n = reg.ac < opd; 
+  reg.srf.z = reg.ac == opd; 
+  reg.srf.c = reg.ac >= opd; 
   return;
 }
 
 // Compare Memory and Index X
-void MOS_6502::CPX(const Mem::Ref M) {
+void Mos6502::CPX(const byte opd) {
   // set appropriate bit flags
-  reg.SRF.N = reg.X <  *M; 
-  reg.SRF.Z = reg.X == *M; 
-  reg.SRF.C = reg.X >= *M; 
+  reg.srf.n = reg.x < opd; 
+  reg.srf.z = reg.x == opd; 
+  reg.srf.c = reg.x >= opd; 
   return;
 }
 
 // Compare Memory and Index Y
-void MOS_6502::CPY(const Mem::Ref M) {
+void Mos6502::CPY(const byte opd) {
   // set appropriate bit flags
-  reg.SRF.N = reg.Y <  *M; 
-  reg.SRF.Z = reg.Y == *M; 
-  reg.SRF.C = reg.Y >= *M; 
+  reg.srf.n = reg.y < opd; 
+  reg.srf.z = reg.y == opd; 
+  reg.srf.c = reg.y >= opd; 
   return;
 }
 
 // Test Bits in Memory with Accumulator
-void MOS_6502::BIT(const Mem::Ref M) {
+void Mos6502::BIT(const byte opd) {
   // zero flag is set to result of A AND M
-  reg.SRF.Z = Check_Not_Zero(reg.AC & *M);
+  reg.srf.z = Check_Not_Zero(reg.ac & opd);
   // M7 -> N, M6 -> V
-  reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
-  reg.SRF.V = Check_Nth_Bit(*M, Bit_Position::bit6);
+  reg.srf.n = Check_Nth_Bit(opd, Bit_Position::bit7);
+  reg.srf.v = Check_Nth_Bit(opd, Bit_Position::bit6);
   return;
 }
 
@@ -345,54 +339,54 @@ void MOS_6502::BIT(const Mem::Ref M) {
 // ----------------------------------------------------------------------------
 
 // Shift Left One Bit (Memory or Accumulator)
-void MOS_6502::ASL(Mem::Ref M) {
+byte Mos6502::ASL(byte opd) {
   // Set the carry bit.
-  reg.SRF.C = Check_Nth_Bit(*M, Bit_Position::bit7);
+  reg.srf.c = Check_Nth_Bit(opd, Bit_Position::bit7);
   // Shift memory (or accumulator) left 1
-  *M = *M << 1;
+  opd = opd << 1;
   // Set the remaining SR flags
-  reg.SRF.Z = Check_Zero(*M);
-  reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
-  return;
+  reg.srf.z = Check_Zero(opd);
+  reg.srf.n = Check_Nth_Bit(opd, Bit_Position::bit7);
+  return opd;
 }
 
 // Shift One Bit Right (Memory or Accumulator)
-void MOS_6502::LSR(Mem::Ref M) {
+byte Mos6502::LSR(byte opd) {
   // Set the carry bit
-  reg.SRF.C = Check_Nth_Bit(*M, Bit_Position::bit0);
+  reg.srf.c = Check_Nth_Bit(opd, Bit_Position::bit0);
   // Shift memory (or accumulator) left 1
-  *M = *M >> 1;
+  opd = opd >> 1;
   // Set the remaining SR flags
-  reg.SRF.Z = Check_Zero(*M);
-  return;
+  reg.srf.z = Check_Zero(opd);
+  return opd;
 }
 
 // Rotate One Bit Left (Memory or Accumulator)
-void MOS_6502::ROL(Mem::Ref M) {
+byte Mos6502::ROL(byte opd) {
   // Store old carry
-  byte old_C = reg.SRF.C;
+  byte old_c = reg.srf.c;
   // Set the carry bit
-  reg.SRF.C = Check_Nth_Bit(*M, Bit_Position::bit7);
+  reg.srf.c = Check_Nth_Bit(opd, Bit_Position::bit7);
   // Shift left by 1 and OR in old carry
-  *M = (*M << 1) & old_C;
+  opd = (opd << 1) & old_c;
   // Set the remaining SR flags
-  reg.SRF.Z = Check_Zero(*M);
-  reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
-  return;
+  reg.srf.z = Check_Zero(opd);
+  reg.srf.n = Check_Nth_Bit(opd, Bit_Position::bit7);
+  return opd;
 }
 
 // Rotate One Bit Right (Memory or Accumulator)
-void MOS_6502::ROR(Mem::Ref M) {
+byte Mos6502::ROR(byte opd) {
   // Store old carry
-  byte old_C = reg.SRF.C;
+  byte old_c = reg.srf.c;
   // Set the carry bit
-  reg.SRF.C = Check_Nth_Bit(*M, Bit_Position::bit0);
+  reg.srf.c = Check_Nth_Bit(opd, Bit_Position::bit0);
   // Shift right by 1 and OR in old carry
-  *M = (*M >> 1) & (old_C << 7);
+  opd = (opd >> 1) & (old_c << 7);
   // Set the remaining SR flags
-  reg.SRF.Z = Check_Zero(*M);
-  reg.SRF.N = Check_Nth_Bit(*M, Bit_Position::bit7);
-  return;
+  reg.srf.z = Check_Zero(opd);
+  reg.srf.n = Check_Nth_Bit(opd, Bit_Position::bit7);
+  return opd;
 }
 
 
@@ -401,42 +395,42 @@ void MOS_6502::ROR(Mem::Ref M) {
 // ----------------------------------------------------------------------------
 
 // Transfer Accumulator to Index X
-void MOS_6502::TAX() {
+void Mos6502::TAX() {
   // Copy accumulator to X register
-  reg.X = reg.AC;
+  reg.x = reg.ac;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.X);
-  reg.SRF.N = Check_Nth_Bit(reg.X, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.x);
+  reg.srf.n = Check_Nth_Bit(reg.x, Bit_Position::bit7);
   return;
 }
 
 // Transfer Accumulator to Index Y
-void MOS_6502::TAY() {
+void Mos6502::TAY() {
   // Copy accumulator to Y register
-  reg.Y = reg.AC;
+  reg.y = reg.ac;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.Y);
-  reg.SRF.N = Check_Nth_Bit(reg.Y, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.y);
+  reg.srf.n = Check_Nth_Bit(reg.y, Bit_Position::bit7);
   return;
 }
 
 // Transfer Index X to Accumulator
-void MOS_6502::TXA() {
+void Mos6502::TXA() {
   // Copy X register to accumulator
-  reg.AC = reg.X;
+  reg.ac = reg.x;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.ac);
+  reg.srf.n = Check_Nth_Bit(reg.ac, Bit_Position::bit7);
   return;
 }
 
 // Transfer Index Y to Accumulator
-void MOS_6502::TYA() {
+void Mos6502::TYA() {
   // Copy Y register to accumulator
-  reg.AC = reg.Y;
+  reg.ac = reg.y;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.AC);
-  reg.SRF.N = Check_Nth_Bit(reg.AC, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.ac);
+  reg.srf.n = Check_Nth_Bit(reg.ac, Bit_Position::bit7);
   return;
 }
 
@@ -446,49 +440,49 @@ void MOS_6502::TYA() {
 // ----------------------------------------------------------------------------
 
 // Transfer Stack Pointer to Index X
-void MOS_6502::TSX() {
+void Mos6502::TSX() {
   // Copy Stack Pointer to X register
-  reg.X = reg.SP;
+  reg.x = reg.sp;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.X);
-  reg.SRF.N = Check_Nth_Bit(reg.X, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.x);
+  reg.srf.n = Check_Nth_Bit(reg.x, Bit_Position::bit7);
   return;
 }
 
 // Transfer Index X to Stack Pointer
-void MOS_6502::TXS() {
+void Mos6502::TXS() {
   // Copy X register to stack pointer
-  reg.SP = reg.X;
+  reg.sp = reg.x;
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.SP);
-  reg.SRF.N = Check_Nth_Bit(reg.SP, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.sp);
+  reg.srf.n = Check_Nth_Bit(reg.sp, Bit_Position::bit7);
   return;
 }
 
 // Push Accumulator on the Stack
-void MOS_6502::PHA() {
-  stack.push(reg.AC);
+void Mos6502::PHA() {
+  stack.Push(reg.ac);
   return;
 }
 
 // Push Processor Status on the Stack
-void MOS_6502::PHP() {
-  stack.push(reg.SR);
+void Mos6502::PHP() {
+  stack.Push(reg.sr);
   return;
 }
 
 // Pull Accumulator from Stack
-void MOS_6502::PLA() {
-  reg.AC = stack.pull();
+void Mos6502::PLA() {
+  reg.ac = stack.Pull();
   // set appropriate status register flags
-  reg.SRF.Z = Check_Zero(reg.SP);
-  reg.SRF.N = Check_Nth_Bit(reg.SP, Bit_Position::bit7);
+  reg.srf.z = Check_Zero(reg.sp);
+  reg.srf.n = Check_Nth_Bit(reg.sp, Bit_Position::bit7);
   return;
 }
 
 // Pull Processor Status from Stack
-void MOS_6502::PLP() {
-  reg.SR = stack.pull();
+void Mos6502::PLP() {
+  reg.sr = stack.Pull();
   return;
 }
   
@@ -498,37 +492,35 @@ void MOS_6502::PLP() {
 // ----------------------------------------------------------------------------
 
 // Jump to New Location Saving Return Address
-void MOS_6502::JSR(const Mem::Ref M) {
-  // Push the value PC+2 onto the stack then grab the new PC bytes from memory
-  // location M.
-  // (PC+1) -> PCL
-  // (PC+2) -> PCH
-  // Note that after the opcode has been fetched PC is incremented, so by
-  // convention, we have PC+1 = M, PC+2 = M+1.
-  reg.PC = reg.PC + 2;
-  stack.push(reg.PCH);
-  stack.push(reg.PCL);
-  reg.PCL = *M;
-  reg.PCH = *(M+1);
+void Mos6502::JSR(const byte opd_lo, const byte opd_hi) {
+  // Push the value PC+2 onto the stack then assigned the new PC bytes from
+  // opd_lo and opd_hi.
+  // opd_lo -> PCL
+  // opd_hi -> PCH
+  reg.pc = reg.pc + 2;
+  stack.Push(reg.pch);
+  stack.Push(reg.pcl);
+  reg.pcl = opd_lo;
+  reg.pch = opd_hi;
   return;
 }
 
-void MOS_6502::RTI() {
+void Mos6502::RTI() {
   // pull status register from stack, followed by program counter
   // BRK implementation pushes PCH then PCL then SR so must pull in reverse order
-  reg.SR  = stack.pull();
-  reg.PCL = stack.pull();
-  reg.PCH = stack.pull();
+  reg.sr  = stack.Pull();
+  reg.pcl = stack.Pull();
+  reg.pch = stack.Pull();
   return;
 }
 
 // Return from Subroutine
-void MOS_6502::RTS() {
+void Mos6502::RTS() {
   // pull program counter from the stack and increment to land on new instruction
   // JSR implementation pushes PCH then PCL so must pull PCL then PCH
-  reg.PCL = stack.pull();
-  reg.PCH = stack.pull();
-  reg.PC  = reg.PC + 1;
+  reg.pcl = stack.Pull();
+  reg.pch = stack.Pull();
+  reg.pc  = reg.pc + 1;
   return;
 }
 
@@ -538,44 +530,44 @@ void MOS_6502::RTS() {
 // ----------------------------------------------------------------------------
 
 // Clear Carry Flag
-void MOS_6502::CLC() {
-  reg.SRF.C = 0;
+void Mos6502::CLC() {
+  reg.srf.c = 0;
   return;
 }
 
 // Clear Decimal Mode
-void MOS_6502::CLD() {
-  reg.SRF.D = 0;
+void Mos6502::CLD() {
+  reg.srf.d = 0;
   return;
 }
 
 // Clear Interrupt Disable Bit
-void MOS_6502::CLI() {
-  reg.SRF.I = 0;
+void Mos6502::CLI() {
+  reg.srf.i = 0;
   return;
 }
 
 // Clear Overflow Flag
-void MOS_6502::CLV() {
-  reg.SRF.V = 0;
+void Mos6502::CLV() {
+  reg.srf.v = 0;
   return;
 }
 
 // Set Carry Flag
-void MOS_6502::SEC() {
-  reg.SRF.C = 1;
+void Mos6502::SEC() {
+  reg.srf.c = 1;
   return;
 }
 
 // Set Decimal Flag
-void MOS_6502::SED() {
-  reg.SRF.D = 1;
+void Mos6502::SED() {
+  reg.srf.d = 1;
   return;
 }
 
 // Set Interrupt Disable Status
-void MOS_6502::SEI() {
-  reg.SRF.I = 1;
+void Mos6502::SEI() {
+  reg.srf.i = 1;
   return;
 }
 
@@ -585,17 +577,17 @@ void MOS_6502::SEI() {
 // ----------------------------------------------------------------------------
 
 // No Operation
-void MOS_6502::NOP() {
+void Mos6502::NOP() {
   return;
 }
 
 // Force Break
-void MOS_6502::BRK() {
+void Mos6502::BRK() {
   // interrupt, push PC+2, push SR
-  reg.SRF.I = 1; // Set interrupt flag
-  stack.push(reg.PCH);
-  stack.push(reg.PCL);
-  stack.push(reg.SR);
+  reg.srf.i = 1; // Set interrupt flag
+  stack.Push(reg.pch);
+  stack.Push(reg.pcl);
+  stack.Push(reg.sr);
   return;
 }
 
@@ -614,13 +606,13 @@ static inline byte Check_Not_Zero(byte x) {
   return x != 0;
 }
 
-static inline byte Check_Nth_Bit(byte x, Bit_Position N) {
+static inline byte Check_Nth_Bit(byte x, Bit_Position n) {
   // Returns 1 if Nth bit 1, 0 otherwise. Bit indexing it 0 - 7.
-  return (x >> static_cast<byte>(N)) & ONE_BIT_MASK;
+  return (x >> static_cast<byte>(n)) & ONE_BIT_MASK;
 }
 
-static inline uint16 Compute_Branch(uint16 PC, byte M) {
+static inline uint16 Compute_Branch(uint16 pc, byte m) {
   // Cast the memory M to a signed int and then add to the program counter to
   // compute the branch.
-  return PC + static_cast<int8>(M);
+  return pc + static_cast<int8>(m);
 }

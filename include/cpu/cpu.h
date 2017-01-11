@@ -1,13 +1,25 @@
-
+//===-- include/cpu/cpu.h - Cpu Base Class ----------------------*- C++ -*-===//
+//
+//                           The OsNES Project
+//
+// This file is distributed under GPL v2. See LICENSE.md for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// This file contains the Cpu template which serves as an abstract base class
+/// for all Cpu style classes in the OsNES project.
+///
+//===----------------------------------------------------------------------===//
 #include "common.h"
 
 #ifndef CPU_H
 #define CPU_H
-template<class Arch> class CPU {
+template<class Arch> class Cpu {
   public:
-    CPU() {};
-    virtual ~CPU() {};
-    virtual void execute(Arch opcode) = 0;
-    virtual Arch fetch() = 0;
+    Cpu() {};
+    virtual ~Cpu() {};
+    virtual void Execute(Arch opcode) = 0;
+    virtual Arch Fetch() = 0;
 };
 #endif // CPU_H //:~
