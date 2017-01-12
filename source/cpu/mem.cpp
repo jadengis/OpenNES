@@ -14,7 +14,7 @@ using namespace com;
 Mem::Bank::Page::Page(uint8 nam) : name{nam} {
   // A memory page consists of a 256 byte array of memory
   // so we will allocate that here.
-  byte_p = new byte[MAX_SIZE_BYTE];
+  byte_p = new byte[MAX_BYTE + 1];
 }
 
 Mem::Bank::Page::~Page() {
@@ -46,8 +46,8 @@ Mem::Bank::Bank(uint8 nam) : name{nam} {
   // allocate this memory and set appropriate names
   // TODO: I think this can be improved. Dont like this atm.
   // Ideally i can remove set name
-  page_p = new Page[MAX_SIZE_BYTE];
-  for(long i = 0; i < MAX_SIZE_BYTE; i++) {
+  page_p = new Page[MAX_BYTE + 1];
+  for(long i = 0; i < MAX_BYTE + 1; i++) {
     page_p[i].set_name(i);
   }
 }

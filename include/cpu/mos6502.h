@@ -135,14 +135,48 @@ class Mos6502 : public Cpu<byte> {
     } reg;
 
     // Processor stack
+    // LIFO, top down, 8 bit range, 0x0100 - 0x01FF
     class Stack {
       public:
-        inline void Push(byte);
-        inline byte Pull();
-        Stack();
-        ~Stack();
+        inline void Push(byte data) {
+          // store data at current location and decrement
+          *top = data;
+          top--;
+        }
+
+        inline byte Pull() {
+          // retrieve data, increment, and return data
+          auto temp = *top;
+          top++;
+          return temp;
+        }
+
+        Stack(std::unique_ptr<byte[]> mem_ptr = nullptr) {
+          // If we construct with a non-null unique_ptr, we will move ownership
+          // of that memory resource to this stack. Otherwise, we will make our
+          // own unique_ptr.
+          if(mem_ptr == nullptr) {
+            base = std::make_unique<byte[]>(com::MAX_BYTE + 1);
+          }
+          else {
+            base = std::move(mem_ptr);
+          }
+          // Mos6502 stack is top-down, so we must offset top from base.
+          top = base.get() + com::MAX_BYTE;
+        }
+
+        ~Stack() {
+          // Set both pointers to be nullptr for safety
+          top = nullptr;
+          base = nullptr;
+        }
       private:
-        byte* data;
+        // The stack consists of two pointers, one raw pointer, top,
+        // which will point to the 'top' of the stack, and one unique_ptr
+        // base, which will control the memory resource associated with this
+        // Stack.
+        byte* top;
+        std::unique_ptr<byte[]> base;
     } stack;
 };
 
