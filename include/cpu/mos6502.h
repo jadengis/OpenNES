@@ -30,6 +30,12 @@ class Mos6502 : public Cpu<byte> {
     Mem::Ref Absolute_Y();
     Mem::Ref Immediate();
     Mem::Ref Indirect();
+    Mem::Ref X_Indirect();
+    Mem::Ref Indirect_Y();
+    Mem::Ref Relative();
+    Mem::Ref Zeropage();
+    Mem::Ref Zeropage_X();
+    Mem::Ref Zeropage_Y();
 
     // CPU Instruction emulation functions
     void ADC(const byte);
@@ -90,6 +96,8 @@ class Mos6502 : public Cpu<byte> {
     void TYA();
 
   private:
+    // Cycles required to execute current instruction
+    int64 cycle_count;
     // Register structure
     struct {
       union {
