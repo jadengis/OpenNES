@@ -14,17 +14,16 @@ include $(TOP)/Makefile.util
 # Flags and Definitions
 ###############################################################################
 
-INCLUDE = $(TOP)/include/cpu
 LIB =
 
-CFLAGS  := $(CFLAGS) -I $(INCLUDE)
+CFLAGS  := $(CFLAGS)
 LDFLAGS := 
 
 ###############################################################################
 # Source
 ###############################################################################
 .KEEP_STATE:
-SOURCES = mem.cpp mos_6502.cpp
+SOURCES = $(wildcard *.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)
 
 ###############################################################################
