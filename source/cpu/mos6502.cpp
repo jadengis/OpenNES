@@ -432,8 +432,356 @@ void Mos6502::Execute(byte opcode) {
       break;
 
     // HI-NIBBLE == 0x90
+    case Op::BCC_REL:
+      cycle_count += 2;
+      ref = REL();
+      BCC(*ref);
+      break;
+    case Op::STA_IND_Y:
+      cycle_count += 6;
+      ref = IND_Y();
+      *ref = STA();
+      break;
+    case Op::STY_ZPG_X:
+      cycle_count += 4;
+      ref = ZPG_X();
+      *ref = STY();
+      break;
+    case Op::STA_ZPG_X:
+      cycle_count += 4;
+      ref = ZPG_X();
+      *ref = STA();
+      break;
+    case Op::STX_ZPG_Y:
+      cycle_count += 4;
+      ref = ZPG_Y();
+      *ref = STX();
+      break;
+    case Op::TYA_IMPL:
+      cycle_count += 2;
+      TYA();
+      break;
+    case Op::STA_ABS_Y:
+      cycle_count += 4;
+      ref = ABS_Y();
+      *ref = STA();
+      break;
+    case Op::TXS_IMPL:
+      cycle_count += 2;
+      TXS();
+      break;
+    case Op::STA_ABS_X:
+      cycle_count += 4;
+      ref = ABS_X();
+      *ref = STA();
+      break;
 
+    // HI-NIBBLE == 0xA0
+    case Op::LDY_IMMED:
+      cycle_count += 2;
+      ref = IMMED();
+      LDY(*ref);
+      break;
+    case Op::LDA_X_IND:
+      cycle_count += 6;
+      ref = X_IND();
+      LDA(*ref);
+      break;
+    case Op::LDX_IMMED:
+      cycle_count += 2;
+      ref = IMMED();
+      LDX(*ref);
+      break;
+    case Op::LDY_ZPG:
+      cycle_count += 3;
+      ref = ZPG();
+      LDY(*ref);
+      break;
+    case Op::LDA_ZPG:
+      cycle_count += 3;
+      ref = ZPG();
+      LDA(*ref);
+      break;
+    case Op::LDX_ZPG:
+      cycle_count += 3;
+      ref = ZPG();
+      LDX(*ref);
+      break;
+    case Op::TAY_IMPL:
+      cycle_count += 2;
+      TAY();
+      break;
+    case Op::LDA_IMMED:
+      cycle_count += 2;
+      ref = IMMED();
+      LDA(*ref);
+      break;
+    case Op::TAX_IMPL:
+      cycle_count += 2;
+      TAX();
+      break;
+    case Op::LDY_ABS:
+      cycle_count += 4;
+      ref = ABS();
+      LDY(*ref);
+      break;
+    case Op::LDA_ABS:
+      cycle_count += 4;
+      ref = ABS();
+      LDA(*ref);
+      break;
+    case Op::LDX_ABS:
+      cycle_count += 4;
+      ref = ABS();
+      LDX(*ref);
+      break;
 
+    // HI-NIBBLE == 0xB0
+    case Op::BCS_REL:
+      cycle_count += 2;
+      ref = REL();
+      BCS(*ref);
+      break;
+    case Op::LDA_IND_Y:
+      cycle_count += 5;
+      ref = IND_Y();
+      LDA(*ref);
+      break;
+    case Op::LDY_ZPG_X:
+      cycle_count += 4;
+      ref = ZPG_X();
+      LDY(*ref);
+      break;
+    case Op::LDA_ZPG_X:
+      cycle_count += 4;
+      ref = ZPG_X();
+      LDA(*ref);
+      break;
+    case Op::LDX_ZPG_Y:
+      cycle_count += 4;
+      ref = ZPG_Y();
+      LDX(*ref);
+      break;
+    case Op::CLV_IMPL:
+      cycle_count += 2;
+      CLV();
+      break;
+    case Op::LDA_ABS_Y:
+      cycle_count += 4;
+      ref = ABS_Y();
+      LDA(*ref);
+      break;
+    case Op::TSX_IMPL:
+      cycle_count += 2;
+      TSX();
+      break;
+    case Op::LDY_ABS_X:
+      cycle_count += 4;
+      ref = ABS_X();
+      LDY(*ref);
+      break;
+    case Op::LDA_ABS_X:
+      cycle_count += 4;
+      ref = ABS_X();
+      LDA(*ref);
+      break;
+    case Op::LDX_ABS_Y:
+      cycle_count += 4;
+      ref = ABS_Y();
+      LDX(*ref);
+      break;
+
+    // HI-NIBBLE == 0xC0
+    case Op::CPY_IMMED:
+      cycle_count += 2;
+      ref = IMMED();
+      CPY(*ref);
+      break;
+    case Op::CMP_X_IND:
+      cycle_count += 6;
+      ref = X_IND();
+      CMP(*ref);
+      break;
+    case Op::CPY_ZPG:
+      cycle_count += 3;
+      ref = ZPG();
+      CPY(*ref);
+      break;
+    case Op::CMP_ZPG:
+      cycle_count += 3;
+      ref = ZPG();
+      CMP(*ref);
+      break;
+    case Op::DEC_ZPG:
+      cycle_count += 5;
+      ref = ZPG();
+      DEC(*ref);
+      break;
+    case Op::INY_IMPL:
+      cycle_count += 2;
+      INY();
+      break;
+    case Op::CMP_IMMED:
+      cycle_count += 2;
+      ref = IMMED();
+      CMP(*ref);
+      break;
+    case Op::DEX_IMPL:
+      cycle_count += 2;
+      DEX();
+      break;
+    case Op::CPY_ABS:
+      cycle_count += 4;
+      ref = ABS();
+      CPY(*ref);
+      break;
+    case Op::CMP_ABS:
+      cycle_count += 4;
+      ref = ABS();
+      CMP(*ref);
+      break;
+    case Op::DEC_ABS:
+      cycle_count += 6;
+      ref = ABS();
+      DEC(*ref);
+      break;
+
+    // HI-NIBBLE == 0xD0
+    case Op::BNE_REL:
+      cycle_count += 2;
+      ref = REL();
+      BNE(*ref);
+      break;
+    case Op::CMP_IND_Y:
+      cycle_count += 5;
+      ref = IND_Y();
+      CPY(*ref);
+      break;
+    case Op::CMP_ZPG_X:
+      cycle_count += 4;
+      ref = ZPG_X();
+      CMP(*ref);
+      break;
+    case Op::DEC_ZPG_X:
+      cycle_count += 6;
+      ref = ZPG_X();
+      DEC(*ref);
+      break;
+    case Op::CLD_IMPL:
+      cycle_count += 2;
+      CLD();
+      break;
+    case Op::CMP_ABS_Y:
+      cycle_count += 4;
+      ref = ABS_Y();
+      CPY(*ref);
+      break;
+    case Op::CMP_ABS_X:
+      cycle_count += 4;
+      ref = ABS_X();
+      CMP(*ref);
+      break;
+    case Op::DEC_ABS_X:
+      cycle_count += 7;
+      ref = ABS_X();
+      DEC(*ref);
+      break;
+
+    // HI-NIBBLE == 0xE0
+    case Op::CPX_IMMED:
+      cycle_count += 2;
+      ref = IMMED();
+      CPX(*ref);
+      break;
+    case Op::SBC_X_IND:
+      cycle_count += 6;
+      ref = X_IND();
+      SBC(*ref);
+      break;
+    case Op::CPX_ZPG:
+      cycle_count += 3;
+      ref = ZPG();
+      CPX(*ref);
+      break;
+    case Op::SBC_ZPG:
+      cycle_count += 3;
+      ref = ZPG();
+      SBC(*ref);
+      break;
+    case Op::INC_ZPG:
+      cycle_count += 5;
+      ref = ZPG();
+      INC(*ref);
+      break;
+    case Op::INX_IMPL:
+      cycle_count += 2;
+      INX();
+      break;
+    case Op::SBC_IMMED:
+      cycle_count += 2;
+      ref = IMMED();
+      SBC(*ref);
+      break;
+    case Op::NOP_IMPL:
+      cycle_count += 2;
+      NOP();
+      break;
+    case Op::CPX_ABS:
+      cycle_count += 4;
+      ref = ABS();
+      CPX(*ref);
+      break;
+    case Op::SBC_ABS:
+      cycle_count += 4;
+      ref = ABS();
+      SBC(*ref);
+      break;
+    case Op::INC_ABS:
+      cycle_count += 6;
+      ref = ABS();
+      INC(*ref);
+      break;
+
+    // HI-NIBBLE == 0xF0
+    case Op::BEQ_REL:
+      cycle_count += 2;
+      ref = REL();
+      BEQ(*ref);
+      break;
+    case Op::SBC_IND_Y:
+      cycle_count += 5;
+      ref = IND_Y();
+      SBC(*ref);
+      break;
+    case Op::SBC_ZPG_X:
+      cycle_count += 4;
+      ref = ZPG_X();
+      SBC(*ref);
+      break;
+    case Op::INC_ZPG_X:
+      cycle_count += 6;
+      ref = ZPG_X();
+      INC(*ref);
+      break;
+    case Op::SED_IMPL:
+      cycle_count += 2;
+      SED();
+      break;
+    case Op::SBC_ABS_Y:
+      cycle_count += 4;
+      ref = ABS_Y();
+      SBC(*ref);
+      break;
+    case Op::SBC_ABS_X:
+      cycle_count += 4;
+      ref = ABS_X();
+      SBC(*ref);
+      break;
+    case Op::INC_ABS_X:
+      cycle_count += 7;
+      ref = ABS_X();
+      INC(*ref);
+      break;
     default:
       // opcode must be unrecognized, throw exception
       throw Exception::BadOpcode(opcode);
