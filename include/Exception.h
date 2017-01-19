@@ -4,7 +4,7 @@
 #include <exception>
 #include <string.h>
 #include <iostream>
-#include "common.h"
+#include "Common.h"
 
 // Base exception class for OsNES. This will grab the stack 
 // TODO: Get the Exception class to grab a stack trace at throw time.
