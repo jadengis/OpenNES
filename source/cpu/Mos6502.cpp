@@ -11,9 +11,9 @@
 /// Mos6502 class.
 ///
 //===----------------------------------------------------------------------===//
-#include "exception.h"
+#include "Exception.h"
 #include "cpu/mem.h"
-#include "cpu/mos6502.h"
+#include "cpu/Mos6502.h"
 
 void Mos6502::Execute(byte opcode) {
   // To execute a fetched opcode, first update the cycle count, use the indicated
