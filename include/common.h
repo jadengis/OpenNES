@@ -38,9 +38,9 @@ namespace com {
   };
 
   // Common constant definitions
-  static const uint64 MAX_SIZE_BYTE = 256;
-  static const int64  MAX_INT8      = 127;
-  static const int64  MIN_INT8      = -128;
+  static const uint64 MAX_BYTE = 256;
+  static const int64  MAX_INT8 = 127;
+  static const int64  MIN_INT8 = -128;
 
   // Useful masks
   static const uint_native BYTE_MASK     = 0xFF;

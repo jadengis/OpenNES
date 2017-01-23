@@ -23,13 +23,31 @@ class Mos6502 : public Cpu<byte> {
     byte Fetch() override;
 
   protected:
-    // Address mode functions
-    Mem::Ref Accumulator();
-    Mem::Ref Absolute();
-    Mem::Ref Absolute_X();
-    Mem::Ref Absolute_Y();
-    Mem::Ref Immediate();
-    Mem::Ref Indirect();
+    // Addressing mode functions
+    // Accumulator addressing
+    Mem::Ref ACC();
+    // Absolute addressing
+    Mem::Ref ABS();
+    // Absolute addressing X-indexed
+    Mem::Ref ABS_X();
+    // Absolute addressing Y-indexed
+    Mem::Ref ABS_Y();
+    // Immediate addressing
+    Mem::Ref IMMED();
+    // Indirect addressing
+    Mem::Ref IND();
+    // X-indexed indirect addressing
+    Mem::Ref X_IND();
+    // Indirect addressing Y-indexed
+    Mem::Ref IND_Y();
+    // Relative addressing
+    Mem::Ref REL();
+    // Zeropage addressing
+    Mem::Ref ZPG();
+    // Zeropage addressing X-indexed
+    Mem::Ref ZPG_X();
+    // Zeropage addressing Y-indexed
+    Mem::Ref ZPG_Y();
 
     // CPU Instruction emulation functions
     void ADC(const byte);
@@ -90,6 +108,8 @@ class Mos6502 : public Cpu<byte> {
     void TYA();
 
   private:
+    // Cycles required to execute current instruction
+    int64 cycle_count;
     // Register structure
     struct {
       union {
@@ -135,14 +155,48 @@ class Mos6502 : public Cpu<byte> {
     } reg;
 
     // Processor stack
+    // LIFO, top down, 8 bit range, 0x0100 - 0x01FF
     class Stack {
       public:
-        inline void Push(byte);
-        inline byte Pull();
-        Stack();
-        ~Stack();
+        inline void Push(byte data) {
+          // store data at current location and decrement
+          *top = data;
+          top--;
+        }
+
+        inline byte Pull() {
+          // retrieve data, increment, and return data
+          auto temp = *top;
+          top++;
+          return temp;
+        }
+
+        Stack(std::unique_ptr<byte[]> mem_ptr = nullptr) {
+          // If we construct with a non-null unique_ptr, we will move ownership
+          // of that memory resource to this stack. Otherwise, we will make our
+          // own unique_ptr.
+          if(mem_ptr == nullptr) {
+            base = std::make_unique<byte[]>(com::MAX_BYTE + 1);
+          }
+          else {
+            base = std::move(mem_ptr);
+          }
+          // Mos6502 stack is top-down, so we must offset top from base.
+          top = base.get() + com::MAX_BYTE;
+        }
+
+        ~Stack() {
+          // Set both pointers to be nullptr for safety
+          top = nullptr;
+          base = nullptr;
+        }
       private:
-        byte* data;
+        // The stack consists of two pointers, one raw pointer, top,
+        // which will point to the 'top' of the stack, and one unique_ptr
+        // base, which will control the memory resource associated with this
+        // Stack.
+        byte* top;
+        std::unique_ptr<byte[]> base;
     } stack;
 };
 
@@ -168,7 +222,7 @@ namespace Op {
   static const byte ASL_ZPG   = 0x06;
   static const byte PHP_IMPL  = 0x08;
   static const byte ORA_IMMED = 0x09;
-  static const byte ASL_A     = 0x0A;
+  static const byte ASL_ACC   = 0x0A;
   static const byte ORA_ABS   = 0x0D;
   static const byte ASL_ABS   = 0x0E;
 
@@ -190,7 +244,7 @@ namespace Op {
   static const byte ROL_ZPG   = 0x26;
   static const byte PLP_IMPL  = 0x28;
   static const byte AND_IMMED = 0x29;
-  static const byte ROL_A     = 0x2A;
+  static const byte ROL_ACC   = 0x2A;
   static const byte BIT_ABS   = 0x2C;
   static const byte AND_ABS   = 0x2D;
   static const byte ROL_ABS   = 0x2E;
@@ -212,7 +266,7 @@ namespace Op {
   static const byte LSR_ZPG   = 0x46;
   static const byte PHA_IMPL  = 0x48;
   static const byte EOR_IMMED = 0x49;
-  static const byte LSR_A     = 0x4A;
+  static const byte LSR_ACC   = 0x4A;
   static const byte JMP_ABS   = 0x4C;
   static const byte EOR_ABS   = 0x4D;
   static const byte LSR_ABS   = 0x4E;
@@ -234,8 +288,8 @@ namespace Op {
   static const byte ROR_ZPG   = 0x66;
   static const byte PLA_IMPL  = 0x68;
   static const byte ADC_IMMED = 0x69;
-  static const byte ROR_A     = 0x6A;
-  static const byte JMP_ind   = 0x6C;
+  static const byte ROR_ACC   = 0x6A;
+  static const byte JMP_IND   = 0x6C;
   static const byte ADC_ABS   = 0x6D;
   static const byte ROR_ABS   = 0x6E;
 
