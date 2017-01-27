@@ -13,8 +13,8 @@
 //===----------------------------------------------------------------------===//
 #ifndef MOS_6502_H
 #define MOS_6502_H
-#include "common.h"
-#include "cpu/cpu.h"
+#include "Common.h"
+#include "cpu/Cpu.h"
 #include "cpu/mem.h"
 
 class Mos6502 : public Cpu<byte> {
@@ -50,62 +50,62 @@ class Mos6502 : public Cpu<byte> {
     Mem::Ref ZPG_Y();
 
     // CPU Instruction emulation functions
-    void ADC(const byte);
-    void AND(const byte);
-    byte ASL(byte);
-    void BCC(const byte);
-    void BCS(const byte);
-    void BEQ(const byte);
-    void BIT(const byte);
-    void BMI(const byte);
-    void BNE(const byte);
-    void BPL(const byte);
-    void BRK();
-    void BVC(const byte);
-    void BVS(const byte);
-    void CLC();
-    void CLD();
-    void CLI();
-    void CLV();
-    void CMP(const byte);
-    void CPX(const byte);
-    void CPY(const byte);
-    byte DEC(byte);
-    void DEX();
-    void DEY();
-    void EOR(const byte);
-    byte INC(byte);
-    void INX();
-    void INY();
-    void JMP(const byte, const byte);
-    void JSR(const byte, const byte);
-    void LDA(const byte);
-    void LDX(const byte);
-    void LDY(const byte);
-    byte LSR(byte);
-    void NOP();
-    void ORA(const byte);
-    void PHA();
-    void PHP();
-    void PLA();
-    void PLP();
-    byte ROL(byte);
-    byte ROR(byte);
-    void RTI();
-    void RTS();
-    void SBC(const byte);
-    void SEC();
-    void SED();
-    void SEI();
-    byte STA();
-    byte STX();
-    byte STY();
-    void TAX();
-    void TAY();
-    void TSX();
-    void TXA();
-    void TXS();
-    void TYA();
+    inline void ADC(const byte);
+    inline void AND(const byte);
+    inline byte ASL(byte);
+    inline void BCC(const byte);
+    inline void BCS(const byte);
+    inline void BEQ(const byte);
+    inline void BIT(const byte);
+    inline void BMI(const byte);
+    inline void BNE(const byte);
+    inline void BPL(const byte);
+    inline void BRK();
+    inline void BVC(const byte);
+    inline void BVS(const byte);
+    inline void CLC();
+    inline void CLD();
+    inline void CLI();
+    inline void CLV();
+    inline void CMP(const byte);
+    inline void CPX(const byte);
+    inline void CPY(const byte);
+    inline byte DEC(byte);
+    inline void DEX();
+    inline void DEY();
+    inline void EOR(const byte);
+    inline byte INC(byte);
+    inline void INX();
+    inline void INY();
+    inline void JMP(const byte, const byte);
+    inline void JSR(const byte, const byte);
+    inline void LDA(const byte);
+    inline void LDX(const byte);
+    inline void LDY(const byte);
+    inline byte LSR(byte);
+    inline void NOP();
+    inline void ORA(const byte);
+    inline void PHA();
+    inline void PHP();
+    inline void PLA();
+    inline void PLP();
+    inline byte ROL(byte);
+    inline byte ROR(byte);
+    inline void RTI();
+    inline void RTS();
+    inline void SBC(const byte);
+    inline void SEC();
+    inline void SED();
+    inline void SEI();
+    inline byte STA();
+    inline byte STX();
+    inline byte STY();
+    inline void TAX();
+    inline void TAY();
+    inline void TSX();
+    inline void TXA();
+    inline void TXS();
+    inline void TYA();
 
   private:
     // Cycles required to execute current instruction
@@ -398,4 +398,8 @@ namespace Op {
   static const byte SBC_ABS_X = 0xFD;
   static const byte INC_ABS_X = 0xFE;
 }
+
+// Include inlinable definition of above functions
+#include "cpu/Mos6502_Inst.h"
+
 #endif // MOS_6502_H //:~
