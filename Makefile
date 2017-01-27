@@ -28,3 +28,6 @@ $(SOURCES):
 
 clean: 
 	$(foreach source, $(SOURCES), $(MAKE) -C $(source) clean;)
+
+ctags:
+	$(CTAGS) -R -f ./tags .
