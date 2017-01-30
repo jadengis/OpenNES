@@ -38,5 +38,21 @@ namespace Exception {
     private:
       const byte bad_opcode;
   };
+
+  class ReadOnlyMemory : public Base {
+    public:
+      // Construction Methods
+      ReadOnlyMemory(byte opcode) : bad_opcode(opcode) {}
+      ReadOnlyMemory(const ReadOnlyMemory&) noexcept;
+      ReadOnlyMemory& operator= (const ReadOnlyMemory&) noexcept;
+
+      // Destructors
+      ~ReadOnlyMemory() {}
+
+      //
+      std::string message() const noexcept;
+    private:
+      const byte bad_opcode;
+  };
 }
 #endif // EXCEPTION_H //:~
