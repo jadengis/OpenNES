@@ -34,6 +34,9 @@ namespace Memory {
       /// Read from references location
       inline const Wordsize Read() const;
 
+      /// Increment the reference index
+      inline const Reference& operator++();
+
     private:
       /// Index into the underlying memory bank
       std::size_t index;
@@ -52,12 +55,20 @@ Memory::Reference::Reference(std::shared_ptr<Bank> data_bank, std::size_t index)
 
 template<class Wordsize>
 void Memory::Reference::Write(Wordsize data) {
+  // write data to data_bank at index
   data_bank->Write(index, data);
 }
 
 template<class Wordsize>
 const Wordsize Memory::Reference::Read() const {
+  // read the word from data_bank at index
   return data_bank->Read(index);
+}
+
+const Reference& operator++() {
+  // increment the index, and return the this object
+  this->index += 1;
+  return *this;
 }
 
 #endif // MEMORY_REFERENCE_H //
