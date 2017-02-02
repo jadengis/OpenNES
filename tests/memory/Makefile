@@ -1,11 +1,11 @@
 ###############################################################################
-# OpenNES OpenNES/tests/Makefile
+# OpenNES tests/memory/Makefile
 #
-# This Makefile will build all the OsNES subsystems (CPU, PPU, Memory etc.)
+# This Makefile will be used to build all C++ files in the source/memory dir
 ###############################################################################
 
 ifndef TOP
-	TOP := ..
+	TOP := ../..
 endif
 # For including common make utility commands
 include $(TOP)/Makefile.util
@@ -14,24 +14,26 @@ include $(TOP)/Makefile.util
 # Flags and Definitions
 ###############################################################################
 
+LIB =
+
+CFLAGS  := $(CFLAGS)
+LDFLAGS := 
+
+###############################################################################
+# Source
+###############################################################################
 .KEEP_STATE:
 SOURCES = $(wildcard *.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)
-SUBSYSTEMS := $(sort $(dir $(wildcard */ )))
 
 ###############################################################################
 # Targets
 ###############################################################################
-.PHONY: all $(SUBSYSTEMS)
 
-all: $(OBJECTS) $(SUBSYSTEMS)
-	
+all: $(OBJECTS)
+
 %.o : %.cpp
 	$(CXX) $(CFLAGS) $< -o $@
 
-$(SUBSYSTEMS):
-	$(MAKE) -C $@
-
-clean: 
-	$(foreach subsystem, $(SUBSYSTEMS), $(MAKE) -C $(subsystem) clean;)
+clean:
 	$(RM) *.o *.d

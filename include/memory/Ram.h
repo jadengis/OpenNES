@@ -22,16 +22,20 @@ namespace Memory {
   template<class Wordsize> 
   class Ram : public Bank<Wordsize> {
     public:
-      Ram(std::size_t size) : Bank(size) {};
+      Ram(std::size_t size) : Bank<Wordsize>(size) {};
       virtual ~Ram() {};
+
+      /// Throw an error when trying to write
+      /// We cannot write to a Rom, so throw a ReadOnlyMemory Exception when
+      /// this method is called.
       inline void Write(std::size_t index, Wordsize data) override;
   };
 }
 
 template<class Wordsize>
-void Memory::Ram::Write(std::size_t index, Wordsize data) {
+void Memory::Ram<Wordsize>::Write(std::size_t index, Wordsize data) {
   // write the data at the given index
-  data_bank[index] = data;
+  this->data_bank[index] = data;
 }
 
 #endif // MEMORY_RAM_H //:~

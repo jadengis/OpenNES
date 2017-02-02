@@ -25,11 +25,19 @@ namespace Memory {
       inline Bank(std::size_t size);
       virtual ~Bank() {};
 
-      /// Write word at index
+      /// Write word \p data at \p index
+      /// \param index Index into the data_bank array
+      /// \param data Word to store at \p index
       virtual inline void Write(std::size_t index, Wordsize data) = 0;
 
-      /// Read word from index
+      /// Read word from \p index
+      /// \param index Index into the data_bank array
+      /// \returns word at the given index
       virtual inline const Wordsize Read(std::size_t index) const final;
+
+      /// Get the size of the memory
+      /// \returns the size of the memory
+      inline std::size_t Get_Size() const;
 
     protected:
       /// Size of the underlying array 
@@ -41,7 +49,7 @@ namespace Memory {
 }
 
 template<class Wordsize>
-Memory::Bank::Bank(std::size_t size) {
+Memory::Bank<Wordsize>::Bank(std::size_t size) {
   // Store the memory bank size
   this->size = size;
   // Initialize the memory bank
@@ -49,9 +57,14 @@ Memory::Bank::Bank(std::size_t size) {
 }
 
 template<class Wordsize>
-const Wordsize Memory::Bank::Read(std::size_t index) const {
+const Wordsize Memory::Bank<Wordsize>::Read(std::size_t index) const {
   // read the data from the given index
   return data_bank[index];
+}
+
+template<class Wordsize>
+std::size_t Memory::Bank<Wordsize>::Get_Size() const {
+  return size;
 }
 
 #endif // MEMORY_BANK_H //
