@@ -30,3 +30,6 @@
 
 # vim swp files
 *.swp
+
+# ctags tags file
+tags
