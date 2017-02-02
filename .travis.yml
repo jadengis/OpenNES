@@ -29,3 +29,6 @@ before_install:
 script:
   - echo $CXX
   - make --environment-overrides -C ${TRAVIS_BUILD_DIR}
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
