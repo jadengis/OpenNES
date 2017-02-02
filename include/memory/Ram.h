@@ -1,4 +1,4 @@
-//===-- include/memory/Rom.h - Rom Class ------------------------*- C++ -*-===//
+//===-- include/memory/Ram.h - Ram Class ------------------------*- C++ -*-===//
 //
 //                           The OsNES Project
 //
@@ -7,11 +7,11 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// This file defines the Memory::Rom class.
+/// This file defines the Memory::Ram class.
 ///
 //===----------------------------------------------------------------------===//
-#ifndef MEMORY_ROM_H
-#define MEMORY_ROM_H
+#ifndef MEMORY_RAM_H
+#define MEMORY_RAM_H
 
 #include "Common.h"
 #include "Exception.h"
@@ -20,18 +20,18 @@
 namespace Memory {
 
   template<class Wordsize> 
-  class Rom : public Bank<Wordsize> {
+  class Ram : public Bank<Wordsize> {
     public:
-      Rom(std::size_t size) : Bank(size) {};
-      virtual ~Rom() {};
+      Ram(std::size_t size) : Bank(size) {};
+      virtual ~Ram() {};
       inline void Write(std::size_t index, Wordsize data) override;
-      virtual void Load() delete;
   };
 }
 
-void Memory::Rom::Write(std::size_t index, Wordsize data) {
-  // Cannot write to a Rom, so throw a ReadOnlyMemory exception
-  throw Exception::ReadOnlyMemory();
+template<class Wordsize>
+void Memory::Ram::Write(std::size_t index, Wordsize data) {
+  // write the data at the given index
+  data_bank[index] = data;
 }
 
-#endif // MEMORY_ROM_H //:~
+#endif // MEMORY_RAM_H //:~
