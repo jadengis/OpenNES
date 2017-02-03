@@ -15,6 +15,7 @@ include $(TOP)/Makefile.util
 ###############################################################################
 
 SOURCES := source/
+TESTS   := tests/
 
 ###############################################################################
 # Targets
@@ -28,6 +29,9 @@ $(SOURCES):
 
 clean: 
 	$(foreach source, $(SOURCES), $(MAKE) -C $(source) clean;)
+
+test:
+	$(foreach test, $(TESTS), $(MAKE) -C $(test);)
 
 ctags:
 	$(CTAGS) -R -f ./tags .

@@ -25,7 +25,7 @@ namespace Memory {
   class Reference {
     public:
       // Constructor and Destructor
-      inline Reference(std::shared_ptr< Bank<Wordsize> > data_bank, std::size_t index);
+      inline Reference(std::shared_ptr<Bank<Wordsize>> data_bank, std::size_t index);
       virtual ~Reference() {};
 
       /// Write to referenced location
@@ -37,37 +37,49 @@ namespace Memory {
       /// Increment the reference index
       inline const Reference& operator++();
 
+      /// Decrement the reference index
+      inline const Reference& operator--();
+
     private:
       /// Index into the underlying memory bank
       std::size_t index;
 
       /// The memory bank pointed to by the reference
-      std::shared_ptr<Bank> data_bank;
+      std::shared_ptr<Bank<Wordsize>> data_bank;
   };
 
 }
 
 template <class Wordsize>
-Memory::Reference::Reference(std::shared_ptr<Bank> data_bank, std::size_t index) {
+Memory::Reference<Wordsize>::Reference(std::shared_ptr<Memory::Bank<Wordsize>> data_bank,
+                             std::size_t index) {
   this->data_bank = data_bank;
   this->index = index;
 }
 
 template<class Wordsize>
-void Memory::Reference::Write(Wordsize data) {
+void Memory::Reference<Wordsize>::Write(Wordsize data) {
   // write data to data_bank at index
   data_bank->Write(index, data);
 }
 
 template<class Wordsize>
-const Wordsize Memory::Reference::Read() const {
+const Wordsize Memory::Reference<Wordsize>::Read() const {
   // read the word from data_bank at index
   return data_bank->Read(index);
 }
 
-const Reference& operator++() {
+template<class Wordsize>
+const Memory::Reference<Wordsize>& Memory::Reference<Wordsize>::operator++() {
   // increment the index, and return the this object
   this->index += 1;
+  return *this;
+}
+
+template<class Wordsize>
+const Memory::Reference<Wordsize>& Memory::Reference<Wordsize>::operator--() {
+  // decrement the index, and return the this object
+  this->index -= 1;
   return *this;
 }
 

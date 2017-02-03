@@ -14,7 +14,7 @@ include $(TOP)/Makefile.util
 # Flags and Definitions
 ###############################################################################
 
-LIB =
+LIB = 
 
 CFLAGS  := $(CFLAGS)
 LDFLAGS := 

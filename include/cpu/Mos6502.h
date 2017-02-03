@@ -15,7 +15,7 @@
 #define MOS_6502_H
 #include "Common.h"
 #include "cpu/Cpu.h"
-#include "cpu/mem.h"
+#include "memory/Reference.h"
 
 class Mos6502 : public Cpu<byte> {
   public:
@@ -25,29 +25,29 @@ class Mos6502 : public Cpu<byte> {
   protected:
     // Addressing mode functions
     // Accumulator addressing
-    Mem::Ref ACC();
+    Memory::Reference<byte> ACC();
     // Absolute addressing
-    Mem::Ref ABS();
+    Memory::Reference<byte> ABS();
     // Absolute addressing X-indexed
-    Mem::Ref ABS_X();
+    Memory::Reference<byte> ABS_X();
     // Absolute addressing Y-indexed
-    Mem::Ref ABS_Y();
+    Memory::Reference<byte> ABS_Y();
     // Immediate addressing
-    Mem::Ref IMMED();
+    Memory::Reference<byte> IMMED();
     // Indirect addressing
-    Mem::Ref IND();
+    Memory::Reference<byte> IND();
     // X-indexed indirect addressing
-    Mem::Ref X_IND();
+    Memory::Reference<byte> X_IND();
     // Indirect addressing Y-indexed
-    Mem::Ref IND_Y();
+    Memory::Reference<byte> IND_Y();
     // Relative addressing
-    Mem::Ref REL();
+    Memory::Reference<byte> REL();
     // Zeropage addressing
-    Mem::Ref ZPG();
+    Memory::Reference<byte> ZPG();
     // Zeropage addressing X-indexed
-    Mem::Ref ZPG_X();
+    Memory::Reference<byte> ZPG_X();
     // Zeropage addressing Y-indexed
-    Mem::Ref ZPG_Y();
+    Memory::Reference<byte> ZPG_Y();
 
     // CPU Instruction emulation functions
     inline void ADC(const byte);
