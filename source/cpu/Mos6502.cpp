@@ -21,7 +21,7 @@ void Mos6502::Execute(byte opcode) {
   // associated emulation function
 
   // Declare memory refence before looking up the opcode
-  Memory::Reference ref;
+  Memory::Reference<byte> ref(nullptr, 0);
 
   // Lookup the fetched opcode
   switch(opcode) {
@@ -162,7 +162,7 @@ void Mos6502::Execute(byte opcode) {
     case Op::ROL_ABS:
       cycle_count += 6;
       ref = ABS();
-      ref.Wite(ROL(ref.Read()));
+      ref.Write(ROL(ref.Read()));
       break;
 
     // HI-NIBBLE == 0x30
