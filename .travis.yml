@@ -28,7 +28,7 @@ before_install:
 # Build Steps
 script:
   - make --environment-overrides -C ${TRAVIS_BUILD_DIR}
-  - make --enviroment-ovverides -C ${TRAVIS_BUILD_DIR} test
+  - make --environment-overrides -C ${TRAVIS_BUILD_DIR} test
   - ${TRAVIS_BUILD_DIR}/tests/test.out
 
 after_success:
