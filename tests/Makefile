@@ -28,7 +28,7 @@ TESTS = $(foreach dir, $(SUBSYSTEMS),$(wildcard $(dir)*.o))
 .PHONY: all $(SUBSYSTEMS)
 
 all: $(EXECUTABLE)
-	$(CXX) -o $(EXECUTABLE) $(TESTS) $(OBJECTS)
+	$(CXX) -o $(EXECUTABLE) $(OBJECTS) $(TESTS) 
 
 $(EXECUTABLE): $(OBJECTS) $(SUBSYSTEMS)
 	
