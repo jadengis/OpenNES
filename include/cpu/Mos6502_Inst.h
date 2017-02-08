@@ -17,7 +17,6 @@
 //===----------------------------------------------------------------------===//
 #ifndef MOS6502_INST_H
 #define MOS6502_INST_H
-#include "cpu/mem.h"
 #include "cpu/Mos6502.h"
 
 using namespace com;

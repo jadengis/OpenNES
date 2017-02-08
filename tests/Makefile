@@ -15,16 +15,22 @@ include $(TOP)/Makefile.util
 ###############################################################################
 
 .KEEP_STATE:
+EXECUTABLE = test.out
 SOURCES = $(wildcard *.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)
 SUBSYSTEMS := $(sort $(dir $(wildcard */ )))
+
+TESTS = $(foreach dir, $(SUBSYSTEMS),$(wildcard $(dir)*.o))
 
 ###############################################################################
 # Targets
 ###############################################################################
 .PHONY: all $(SUBSYSTEMS)
 
-all: $(SOURCES) $(SUBSYSTEMS)
+all: $(EXECUTABLE)
+	$(CXX) -o $(EXECUTABLE) $(OBJECTS) $(TESTS) 
+
+$(EXECUTABLE): $(OBJECTS) $(SUBSYSTEMS)
 	
 %.o : %.cpp
 	$(CXX) $(CFLAGS) $< -o $@

@@ -1,11 +1,11 @@
 ###############################################################################
-# OsNES osnes/Makefile
+# OpenNES tests/memory/Makefile
 #
-# This Makefile will build all the OsNES source and test executables
+# This Makefile will be used to build all C++ files in the source/memory dir
 ###############################################################################
 
 ifndef TOP
-	TOP := .
+	TOP := ../..
 endif
 # For including common make utility commands
 include $(TOP)/Makefile.util
@@ -14,24 +14,26 @@ include $(TOP)/Makefile.util
 # Flags and Definitions
 ###############################################################################
 
-SOURCES := source/
-TESTS   := tests/
+LIB = 
+
+CFLAGS  := $(CFLAGS)
+LDFLAGS := 
+
+###############################################################################
+# Source
+###############################################################################
+.KEEP_STATE:
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
 
 ###############################################################################
 # Targets
 ###############################################################################
-.PHONY: all $(SOURCES)
 
-all: $(SOURCES)
-	
-$(SOURCES):
-	$(MAKE) -C $@
+all: $(OBJECTS)
 
-clean: 
-	$(foreach source, $(SOURCES), $(MAKE) -C $(source) clean;)
+%.o : %.cpp
+	$(CXX) $(CFLAGS) $< -o $@
 
-test:
-	$(foreach test, $(TESTS), $(MAKE) -C $(test);)
-
-ctags:
-	$(CTAGS) -R -f ./tags .
+clean:
+	$(RM) *.o *.d
