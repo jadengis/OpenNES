@@ -28,7 +28,7 @@ namespace Memory {
       /// Write word \p data at \p index
       /// \param index Index into the data_bank array
       /// \param data Word to store at \p index
-      virtual inline void Write(std::size_t index, Wordsize data) = 0;
+      virtual void Write(std::size_t index, Wordsize data) = 0;
 
       /// Read word from \p index
       /// \param index Index into the data_bank array
