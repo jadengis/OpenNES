@@ -28,7 +28,7 @@ class Bank {
     /// Write word \p data at \p index
     /// \param index Index into the dataBank array
     /// \param data Word to store at \p index
-    virtual inline void write(std::size_t index, Wordsize data) = 0;
+    virtual void write(std::size_t index, Wordsize data) = 0;
 
     /// Read word from \p index
     /// \param index Index into the dataBank array
