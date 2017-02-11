@@ -23,7 +23,7 @@ TEST_CASE("Reference read and write to Ram", "[Memory][Reference]") {
   // Build a Ram object
   std::size_t size = 100;
   std::shared_ptr<Memory::Ram<byte> > ram_p(new Memory::Ram<byte>(size));
-  REQUIRE(ram_p->Get_Size() == size);
+  REQUIRE(ram_p->getSize() == size);
 
   // Build a reference to the memory object
   Memory::Reference<byte> ref(ram_p, 5);
@@ -31,8 +31,8 @@ TEST_CASE("Reference read and write to Ram", "[Memory][Reference]") {
   SECTION("Write data to memory with reference, and read back") {
     byte data = 7;
     // write the data at the referenced index
-    ref.Write(data);
-    byte test_data = ref.Read();
-    REQUIRE(test_data == data);
+    ref.write(data);
+    byte testData = ref.read();
+    REQUIRE(testData == data);
   }
 }

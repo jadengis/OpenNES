@@ -22,13 +22,13 @@ TEST_CASE("Ram write and read functionality", "[Memory][Ram]") {
   // Build a Ram object
   std::size_t size = 100;
   Memory::Ram<byte> ram(size);
-  REQUIRE(ram.Get_Size() == size);
+  REQUIRE(ram.getSize() == size);
 
   SECTION("Write to index and read back") {
     std::size_t index = 5;
     byte data = 7;
     // write the data at the index
-    ram.Write(index, data);
-    REQUIRE(ram.Read(index) == data);
+    ram.write(index, data);
+    REQUIRE(ram.read(index) == data);
   }
 }

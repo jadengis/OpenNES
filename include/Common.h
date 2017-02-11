@@ -26,7 +26,7 @@ using byte = unsigned char;
 //       constant values used throughout the source.
 namespace com {
   // Common enum type for referencing bit positions
-  enum class Bit_Position {
+  enum class BitPosition {
     bit0 = 0,
     bit1 = 1,
     bit2 = 2,
