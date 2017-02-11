@@ -18,69 +18,69 @@
 
 namespace Memory {
 
-  /// Reference - This creates references to the underlying words in objects of
-  /// the type Memory::Bank. These references should be use to access data in
-  /// other subsystems.
-  template<class Wordsize>
-  class Reference {
-    public:
-      // Constructor and Destructor
-      inline Reference(std::shared_ptr<Bank<Wordsize>> data_bank, std::size_t index);
-      virtual ~Reference() {};
+/// Reference - This creates references to the underlying words in objects of
+/// the type Memory::Bank. These references should be use to access data in
+/// other subsystems.
+template<class Wordsize>
+class Reference {
+  public:
+    // Constructor and Destructor
+    inline Reference(std::shared_ptr<Bank<Wordsize>> dataBank, std::size_t index);
+    virtual ~Reference() {};
 
-      /// Write to referenced location
-      inline void Write(Wordsize data);
+    /// Write to referenced location
+    inline void write(Wordsize data);
 
-      /// Read from references location
-      inline const Wordsize Read() const;
+    /// Read from references location
+    inline const Wordsize read() const;
 
-      /// Increment the reference index
-      inline const Reference& operator++();
+    /// Increment the reference index
+    inline const Reference& operator++();
 
-      /// Decrement the reference index
-      inline const Reference& operator--();
+    /// Decrement the reference index
+    inline const Reference& operator--();
 
-    private:
-      /// Index into the underlying memory bank
-      std::size_t index;
+  private:
+    /// Index into the underlying memory bank
+    std::size_t index;
 
-      /// The memory bank pointed to by the reference
-      std::shared_ptr<Bank<Wordsize>> data_bank;
-  };
-
-}
+    /// The memory bank pointed to by the reference
+    std::shared_ptr<Bank<Wordsize>> dataBank;
+};
 
 template <class Wordsize>
-Memory::Reference<Wordsize>::Reference(std::shared_ptr<Memory::Bank<Wordsize>> data_bank,
-                             std::size_t index) {
-  this->data_bank = data_bank;
+Reference<Wordsize>::Reference(std::shared_ptr<Memory::Bank<Wordsize>> dataBank,
+                               std::size_t index) {
+  this->dataBank = dataBank;
   this->index = index;
 }
 
 template<class Wordsize>
-void Memory::Reference<Wordsize>::Write(Wordsize data) {
-  // write data to data_bank at index
-  data_bank->Write(index, data);
+void Reference<Wordsize>::write(Wordsize data) {
+  // write data to dataBank at index
+  dataBank->write(index, data);
 }
 
 template<class Wordsize>
-const Wordsize Memory::Reference<Wordsize>::Read() const {
-  // read the word from data_bank at index
-  return data_bank->Read(index);
+const Wordsize Reference<Wordsize>::read() const {
+  // read the word from dataBank at index
+  return dataBank->read(index);
 }
 
 template<class Wordsize>
-const Memory::Reference<Wordsize>& Memory::Reference<Wordsize>::operator++() {
+const Reference<Wordsize>& Reference<Wordsize>::operator++() {
   // increment the index, and return the this object
   this->index += 1;
   return *this;
 }
 
 template<class Wordsize>
-const Memory::Reference<Wordsize>& Memory::Reference<Wordsize>::operator--() {
+const Reference<Wordsize>& Reference<Wordsize>::operator--() {
   // decrement the index, and return the this object
   this->index -= 1;
   return *this;
 }
+
+} // namespace Memory
 
 #endif // MEMORY_REFERENCE_H //

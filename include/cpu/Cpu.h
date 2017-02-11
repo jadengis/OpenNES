@@ -15,11 +15,13 @@
 
 #ifndef CPU_H
 #define CPU_H
+
 template<class Arch> class Cpu {
   public:
     Cpu() {};
     virtual ~Cpu() {};
-    virtual void Execute(Arch opcode) = 0;
-    virtual Arch Fetch() = 0;
+    virtual void executeOpcode(Arch opcode) = 0;
+    virtual Arch fetchOpcode() = 0;
 };
+
 #endif // CPU_H //:~

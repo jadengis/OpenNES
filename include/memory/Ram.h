@@ -14,28 +14,29 @@
 #define MEMORY_RAM_H
 
 #include "Common.h"
-#include "Exception.h"
+#include "memory/Exception.h"
 #include "memory/Bank.h"
 
 namespace Memory {
 
-  template<class Wordsize> 
-  class Ram : public Bank<Wordsize> {
-    public:
-      Ram(std::size_t size) : Bank<Wordsize>(size) {};
-      virtual ~Ram() {};
+template<class Wordsize> 
+class Ram : public Bank<Wordsize> {
+  public:
+    Ram(std::size_t size) : Bank<Wordsize>(size) {};
+    virtual ~Ram() {};
 
-      /// Throw an error when trying to write
-      /// We cannot write to a Rom, so throw a ReadOnlyMemory Exception when
-      /// this method is called.
-      inline void Write(std::size_t index, Wordsize data) override;
-  };
-}
+    /// Throw an error when trying to write
+    /// We cannot write to a Rom, so throw a ReadOnlyMemory Exception when
+    /// this method is called.
+    inline void write(std::size_t index, Wordsize data) override;
+};
 
 template<class Wordsize>
-void Memory::Ram<Wordsize>::Write(std::size_t index, Wordsize data) {
+void Ram<Wordsize>::write(std::size_t index, Wordsize data) {
   // write the data at the given index
-  this->data_bank[index] = data;
+  this->dataBank[index] = data;
 }
+
+} // namespace Memory
 
 #endif // MEMORY_RAM_H //:~

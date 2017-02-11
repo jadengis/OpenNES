@@ -18,53 +18,54 @@
 
 namespace Memory {
 
-  template<class Wordsize> 
-  class Bank {
-    public:
-      // Constructors and Destructors
-      inline Bank(std::size_t size);
-      virtual ~Bank() {};
+template<class Wordsize> 
+class Bank {
+  public:
+    // Constructors and Destructors
+    inline Bank(std::size_t size);
+    virtual ~Bank() {};
 
-      /// Write word \p data at \p index
-      /// \param index Index into the data_bank array
-      /// \param data Word to store at \p index
-      virtual void Write(std::size_t index, Wordsize data) = 0;
+    /// Write word \p data at \p index
+    /// \param index Index into the dataBank array
+    /// \param data Word to store at \p index
+    virtual void write(std::size_t index, Wordsize data) = 0;
 
-      /// Read word from \p index
-      /// \param index Index into the data_bank array
-      /// \returns word at the given index
-      virtual inline const Wordsize Read(std::size_t index) const final;
+    /// Read word from \p index
+    /// \param index Index into the dataBank array
+    /// \returns word at the given index
+    virtual inline const Wordsize read(std::size_t index) const final;
 
-      /// Get the size of the memory
-      /// \returns the size of the memory
-      inline std::size_t Get_Size() const;
+    /// Get the size of the memory
+    /// \returns the size of the memory
+    inline std::size_t getSize() const;
 
-    protected:
-      /// Size of the underlying array 
-      std::size_t size;
-      /// The array of data comprising the memory bank
-      std::unique_ptr<Wordsize[]> data_bank;
-  };
+  protected:
+    /// Size of the underlying array 
+    std::size_t size;
 
-}
+    /// The array of data comprising the memory bank
+    std::unique_ptr<Wordsize[]> dataBank;
+};
 
 template<class Wordsize>
-Memory::Bank<Wordsize>::Bank(std::size_t size) {
+Bank<Wordsize>::Bank(std::size_t size) {
   // Store the memory bank size
   this->size = size;
   // Initialize the memory bank
-  data_bank = std::make_unique<Wordsize[]>(size);
+  this->dataBank = std::make_unique<Wordsize[]>(size);
 }
 
 template<class Wordsize>
-const Wordsize Memory::Bank<Wordsize>::Read(std::size_t index) const {
+const Wordsize Bank<Wordsize>::read(std::size_t index) const {
   // read the data from the given index
-  return data_bank[index];
+  return dataBank[index];
 }
 
 template<class Wordsize>
-std::size_t Memory::Bank<Wordsize>::Get_Size() const {
+std::size_t Bank<Wordsize>::getSize() const {
   return size;
 }
+
+} // namespace Memory
 
 #endif // MEMORY_BANK_H //

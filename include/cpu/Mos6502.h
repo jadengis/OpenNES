@@ -19,8 +19,8 @@
 
 class Mos6502 : public Cpu<byte> {
   public:
-    void Execute(byte opcode) override;
-    byte Fetch() override;
+    void executeOpcode(byte opcode) override;
+    byte fetchOpcode() override;
 
   protected:
     // Addressing mode functions
@@ -109,7 +109,7 @@ class Mos6502 : public Cpu<byte> {
 
   private:
     // Cycles required to execute current instruction
-    int64 cycle_count;
+    int64 cycleCount;
     // Register structure
     struct {
       union {
@@ -158,13 +158,13 @@ class Mos6502 : public Cpu<byte> {
     // LIFO, top down, 8 bit range, 0x0100 - 0x01FF
     class Stack {
       public:
-        inline void Push(byte data) {
+        inline void push(byte data) {
           // store data at current location and decrement
           *top = data;
           top--;
         }
 
-        inline byte Pull() {
+        inline byte pull() {
           // retrieve data, increment, and return data
           auto temp = *top;
           top++;
