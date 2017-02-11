@@ -11,7 +11,9 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: CXX=g++-6
+      env: 
+        - CXX=g++-6
+        - COV=gcov-6
     - compiler: clang
       addons:
         apt:
@@ -20,8 +22,10 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
-      env: CXX=clang++-3.7
-
+      env: 
+        - CXX=clang++-3.7
+        - COV=gcov
+        #- COV="llvm-cov-3.7 gcov"
 before_install:
   - sudo apt-get update -qq
 
@@ -32,4 +36,4 @@ script:
   - ${TRAVIS_BUILD_DIR}/tests/test.out
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -x $COV
