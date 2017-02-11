@@ -1,9 +1,6 @@
 
 #ifndef MEMORY_EXCEPTION_H
 #define MEMORY_EXCEPTION_H
-#include <string.h>
-#include <iostream>
-#include "Common.h"
 #include "BaseException.h"
 
 namespace Exception {
