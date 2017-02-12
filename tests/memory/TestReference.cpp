@@ -35,4 +35,20 @@ TEST_CASE("Reference read and write to Ram", "[Memory][Reference]") {
     byte testData = ref.read();
     REQUIRE(testData == data);
   }
+
+  SECTION("Increment a reference and read the value") {
+    // write some data to the RAM
+    byte data = 8;
+    ram_p->write(6, data);
+    byte testData = (++ref).read();
+    REQUIRE(testData == data);
+  }
+
+  SECTION("Decrement a reference and read the value") {
+    // write some data to the RAM
+    byte data = 9;
+    ram_p->write(4, data);
+    byte testData = (--ref).read();
+    REQUIRE(testData == data);
+  }
 }
