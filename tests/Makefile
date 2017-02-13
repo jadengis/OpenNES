@@ -28,7 +28,7 @@ TESTS = $(foreach dir, $(SUBSYSTEMS),$(wildcard $(dir)*.o))
 .PHONY: all $(SUBSYSTEMS)
 
 all: $(EXECUTABLE)
-	$(CXX) -o $(EXECUTABLE) $(OBJECTS) $(TESTS) 
+	$(CXX) $(LFLAGS) -o $(EXECUTABLE) $(OBJECTS) $(TESTS) 
 
 $(EXECUTABLE): $(OBJECTS) $(SUBSYSTEMS)
 	
@@ -40,4 +40,4 @@ $(SUBSYSTEMS):
 
 clean: 
 	$(foreach subsystem, $(SUBSYSTEMS), $(MAKE) -C $(subsystem) clean;)
-	$(RM) *.o *.d
+	$(RM) *.o *.d *.gcov *.gcno *.gcda

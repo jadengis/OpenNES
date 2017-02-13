@@ -12,14 +12,16 @@
 AR  		?= /usr/bin/ar
 RM  		?= /bin/rm -f
 CC  		?= /usr/bin/clang
-CXX 		?= /usr/bin/clang++
+#CXX 		:= /usr/local/bin/clang++-3.7
+CXX 		:= /usr/local/bin/g++-6
+COV     := /usr/local/bin/gcov-6
 
 CTAGS   ?= /usr/local/bin/ctags
 
 INCLUDE := $(TOP)/include
 
-CFLAGS  := -std=c++14 -I $(INCLUDE) -c
-LFLAGS  :=
+CFLAGS  := -std=c++14 -I $(INCLUDE) -c --coverage
+LFLAGS  := --coverage
 
 ################################################################################
 # Utilities

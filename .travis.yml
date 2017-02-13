@@ -1,8 +1,16 @@
 sudo: required
 dist: trusty
-langauge: cpp
+language: cpp
+
+env:
+  global:
+    - BUILD_FLAGS="-std=c++14 -I ${TRAVIS_BUILD_DIR}/include -c -O0 -g --coverage"
+  matrix:
+    - TRAVIS_EMPTY_JOB_WORKAROUND=true
 
 matrix:
+  exclude:
+    - env: TRAVIS_EMPTY_JOB_WORKAROUND=true
   include:
     - compiler: gcc
       addons:
@@ -11,25 +19,37 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: CXX=g++-6
+      env:
+        - COMPILER=g++-6
+        - COV=gcov-6
+        - EXTRA_FLAGS=""
     - compiler: clang
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - llvm-toolchain-precise-3.9
           packages:
-            - clang-3.7
-      env: CXX=clang++-3.7
+            - libstdc++6
+            - clang-3.9
+      env: 
+        - COMPILER=clang++-3.9
+        - COV="llvm-cov gcov"
+        - EXTRA_FLAGS=""
 
+# Prepare the Build environments
 before_install:
   - sudo apt-get update -qq
+  # - if [ "$CXX" == "clang++" ]; then a=$(sudo find / -name llvm-cov | grep 3.8 | head -1); sudo ln -sfn ${a} /usr/bin/llvm-cov; fi
+  - export CXX=${COMPILER}
+  - ${CXX} --version
+  - ${COV} --version
 
 # Build Steps
 script:
-  - make --environment-overrides -C ${TRAVIS_BUILD_DIR}
-  - make --environment-overrides -C ${TRAVIS_BUILD_DIR} test
+  - make --environment-overrides -C ${TRAVIS_BUILD_DIR} CFLAGS="${BUILD_FLAGS} ${EXTRA_FLAGS}"
+  - make --environment-overrides -C ${TRAVIS_BUILD_DIR} test CFLAGS="${BUILD_FLAGS} ${EXTRA_FLAGS}"
   - ${TRAVIS_BUILD_DIR}/tests/test.out
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -x ${COV}

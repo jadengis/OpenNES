@@ -16,7 +16,7 @@ include $(TOP)/Makefile.util
 
 SOURCES := source/
 TESTS   := tests/
-
+ALL_SOURCES = $(shell find . -name '*.cpp')
 ###############################################################################
 # Targets
 ###############################################################################
@@ -29,6 +29,7 @@ $(SOURCES):
 
 clean: 
 	$(foreach source, $(SOURCES), $(MAKE) -C $(source) clean;)
+	$(RM) -f *.o *.gcno *.gcda *.gcov
 
 test:
 	$(foreach test, $(TESTS), $(MAKE) -C $(test);)

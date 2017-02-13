@@ -36,4 +36,4 @@ all: $(OBJECTS)
 	$(CXX) $(CFLAGS) $< -o $@
 
 clean:
-	$(RM) *.o *.d
+	$(RM) *.o *.d *.gcov *.gcno *.gcda
