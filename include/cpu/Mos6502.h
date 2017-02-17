@@ -13,7 +13,7 @@
 //===----------------------------------------------------------------------===//
 #ifndef MOS_6502_H
 #define MOS_6502_H
-#include "Common.h"
+#include "common/CommonTypes.h"
 #include "cpu/Cpu.h"
 #include "memory/Reference.h"
 

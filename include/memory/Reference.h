@@ -13,7 +13,7 @@
 #ifndef MEMORY_REFERENCE_H
 #define MEMORY_REFERENCE_H
 
-#include "Common.h"
+#include "common/CommonTypes.h"
 #include "memory/Bank.h"
 
 namespace Memory {

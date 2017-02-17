@@ -14,7 +14,7 @@
 #ifndef MEMORY_BANK_H
 #define MEMORY_BANK_H
 
-#include "Common.h"
+#include "common/CommonTypes.h"
 
 namespace Memory {
 

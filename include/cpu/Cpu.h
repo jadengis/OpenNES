@@ -11,7 +11,7 @@
 /// for all Cpu style classes in the OsNES project.
 ///
 //===----------------------------------------------------------------------===//
-#include "Common.h"
+#include "common/CommonTypes.h"
 
 #ifndef CPU_H
 #define CPU_H
