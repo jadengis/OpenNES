@@ -28,6 +28,10 @@
 *.out
 *.app
 
+# Coverage files
+*.gcno
+*.gcda
+
 # vim swp files
 *.swp
 
