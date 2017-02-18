@@ -13,15 +13,20 @@
 //===----------------------------------------------------------------------===//
 #include "common/CommonTypes.h"
 
-#ifndef CPU_H
-#define CPU_H
+#ifndef CPU_BASE_H
+#define CPU_BASE_H
 
-template<class Arch> class Cpu {
+namespace Cpu {
+
+class CpuBase {
   public:
-    Cpu() {};
-    virtual ~Cpu() {};
-    virtual void executeOpcode(Arch opcode) = 0;
-    virtual Arch fetchOpcode() = 0;
+    virtual ~CpuBase() {};
+    virtual void init() = 0;
+    virtual void run() = 0;
+    virtual void trace() = 0;
+    virtual void shutdown() = 0;
 };
 
-#endif // CPU_H //:~
+} // namespace Cpu
+
+#endif // CPU_BASE_H //
