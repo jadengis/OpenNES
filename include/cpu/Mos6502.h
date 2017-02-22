@@ -32,10 +32,20 @@ class Mos6502 : public CpuBase {
       byte opcode;
     };
 
+    // Constructors
+    Mos6502() {
+      this->reg.pc = 0;
+      this->reg.ac = 0;
+      this->reg.x = 0;
+      this->reg.y = 0;
+      this->reg.sr = 0;
+      this->reg.sp = 0;
+    }
+
     // CpuBase class methods
-    // TODO: Implement
     void init() override;
     void run() override;
+    void trace() override;
     void shutdown() override;
 
     // Run-time emulation functions
@@ -57,8 +67,6 @@ class Mos6502 : public CpuBase {
 
   protected:
     // Addressing mode functions
-    // Accumulator addressing
-    Memory::Reference<byte> ACC();
     // Absolute addressing
     Memory::Reference<byte> ABS();
     // Absolute addressing X-indexed
@@ -243,9 +251,6 @@ static const byte SR_Z = 0x02; // Zero
 static const byte SR_C = 0x01; // Carry
 
 #include "cpu/Mos6502_Ops.h"
-
-// Include inlinable definition of above functions
-#include "cpu/Mos6502_Inst.h"
 
 } // namespace Cpu
 

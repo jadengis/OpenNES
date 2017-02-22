@@ -24,6 +24,9 @@ void Mos6502::init() {
 void Mos6502::run() {
 }
 
+void Mos6502::trace() {
+}
+
 void Mos6502::shutdown() {
 }
 
