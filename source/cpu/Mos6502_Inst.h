@@ -91,8 +91,6 @@ inline void Cpu::Mos6502::ADC(const byte opd) {
   // ADD the memory to Accumulator + carry if set
   uint_native sum = static_cast<uint_native>(reg.ac) + static_cast<uint_native>(opd) + 
                    static_cast<uint_native>(reg.srf.c);
-  // Mask out the accumulator value
-  reg.ac = static_cast<byte>(sum & BYTE_MASK);
   // Set the carry bit ( 1 if the add overflowed, 0 otherwise)
   // Mask out carry bit (bit 8)
   reg.srf.c = static_cast<byte>((sum >> 8) & ONE_BIT_MASK);
@@ -105,7 +103,9 @@ inline void Cpu::Mos6502::ADC(const byte opd) {
   // bit manipulation to check this fact.
   reg.srf.v = ((~(reg.ac ^ opd) & (reg.ac ^ sum)) >> 7) & ONE_BIT_MASK;
   // Set zero flag
-  reg.srf.z = checkZero(reg.ac);
+  reg.srf.z = checkZero(static_cast<byte>(sum & BYTE_MASK));
+  // Mask out the accumulator value
+  reg.ac = static_cast<byte>(sum & BYTE_MASK);
   return;
 }
 
@@ -300,7 +300,7 @@ inline void Cpu::Mos6502::BVS(const byte opd) {
 // Compare Memory with Accumulator
 inline void Cpu::Mos6502::CMP(const byte opd) {
   // set appropriate bit flags
-  reg.srf.n = reg.ac < opd; 
+  reg.srf.n = checkNthBit(reg.ac - opd, BitPosition::bit7);
   reg.srf.z = reg.ac == opd; 
   reg.srf.c = reg.ac >= opd; 
   return;
@@ -309,7 +309,7 @@ inline void Cpu::Mos6502::CMP(const byte opd) {
 // Compare Memory and Index X
 inline void Cpu::Mos6502::CPX(const byte opd) {
   // set appropriate bit flags
-  reg.srf.n = reg.x < opd; 
+  reg.srf.n = checkNthBit(reg.x - opd, BitPosition::bit7);
   reg.srf.z = reg.x == opd; 
   reg.srf.c = reg.x >= opd; 
   return;
@@ -318,7 +318,7 @@ inline void Cpu::Mos6502::CPX(const byte opd) {
 // Compare Memory and Index Y
 inline void Cpu::Mos6502::CPY(const byte opd) {
   // set appropriate bit flags
-  reg.srf.n = reg.y < opd; 
+  reg.srf.n = checkNthBit(reg.y - opd, BitPosition::bit7);
   reg.srf.z = reg.y == opd; 
   reg.srf.c = reg.y >= opd; 
   return;
@@ -327,7 +327,7 @@ inline void Cpu::Mos6502::CPY(const byte opd) {
 // Test Bits in Memory with Accumulator
 inline void Cpu::Mos6502::BIT(const byte opd) {
   // zero flag is set to result of A AND M
-  reg.srf.z = checkNotZero(reg.ac & opd);
+  reg.srf.z = checkZero(reg.ac & opd);
   // M7 -> N, M6 -> V
   reg.srf.n = checkNthBit(opd, BitPosition::bit7);
   reg.srf.v = checkNthBit(opd, BitPosition::bit6);
@@ -369,7 +369,7 @@ inline byte Cpu::Mos6502::ROL(byte opd) {
   // Set the carry bit
   reg.srf.c = checkNthBit(opd, BitPosition::bit7);
   // Shift left by 1 and OR in old carry
-  opd = (opd << 1) & old_c;
+  opd = (opd << 1) | old_c;
   // Set the remaining SR flags
   reg.srf.z = checkZero(opd);
   reg.srf.n = checkNthBit(opd, BitPosition::bit7);
@@ -383,7 +383,7 @@ inline byte Cpu::Mos6502::ROR(byte opd) {
   // Set the carry bit
   reg.srf.c = checkNthBit(opd, BitPosition::bit0);
   // Shift right by 1 and OR in old carry
-  opd = (opd >> 1) & (old_c << 7);
+  opd = (opd >> 1) | (old_c << 7);
   // Set the remaining SR flags
   reg.srf.z = checkZero(opd);
   reg.srf.n = checkNthBit(opd, BitPosition::bit7);
@@ -476,8 +476,8 @@ inline void Cpu::Mos6502::PHP() {
 inline void Cpu::Mos6502::PLA() {
   reg.ac = stack.pull();
   // set appropriate status register flags
-  reg.srf.z = checkZero(reg.sp);
-  reg.srf.n = checkNthBit(reg.sp, BitPosition::bit7);
+  reg.srf.z = checkZero(reg.ac);
+  reg.srf.n = checkNthBit(reg.ac, BitPosition::bit7);
   return;
 }
 
@@ -585,10 +585,11 @@ inline void Cpu::Mos6502::NOP() {
 // Force Break
 inline void Cpu::Mos6502::BRK() {
   // interrupt, push PC+2, push SR
-  reg.srf.i = 1; // Set interrupt flag
+  reg.pc = reg.pc + 2;
   stack.push(reg.pch);
   stack.push(reg.pcl);
   stack.push(reg.sr);
+  reg.srf.i = 1; // Set interrupt flag
   return;
 }
 

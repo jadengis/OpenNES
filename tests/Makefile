@@ -41,4 +41,4 @@ $(SUBSYSTEMS):
 
 clean: 
 	$(foreach subsystem, $(SUBSYSTEMS), $(MAKE) -C $(subsystem) clean;)
-	$(RM) *.o *.d *.gcov *.gcno *.gcda
+	$(RM) $(TORM)

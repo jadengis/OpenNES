@@ -58,12 +58,21 @@ class Mos6502 : public CpuBase {
 
     // Cpu state inspection methods
     int64 getCycleCount();
-    byte getRegPC();
+    addr getRegPC();
     byte getRegAC();
     byte getRegX();
     byte getRegY();
     byte getRegSR();
     byte getRegSP();
+
+    // SR Flag Masks
+    static const byte SR_N = 0x80; // Negative
+    static const byte SR_V = 0x40; // Overflow
+    static const byte SR_B = 0x10; // Break
+    static const byte SR_D = 0x08; // Decimal (use BCD for arithmetics)
+    static const byte SR_I = 0x04; // Interrupt (IRQ disable)
+    static const byte SR_Z = 0x02; // Zero
+    static const byte SR_C = 0x01; // Carry
 
   protected:
     // Addressing mode functions
@@ -154,7 +163,7 @@ class Mos6502 : public CpuBase {
     // Register structure
     struct {
       union {
-        uint16 pc; // Program Counter
+        addr pc; // Program Counter
         struct {
 #ifdef __BIG_ENDIAN__
           byte pch;
@@ -201,8 +210,8 @@ class Mos6502 : public CpuBase {
       public:
         inline void push(byte data) {
           // store data at current location and decrement
-          *top = data;
           top--;
+          *top = data;
         }
 
         inline byte pull() {
@@ -240,15 +249,6 @@ class Mos6502 : public CpuBase {
         std::unique_ptr<byte[]> base;
     } stack;
 };
-
-// SR Flag Masks
-static const byte SR_N = 0x80; // Negative
-static const byte SR_V = 0x40; // Overflow
-static const byte SR_B = 0x10; // Break
-static const byte SR_D = 0x08; // Decimal (use BCD for arithmetics)
-static const byte SR_I = 0x04; // Interrupt (IRQ disable)
-static const byte SR_Z = 0x02; // Zero
-static const byte SR_C = 0x01; // Carry
 
 #include "cpu/Mos6502_Ops.h"
 

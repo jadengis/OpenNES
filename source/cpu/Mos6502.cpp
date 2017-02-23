@@ -45,7 +45,7 @@ int64 Mos6502::getCycleCount() {
   return cycleCount;
 }
 
-byte Mos6502::getRegPC() {
+addr Mos6502::getRegPC() {
   return reg.pc;
 }
 

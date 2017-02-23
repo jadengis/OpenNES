@@ -23,6 +23,9 @@ using uint_native = unsigned long;
 // important thing is that it is 8 bits.
 using byte = unsigned char;
 
+// use the type 'addr' when referring to 16 bit addresses
+using addr = unsigned short;
+
 // com - The common namespace for all common helper functions and
 //       constant values used throughout the source.
 namespace com {
