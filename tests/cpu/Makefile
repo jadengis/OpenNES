@@ -1,7 +1,7 @@
 ###############################################################################
-# OsNES osnes/source/Makefile
+# OpenNES tests/memory/Makefile
 #
-# This Makefile will be used to build all C++ files in the source directory.
+# This Makefile will be used to build all C++ files in the source/memory dir
 ###############################################################################
 
 ifndef TOP
@@ -14,9 +14,9 @@ include $(TOP)/Makefile.util
 # Flags and Definitions
 ###############################################################################
 
-LIB = libcpu.a
+LIB = 
 
-CFLAGS  := $(CFLAGS)
+CFLAGS  := $(CFLAGS) -I $(TOP)/source/cpu
 LDFLAGS := 
 
 ###############################################################################
@@ -30,13 +30,10 @@ OBJECTS = $(SOURCES:.cpp=.o)
 # Targets
 ###############################################################################
 
-all: $(LIB)
-
-$(LIB) : $(OBJECTS)
-	$(AR) rcs $(LIB) $(OBJECTS)
+all: $(OBJECTS)
 
 %.o : %.cpp
 	$(CXX) $(CFLAGS) $< -o $@
 
 clean:
-	$(RM) *.o *.d *.a *.gcno *.gcda
+	$(RM) *.o *.d *.gcov *.gcno *.gcda

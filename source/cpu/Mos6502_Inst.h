@@ -22,9 +22,9 @@
 using namespace com;
 
 // Static Functions
-static inline byte   checkZero(byte x);
-static inline byte   checkNotZero(byte x);
-static inline byte   checkNthBit(byte x, BitPosition n);
+static inline byte checkZero(byte x);
+static inline byte checkNotZero(byte x);
+static inline byte checkNthBit(byte x, BitPosition n);
 static inline uint16 computeBranch(uint16 pc, byte m);
 
 // ----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ static inline uint16 computeBranch(uint16 pc, byte m);
 // ----------------------------------------------------------------------------
 
 // Load Accumulator with Memory
-inline void Mos6502::LDA(const byte opd) {
+inline void Cpu::Mos6502::LDA(const byte opd) {
   // Copy memory to accumulator
   reg.ac = opd;
   // set appropriate status register flags
@@ -42,7 +42,7 @@ inline void Mos6502::LDA(const byte opd) {
 }
 
 // Load Index X with Memory
-inline void Mos6502::LDX(const byte opd) {
+inline void Cpu::Mos6502::LDX(const byte opd) {
   // Copy memory to X register
   reg.x = opd;
   // set appropriate status register flags
@@ -52,7 +52,7 @@ inline void Mos6502::LDX(const byte opd) {
 }
 
 // Load Index Y with Memory
-inline void Mos6502::LDY(const byte opd) {
+inline void Cpu::Mos6502::LDY(const byte opd) {
   // Copy memory to Y register
   reg.y = opd;
   // set appropriate status register flags
@@ -62,19 +62,19 @@ inline void Mos6502::LDY(const byte opd) {
 }
 
 // Store Accumulator in Memory
-inline byte Mos6502::STA() {
+inline byte Cpu::Mos6502::STA() {
   // return accumulator value to be stored
   return reg.ac;
 }
 
 // Store Index X in Memory
-inline byte Mos6502::STX() {
+inline byte Cpu::Mos6502::STX() {
   // return X register value to be stored
   return reg.x;
 }
 
 // Store Index Y in Memory
-inline byte Mos6502::STY() {
+inline byte Cpu::Mos6502::STY() {
   // return Y register value to be stored
   return reg.y;
 }
@@ -85,7 +85,7 @@ inline byte Mos6502::STY() {
 // ----------------------------------------------------------------------------
 
 // Add Memory to Accumulator with Carry
-inline void Mos6502::ADC(const byte opd) {
+inline void Cpu::Mos6502::ADC(const byte opd) {
   // To add 2 bytes with carry, we will first widen to native width, perform
   // the add with carry, and mask out the relevant bits.
   // ADD the memory to Accumulator + carry if set
@@ -111,7 +111,7 @@ inline void Mos6502::ADC(const byte opd) {
 
 // Subtract Memory from Accumulator with Borrow
 // Notice that SBC(x) == ADC(~x) since a - x - !c == a + ~x + 1 - !c == a + ~x + c
-inline void Mos6502::SBC(const byte opd) {
+inline void Cpu::Mos6502::SBC(const byte opd) {
   ADC(~opd);
   return;
 }
@@ -122,7 +122,7 @@ inline void Mos6502::SBC(const byte opd) {
 // ----------------------------------------------------------------------------
 
 // Increment Memory by One
-inline byte Mos6502::INC(byte opd) {
+inline byte Cpu::Mos6502::INC(byte opd) {
   opd = opd + 1;
   // set appropriate status register flags
   reg.srf.z = checkZero(opd);
@@ -131,7 +131,7 @@ inline byte Mos6502::INC(byte opd) {
 }
 
 // Increment Index X by One
-inline void Mos6502::INX() {
+inline void Cpu::Mos6502::INX() {
   reg.x = reg.x + 1;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.x);
@@ -140,7 +140,7 @@ inline void Mos6502::INX() {
 }
 
 // Increment Memory by One
-inline void Mos6502::INY() {
+inline void Cpu::Mos6502::INY() {
   reg.y = reg.y + 1;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.y);
@@ -149,7 +149,7 @@ inline void Mos6502::INY() {
 }
 
 // Decrement Memory by One
-inline byte Mos6502::DEC(byte opd) {
+inline byte Cpu::Mos6502::DEC(byte opd) {
   opd = opd - 1;
   // set appropriate status register flags
   reg.srf.z = checkZero(opd);
@@ -158,7 +158,7 @@ inline byte Mos6502::DEC(byte opd) {
 }
 
 // Decrement Index X by One
-inline void Mos6502::DEX() {
+inline void Cpu::Mos6502::DEX() {
   reg.x = reg.x - 1;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.x);
@@ -167,7 +167,7 @@ inline void Mos6502::DEX() {
 }
 
 // Decrement Memory by One
-inline void Mos6502::DEY() {
+inline void Cpu::Mos6502::DEY() {
   reg.y = reg.y - 1;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.y);
@@ -181,7 +181,7 @@ inline void Mos6502::DEY() {
 // ----------------------------------------------------------------------------
 
 // AND Memory with Accumulator
-inline void Mos6502::AND(const byte opd) {
+inline void Cpu::Mos6502::AND(const byte opd) {
   // AND the memory M with the Accumulator
   reg.ac = reg.ac & opd;
   // Set the remaining status register flags
@@ -191,7 +191,7 @@ inline void Mos6502::AND(const byte opd) {
 }
 
 // EOR Exclusive-OR Memory with Accumulator
-inline void Mos6502::EOR(const byte opd) {
+inline void Cpu::Mos6502::EOR(const byte opd) {
   // XOR the memory M with the Accumulator
   reg.ac = reg.ac ^ opd;
   // Set the remaining status register flags
@@ -201,7 +201,7 @@ inline void Mos6502::EOR(const byte opd) {
 }
 
 // OR Memory with Accumulator
-inline void Mos6502::ORA(const byte opd) {
+inline void Cpu::Mos6502::ORA(const byte opd) {
   // OR the memory M with the Accumulator
   reg.ac = reg.ac | opd;
   // Set the remaining status register flags
@@ -216,7 +216,7 @@ inline void Mos6502::ORA(const byte opd) {
 // ----------------------------------------------------------------------------
 
 // Jump to New Location
-inline void Mos6502::JMP(const byte opd_lo, const byte opd_hi) {
+inline void Cpu::Mos6502::JMP(const byte opd_lo, const byte opd_hi) {
   // opd_lo is the low byte of the new PC and opd_hi is the high byte of new PC
   // (PC+1 = opd_lo) -> PCL
   // (PC+2 = opd_hi) -> PCH
@@ -226,7 +226,7 @@ inline void Mos6502::JMP(const byte opd_lo, const byte opd_hi) {
 }
 
 // Branch on Carry Clear
-inline void Mos6502::BCC(const byte opd) {
+inline void Cpu::Mos6502::BCC(const byte opd) {
   if(reg.srf.c == 0) {
     // Condition true, branch to PC + offset
     reg.pc = computeBranch(reg.pc, opd);
@@ -235,7 +235,7 @@ inline void Mos6502::BCC(const byte opd) {
 }
 
 // Branch of Carry Set
-inline void Mos6502::BCS(const byte opd) {
+inline void Cpu::Mos6502::BCS(const byte opd) {
   if(reg.srf.c == 1) {
     // Condition true, branch to PC + offset
     reg.pc = computeBranch(reg.pc, opd);
@@ -244,7 +244,7 @@ inline void Mos6502::BCS(const byte opd) {
 }
 
 // Branch on Result Zero
-inline void Mos6502::BEQ(const byte opd) {
+inline void Cpu::Mos6502::BEQ(const byte opd) {
   if(reg.srf.z == 1) {
     // Condition true, branch to PC + offset
     reg.pc = computeBranch(reg.pc,opd);
@@ -253,7 +253,7 @@ inline void Mos6502::BEQ(const byte opd) {
 }
 
 // Branch on Result Minus
-inline void Mos6502::BMI(const byte opd) {
+inline void Cpu::Mos6502::BMI(const byte opd) {
   if(reg.srf.n == 1) {
     // Condition true, branch to PC + offset
     reg.pc = computeBranch(reg.pc,opd);
@@ -262,7 +262,7 @@ inline void Mos6502::BMI(const byte opd) {
 }
 
 // Branch on Result not Zero
-inline void Mos6502::BNE(const byte opd) {
+inline void Cpu::Mos6502::BNE(const byte opd) {
   if(reg.srf.z == 0) {
     // Condition true, branch to PC + offset
     reg.pc = computeBranch(reg.pc,opd);
@@ -271,7 +271,7 @@ inline void Mos6502::BNE(const byte opd) {
 }
 
 // Branch on Result Plus
-inline void Mos6502::BPL(const byte opd) {
+inline void Cpu::Mos6502::BPL(const byte opd) {
   if(reg.srf.n == 0) {
     // Condition true, branch to PC + offset
     reg.pc = computeBranch(reg.pc,opd);
@@ -280,7 +280,7 @@ inline void Mos6502::BPL(const byte opd) {
 }
 
 // Branch on Overflow Clear
-inline void Mos6502::BVC(const byte opd) {
+inline void Cpu::Mos6502::BVC(const byte opd) {
   if(reg.srf.v == 0) {
     // Condition true, branch to PC + offset
     reg.pc = computeBranch(reg.pc,opd);
@@ -289,7 +289,7 @@ inline void Mos6502::BVC(const byte opd) {
 }
 
 // Branch on Overflow Set
-inline void Mos6502::BVS(const byte opd) {
+inline void Cpu::Mos6502::BVS(const byte opd) {
   if(reg.srf.v == 1) {
     // Condition true, branch to PC + offset
     reg.pc = computeBranch(reg.pc,opd);
@@ -298,7 +298,7 @@ inline void Mos6502::BVS(const byte opd) {
 }
 
 // Compare Memory with Accumulator
-inline void Mos6502::CMP(const byte opd) {
+inline void Cpu::Mos6502::CMP(const byte opd) {
   // set appropriate bit flags
   reg.srf.n = reg.ac < opd; 
   reg.srf.z = reg.ac == opd; 
@@ -307,7 +307,7 @@ inline void Mos6502::CMP(const byte opd) {
 }
 
 // Compare Memory and Index X
-inline void Mos6502::CPX(const byte opd) {
+inline void Cpu::Mos6502::CPX(const byte opd) {
   // set appropriate bit flags
   reg.srf.n = reg.x < opd; 
   reg.srf.z = reg.x == opd; 
@@ -316,7 +316,7 @@ inline void Mos6502::CPX(const byte opd) {
 }
 
 // Compare Memory and Index Y
-inline void Mos6502::CPY(const byte opd) {
+inline void Cpu::Mos6502::CPY(const byte opd) {
   // set appropriate bit flags
   reg.srf.n = reg.y < opd; 
   reg.srf.z = reg.y == opd; 
@@ -325,7 +325,7 @@ inline void Mos6502::CPY(const byte opd) {
 }
 
 // Test Bits in Memory with Accumulator
-inline void Mos6502::BIT(const byte opd) {
+inline void Cpu::Mos6502::BIT(const byte opd) {
   // zero flag is set to result of A AND M
   reg.srf.z = checkNotZero(reg.ac & opd);
   // M7 -> N, M6 -> V
@@ -340,7 +340,7 @@ inline void Mos6502::BIT(const byte opd) {
 // ----------------------------------------------------------------------------
 
 // Shift Left One Bit (Memory or Accumulator)
-inline byte Mos6502::ASL(byte opd) {
+inline byte Cpu::Mos6502::ASL(byte opd) {
   // Set the carry bit.
   reg.srf.c = checkNthBit(opd, BitPosition::bit7);
   // Shift memory (or accumulator) left 1
@@ -352,7 +352,7 @@ inline byte Mos6502::ASL(byte opd) {
 }
 
 // Shift One Bit Right (Memory or Accumulator)
-inline byte Mos6502::LSR(byte opd) {
+inline byte Cpu::Mos6502::LSR(byte opd) {
   // Set the carry bit
   reg.srf.c = checkNthBit(opd, BitPosition::bit0);
   // Shift memory (or accumulator) left 1
@@ -363,7 +363,7 @@ inline byte Mos6502::LSR(byte opd) {
 }
 
 // Rotate One Bit Left (Memory or Accumulator)
-inline byte Mos6502::ROL(byte opd) {
+inline byte Cpu::Mos6502::ROL(byte opd) {
   // Store old carry
   byte old_c = reg.srf.c;
   // Set the carry bit
@@ -377,7 +377,7 @@ inline byte Mos6502::ROL(byte opd) {
 }
 
 // Rotate One Bit Right (Memory or Accumulator)
-inline byte Mos6502::ROR(byte opd) {
+inline byte Cpu::Mos6502::ROR(byte opd) {
   // Store old carry
   byte old_c = reg.srf.c;
   // Set the carry bit
@@ -396,7 +396,7 @@ inline byte Mos6502::ROR(byte opd) {
 // ----------------------------------------------------------------------------
 
 // Transfer Accumulator to Index X
-inline void Mos6502::TAX() {
+inline void Cpu::Mos6502::TAX() {
   // Copy accumulator to X register
   reg.x = reg.ac;
   // set appropriate status register flags
@@ -406,7 +406,7 @@ inline void Mos6502::TAX() {
 }
 
 // Transfer Accumulator to Index Y
-inline void Mos6502::TAY() {
+inline void Cpu::Mos6502::TAY() {
   // Copy accumulator to Y register
   reg.y = reg.ac;
   // set appropriate status register flags
@@ -416,7 +416,7 @@ inline void Mos6502::TAY() {
 }
 
 // Transfer Index X to Accumulator
-inline void Mos6502::TXA() {
+inline void Cpu::Mos6502::TXA() {
   // Copy X register to accumulator
   reg.ac = reg.x;
   // set appropriate status register flags
@@ -426,7 +426,7 @@ inline void Mos6502::TXA() {
 }
 
 // Transfer Index Y to Accumulator
-inline void Mos6502::TYA() {
+inline void Cpu::Mos6502::TYA() {
   // Copy Y register to accumulator
   reg.ac = reg.y;
   // set appropriate status register flags
@@ -441,7 +441,7 @@ inline void Mos6502::TYA() {
 // ----------------------------------------------------------------------------
 
 // Transfer Stack Pointer to Index X
-inline void Mos6502::TSX() {
+inline void Cpu::Mos6502::TSX() {
   // Copy Stack Pointer to X register
   reg.x = reg.sp;
   // set appropriate status register flags
@@ -451,7 +451,7 @@ inline void Mos6502::TSX() {
 }
 
 // Transfer Index X to Stack Pointer
-inline void Mos6502::TXS() {
+inline void Cpu::Mos6502::TXS() {
   // Copy X register to stack pointer
   reg.sp = reg.x;
   // set appropriate status register flags
@@ -461,19 +461,19 @@ inline void Mos6502::TXS() {
 }
 
 // Push Accumulator on the Stack
-inline void Mos6502::PHA() {
+inline void Cpu::Mos6502::PHA() {
   stack.push(reg.ac);
   return;
 }
 
 // Push Processor Status on the Stack
-inline void Mos6502::PHP() {
+inline void Cpu::Mos6502::PHP() {
   stack.push(reg.sr);
   return;
 }
 
 // Pull Accumulator from Stack
-inline void Mos6502::PLA() {
+inline void Cpu::Mos6502::PLA() {
   reg.ac = stack.pull();
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.sp);
@@ -482,7 +482,7 @@ inline void Mos6502::PLA() {
 }
 
 // Pull Processor Status from Stack
-inline void Mos6502::PLP() {
+inline void Cpu::Mos6502::PLP() {
   reg.sr = stack.pull();
   return;
 }
@@ -493,7 +493,7 @@ inline void Mos6502::PLP() {
 // ----------------------------------------------------------------------------
 
 // Jump to New Location Saving Return Address
-inline void Mos6502::JSR(const byte opd_lo, const byte opd_hi) {
+inline void Cpu::Mos6502::JSR(const byte opd_lo, const byte opd_hi) {
   // Push the value PC+2 onto the stack then assigned the new PC bytes from
   // opd_lo and opd_hi.
   // opd_lo -> PCL
@@ -506,7 +506,7 @@ inline void Mos6502::JSR(const byte opd_lo, const byte opd_hi) {
   return;
 }
 
-inline void Mos6502::RTI() {
+inline void Cpu::Mos6502::RTI() {
   // pull status register from stack, followed by program counter
   // BRK implementation pushes PCH then PCL then SR so must pull in reverse order
   reg.sr  = stack.pull();
@@ -516,7 +516,7 @@ inline void Mos6502::RTI() {
 }
 
 // Return from Subroutine
-inline void Mos6502::RTS() {
+inline void Cpu::Mos6502::RTS() {
   // pull program counter from the stack and increment to land on new instruction
   // JSR implementation pushes PCH then PCL so must pull PCL then PCH
   reg.pcl = stack.pull();
@@ -531,43 +531,43 @@ inline void Mos6502::RTS() {
 // ----------------------------------------------------------------------------
 
 // Clear Carry Flag
-inline void Mos6502::CLC() {
+inline void Cpu::Mos6502::CLC() {
   reg.srf.c = 0;
   return;
 }
 
 // Clear Decimal Mode
-inline void Mos6502::CLD() {
+inline void Cpu::Mos6502::CLD() {
   reg.srf.d = 0;
   return;
 }
 
 // Clear Interrupt Disable Bit
-inline void Mos6502::CLI() {
+inline void Cpu::Mos6502::CLI() {
   reg.srf.i = 0;
   return;
 }
 
 // Clear Overflow Flag
-inline void Mos6502::CLV() {
+inline void Cpu::Mos6502::CLV() {
   reg.srf.v = 0;
   return;
 }
 
 // Set Carry Flag
-inline void Mos6502::SEC() {
+inline void Cpu::Mos6502::SEC() {
   reg.srf.c = 1;
   return;
 }
 
 // Set Decimal Flag
-inline void Mos6502::SED() {
+inline void Cpu::Mos6502::SED() {
   reg.srf.d = 1;
   return;
 }
 
 // Set Interrupt Disable Status
-inline void Mos6502::SEI() {
+inline void Cpu::Mos6502::SEI() {
   reg.srf.i = 1;
   return;
 }
@@ -578,12 +578,12 @@ inline void Mos6502::SEI() {
 // ----------------------------------------------------------------------------
 
 // No Operation
-inline void Mos6502::NOP() {
+inline void Cpu::Mos6502::NOP() {
   return;
 }
 
 // Force Break
-inline void Mos6502::BRK() {
+inline void Cpu::Mos6502::BRK() {
   // interrupt, push PC+2, push SR
   reg.srf.i = 1; // Set interrupt flag
   stack.push(reg.pch);

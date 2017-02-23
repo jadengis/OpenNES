@@ -15,7 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "tests/catch.hpp"
-#include "Common.h"
+#include "common/CommonTypes.h"
 #include "memory/Ram.h"
 
 TEST_CASE("Ram write and read functionality", "[Memory][Ram]") {

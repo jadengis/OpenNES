@@ -15,7 +15,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "tests/catch.hpp"
-#include "Common.h"
+#include "common/CommonTypes.h"
 #include "memory/Ram.h"
 #include "memory/Reference.h"
 

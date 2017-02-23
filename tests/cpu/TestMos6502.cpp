@@ -15,12 +15,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "tests/catch.hpp"
-#include "commom/CommonTypes.h"
-#include "tests/cpu/TestMos6502.h"
+#include "common/CommonTypes.h"
+#include "tests/cpu/Mos6502.h"
 
 TEST_CASE("Functionality testing for Mos6502 ADC", "[Mos6502][ADC]") {
   // Build a Mos6502 test object
-  TestMos6502 cpu;
+  Test::Mos6502 cpu;
   // initialized accumulator should be zero
   REQUIRE(cpu.getRegAC() == 0);
 

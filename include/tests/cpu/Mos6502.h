@@ -20,7 +20,7 @@
 
 namespace Test {
 
-class TestMos6502 : public Cpu::Mos6502 {
+class Mos6502 : public Cpu::Mos6502 {
   public:
 
     // CPU Instruction emulation accessor functions
