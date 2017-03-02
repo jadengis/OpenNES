@@ -33,7 +33,7 @@ OBJECTS = $(SOURCES:.cpp=.o)
 all: $(LIB)
 
 $(LIB) : $(OBJECTS)
-	$(AR) rcs $(LIB) $(OBJECTS)
+	$(AR) rsv $(LIB) $(OBJECTS)
 
 %.o : %.cpp
 	$(CXX) $(CFLAGS) $< -o $@

@@ -13,7 +13,7 @@ include $(TOP)/Makefile.util
 ###############################################################################
 # Flags and Definitions
 ###############################################################################
-LFLAGS := $(LFLAGS) -L $(TOP)/source/cpu/ -lcpu
+LFLAGS := $(LFLAGS) $(TOP)/source/cpu/libcpu.a
 
 .KEEP_STATE:
 EXECUTABLE = test.out
