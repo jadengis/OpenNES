@@ -13,7 +13,7 @@
 #ifndef MEMORY_RAM_H
 #define MEMORY_RAM_H
 
-#include "Common.h"
+#include "common/CommonTypes.h"
 #include "memory/Exception.h"
 #include "memory/Bank.h"
 

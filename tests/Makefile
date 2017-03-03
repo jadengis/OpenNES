@@ -13,6 +13,7 @@ include $(TOP)/Makefile.util
 ###############################################################################
 # Flags and Definitions
 ###############################################################################
+LFLAGS := $(LFLAGS) $(TOP)/source/cpu/libcpu.a
 
 .KEEP_STATE:
 EXECUTABLE = test.out
@@ -40,4 +41,4 @@ $(SUBSYSTEMS):
 
 clean: 
 	$(foreach subsystem, $(SUBSYSTEMS), $(MAKE) -C $(subsystem) clean;)
-	$(RM) *.o *.d *.gcov *.gcno *.gcda
+	$(RM) $(TORM)

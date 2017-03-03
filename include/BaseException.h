@@ -3,7 +3,7 @@
 #define EXCEPTION_H
 #include <string.h>
 #include <iostream>
-#include "Common.h"
+#include "common/CommonTypes.h"
 
 namespace Exception {
 
