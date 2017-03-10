@@ -32,23 +32,39 @@ struct Mos6502Disassembler {
     /// This function sets the read position before executing.
     /// \param readPosition Memory location to read from.
     /// \return Disassembled instruction.
-    inline Mos6502Instruction&& disassembleInstruction(Memory::Reference readPosition);
+    inline Mos6502Instruction&& disassembleInstruction(Memory::Reference<byte> readPosition);
 
     /// Set the read position of te disassembler.
     /// \param readPosition Value of read position to set. 
-    inline void setReadPosition(Memory::Reference readPosition);
+    inline void setReadPosition(Memory::Reference<byte> readPosition);
   private:
+    /// This function builds and forwards a Mos6502Instruction given a set of
+    /// input data.
+    /// \param opcode Opcode of the instruction to return.
+    /// \param name Name of the instruction.
+    /// \param addr Addressing mode of the given instruction.
+    /// \param cycles Number of cycles taken to execute.
+    /// \param type The InstructionType of the instruction.
+    /// \return The formatted Mos6502 Instruction.
+    Mos6502Instruction&& initInstruction(
+        byte opcode,
+        std::string&& name,
+        std::string&& addr,
+        int64 cycles,
+        Mos6502Instruction::InstructionType type);
+
     /// Memory location to start reading bytes from.
-    Memory::Reference readPosition;
+    Memory::Reference<byte> readPosition;
 };
 
 // Inlinable definitions
-Mos6502Instruction&& disassembleInstruction(Memory::Reference readPosition) {
+Mos6502Instruction&& Mos6502Disassembler::disassembleInstruction(
+    Memory::Reference<byte> readPosition) {
   setReadPosition(readPosition);
   return disassembleInstruction();
 }
 
-void setReadPosition(Memory::Reference readPosition) {
+void Mos6502Disassembler::setReadPosition(Memory::Reference<byte> readPosition) {
   this->readPosition = readPosition;
 }
 

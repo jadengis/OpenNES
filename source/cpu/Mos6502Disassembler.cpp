@@ -12,16 +12,16 @@
 //===----------------------------------------------------------------------===//
 #include "memory/Reference.h"
 #include "cpu/Exception.h"
-#include "cpu/Mos6502_Op.h"
+#include "cpu/Mos6502_Ops.h"
 #include "cpu/Mos6502Instruction.h"
 #include "cpu/Mos6502Disassembler.h"
 
 using namespace Cpu;
 
 // Aliases for this file
-using Mos6502Instruction::InstructionType = Type
+using Type = Mos6502Instruction::InstructionType;
 
-static inline decltype(auto) initInstruction(
+Mos6502Instruction&& Mos6502Disassembler::initInstruction(
     byte opcode, 
     std::string&& name, 
     std::string&& addr, 
@@ -388,7 +388,7 @@ Mos6502Instruction&& Mos6502Disassembler::disassembleInstruction() {
       return initInstruction(opcode, "SBC", "abs,Y", 4, Type::TWO_OP);
     case Op::SBC_ABS_X:
       return initInstruction(opcode, "SBC", "abs,X", 4, Type::TWO_OP);
-    case Cpu::Op::INC_ABS_X:
+    case Op::INC_ABS_X:
       return initInstruction(opcode, "INC", "abs,X", 7, Type::TWO_OP);
     default:
       // opcode must be unrecognized, throw exception
