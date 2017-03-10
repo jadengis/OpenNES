@@ -36,6 +36,15 @@ TEST_CASE("Reference read and write to Ram", "[Memory][Reference]") {
     REQUIRE(testData == data);
   }
 
+  SECTION("Copy the reference and use it to write and read data") {
+    byte data = 7;
+    // write the data at the referenced index
+    ref.write(data);
+    Memory::Reference<byte> anotherRef(ref);
+    byte testData = anotherRef.read();
+    REQUIRE(testData == data);
+  }
+
   SECTION("Increment a reference and read the value") {
     // write some data to the RAM
     byte data = 8;

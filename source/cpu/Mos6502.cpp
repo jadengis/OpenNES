@@ -14,6 +14,7 @@
 #include "memory/Reference.h"
 #include "cpu/Exception.h"
 #include "cpu/Mos6502.h"
+#include "cpu/Mos6502Instruction.h"
 
 using namespace Cpu;
 
@@ -34,10 +35,10 @@ void Mos6502::shutdown() {
 byte Mos6502::fetchOpcode() {
 }
 
-Mos6502::Instruction Mos6502::decodeOpcode(byte opcode) {
+Mos6502Instruction Mos6502::decodeOpcode(byte opcode) {
 }
 
-void Mos6502::executeOpcode(Mos6502::Instruction inst) {
+void Mos6502::executeOpcode(Mos6502Instruction inst) {
 }
 
 // Cpu state inspection methods.

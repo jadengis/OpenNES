@@ -20,6 +20,7 @@
 #include "common/CommonTypes.h"
 #include "cpu/CpuBase.h"
 #include "cpu/Mos6502Instruction.h"
+#include "memory/Ram.h"
 #include "memory/Reference.h"
 
 namespace Cpu {
@@ -49,7 +50,7 @@ class Mos6502 : public CpuBase {
     /// Decode opcode into Instruction object
     virtual Mos6502Instruction decodeOpcode(byte opcode) final;
     /// Execute Instruction object
-    virtual void executeOpcode(Instruction inst) final;
+    virtual void executeOpcode(Mos6502Instruction inst) final;
 
     // Cpu state inspection methods
     int64 getCycleCount();
@@ -199,49 +200,42 @@ class Mos6502 : public CpuBase {
       byte  sp; // Stack Pointer
     } reg;
 
-    // Processor stack
-    // LIFO, top down, 8 bit range, 0x0100 - 0x01FF
+    /// Processor stack
+    /// LIFO, top down, 8 bit range, 0x0100 - 0x01FF
     class Stack {
       public:
         inline void push(byte data) {
           // store data at current location and decrement
-          top--;
-          *top = data;
+          --top;
+          top.write(data);
         }
 
         inline byte pull() {
           // retrieve data, increment, and return data
-          auto temp = *top;
-          top++;
+          auto temp = top.read();
+          ++top;
           return temp;
         }
 
-        Stack(std::unique_ptr<byte[]> mem_ptr = nullptr) {
-          // If we construct with a non-null unique_ptr, we will move ownership
-          // of that memory resource to this stack. Otherwise, we will make our
-          // own unique_ptr.
-          if(mem_ptr == nullptr) {
-            base = std::make_unique<byte[]>(std::numeric_limits<byte>::max() + 1);
-          }
-          else {
-            base = std::move(mem_ptr);
+        Stack(std::shared_ptr<Memory::Ram<byte>> bank = nullptr, std::size_t base = 0) {
+          // If the memory Ram ptr passed in is null, create a new Ram to contain
+          // this stack.
+          if(bank == nullptr) {
+            bank = std::make_shared<Memory::Ram<byte>>(std::numeric_limits<byte>::max() + 1);
+            // if we built our own Ram, base is irrelevant, so set this to 0
+            base = 0;
           }
           // Mos6502 stack is top-down, so we must offset top from base.
-          top = base.get() + std::numeric_limits<byte>::max();
+          top = Memory::Reference<byte>(bank, base + std::numeric_limits<byte>::max());
         }
 
-        ~Stack() {
-          // Set both pointers to be nullptr for safety
-          top = nullptr;
-          base = nullptr;
-        }
+        ~Stack() {}
+
       private:
-        // The stack consists of two pointers, one raw pointer, top,
-        // which will point to the 'top' of the stack, and one unique_ptr
-        // base, which will control the memory resource associated with this
-        // Stack.
-        byte* top;
-        std::unique_ptr<byte[]> base;
+        // this stack consists of a memory reference to the top of the stack inside
+        // a Ram object.
+        Memory::Reference<byte> top;
+
     } stack;
 };
 

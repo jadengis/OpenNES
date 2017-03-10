@@ -24,8 +24,10 @@ namespace Memory {
 template<class Wordsize>
 class Reference {
   public:
-    // Constructor and Destructor
+    // Constructors and Destructor
+    inline Reference();
     inline Reference(std::shared_ptr<Bank<Wordsize>> dataBank, std::size_t index);
+    inline Reference(const Reference<Wordsize>& reference);
     virtual ~Reference() {};
 
     /// Write to referenced location
@@ -34,10 +36,12 @@ class Reference {
     /// Read from references location
     inline const Wordsize read() const;
 
-    /// Increment the reference index
+    /// Increment the reference index before return.
+    /// \return Reference to this for chaining.
     inline const Reference& operator++();
 
-    /// Decrement the reference index
+    /// Decrement the reference index before return.
+    /// \return Reference to this for chaining.
     inline const Reference& operator--();
 
   private:
@@ -48,11 +52,27 @@ class Reference {
     std::shared_ptr<Bank<Wordsize>> dataBank;
 };
 
+// default constructor
 template <class Wordsize>
-Reference<Wordsize>::Reference(std::shared_ptr<Memory::Bank<Wordsize>> dataBank,
-                               std::size_t index) {
+Reference<Wordsize>::Reference() {
+  this->dataBank = nullptr;
+  this->index = 0;
+}
+
+// normal constructor
+template <class Wordsize>
+Reference<Wordsize>::Reference(
+    std::shared_ptr<Memory::Bank<Wordsize>> dataBank,
+    std::size_t index) {
   this->dataBank = dataBank;
   this->index = index;
+}
+
+// copy constructor
+template <class Wordsize>
+Reference<Wordsize>::Reference(const Reference<Wordsize>& reference) {
+  this->dataBank = reference.dataBank;
+  this->index = reference.index;
 }
 
 template<class Wordsize>
