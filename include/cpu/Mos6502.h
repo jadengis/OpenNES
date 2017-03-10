@@ -19,18 +19,13 @@
 
 #include "common/CommonTypes.h"
 #include "cpu/CpuBase.h"
+#include "cpu/Mos6502Instruction.h"
 #include "memory/Reference.h"
 
 namespace Cpu {
 
 class Mos6502 : public CpuBase {
   public:
-
-    // Mos6502 Instruction class
-    struct Instruction {
-      std::string name;
-      byte opcode;
-    };
 
     // Constructors
     Mos6502() {
@@ -52,7 +47,7 @@ class Mos6502 : public CpuBase {
     /// Fetch opcode from memory
     virtual byte fetchOpcode() final;
     /// Decode opcode into Instruction object
-    virtual Instruction decodeOpcode(byte opcode) final;
+    virtual Mos6502Instruction decodeOpcode(byte opcode) final;
     /// Execute Instruction object
     virtual void executeOpcode(Instruction inst) final;
 

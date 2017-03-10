@@ -7,781 +7,389 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// This file contains the implementation of the public interface for the
-/// Mos6502 class.
+/// This file contains the implementation of the Mos6502Disassembler.
 ///
 //===----------------------------------------------------------------------===//
 #include "memory/Reference.h"
 #include "cpu/Exception.h"
-#include "cpu/Mos6502.h"
+#include "cpu/Mos6502_Op.h"
+#include "cpu/Mos6502Instruction.h"
+#include "cpu/Mos6502Disassembler.h"
 
-void disassembleInstruction(byte opcode) {
-  // To execute a fetched opcode, first update the cycle count, use the indicated
-  // addressing mode to compute the memory reference, if needed, and then call the
-  // associated emulation function
+using namespace Cpu;
 
-  // Declare memory refence before looking up the opcode
-  Memory::Reference<byte> ref(nullptr, 0);
+// Aliases for this file
+using Mos6502Instruction::InstructionType = Type
+
+static inline decltype(auto) initInstruction(
+    byte opcode, 
+    std::string&& name, 
+    std::string&& addr, 
+    int64 cycles,
+    Type type) {
+  // declare an empty Mos6502Instruction
+  Mos6502Instruction instruction;
+  instruction.opcode = opcode;
+  instruction.name = name;
+  instruction.addr = addr;
+  instruction.cycles = cycles;
+  instruction.type = type;
+  switch(type) {
+    case Type::NO_OP:
+      instruction.operand.lo = 0;
+      instruction.operand.hi = 0;
+      break;
+    case Type::ONE_OP:
+      instruction.operand.lo = (++readPosition).read();
+      instruction.operand.hi = 0;
+      break;
+    case Type::TWO_OP:
+      instruction.operand.lo = (++readPosition).read();
+      instruction.operand.hi = (++readPosition).read();
+      break;
+  }
+  return std::move(instruction);
+}
+
+Mos6502Instruction&& Mos6502Disassembler::disassembleInstruction() {
+  // Read the opcode from the reference
+  byte opcode = readPosition.read();
 
   // Lookup the fetched opcode
   switch(opcode) {
     // HI-NIBBLE == 0x00
-    case Cpu::Op::BRK_IMPL:
-      cycleCount += 7;
-      BRK();
-      break;
-    case Cpu::Op::ORA_X_IND:
-      cycleCount += 6;
-      ref = X_IND();
-      ORA(ref.read());
-      break;
-    case Cpu::Op::ORA_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      ORA(ref.read());
-      break;
-    case Cpu::Op::ASL_ZPG:
-      cycleCount += 5;
-      ref = ZPG();
-      ref.write(ASL(ref.read()));
-      break;
-    case Cpu::Op::PHP_IMPL:
-      cycleCount += 3;
-      PHP();
-      break;
-    case Cpu::Op::ORA_IMMED:
-      cycleCount += 2;
-      ref = IMMED();
-      ORA(ref.read());
-      break;
-    case Cpu::Op::ASL_ACC:
-      cycleCount += 2;
-      reg.ac = ASL(reg.ac);
-      break;
-    case Cpu::Op::ORA_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      ORA(ref.read());
-      break;
-    case Cpu::Op::ASL_ABS:
-      cycleCount += 6;
-      ref = ABS();
-      ref.write(ASL(ref.read()));
-      break;
+    case Op::BRK_IMPL: 
+      return initInstruction(opcode, "BRK", "impl", 7, Type::NO_OP);
+    case Op::ORA_X_IND:
+      return initInstruction(opcode, "ORA", "X,ind", 6, Type::ONE_OP);
+    case Op::ORA_ZPG:
+      return initInstruction(opcode, "ORA", "zpg", 3, Type::ONE_OP);
+    case Op::ASL_ZPG:
+      return initInstruction(opcode, "ASL", "zpg", 5, Type::ONE_OP);
+    case Op::PHP_IMPL:
+      return initInstruction(opcode, "PHP", "impl", 3, Type::NO_OP);
+    case Op::ORA_IMMED:
+      return initInstruction(opcode, "ORA", "#", 2, Type::ONE_OP);
+    case Op::ASL_ACC:
+      return initInstruction(opcode, "ASL", "A", 2, Type::NO_OP);
+    case Op::ORA_ABS:
+      return initInstruction(opcode, "ORA", "abs", 4, Type::TWO_OP);
+    case Op::ASL_ABS:
+      return initInstruction(opcode, "ASL", "abs", 6, Type::TWO_OP);
 
     // HI-NIBBLE == 0x10
-    case Cpu::Op::BPL_REL:
-      cycleCount += 2;
-      ref = REL();
-      BPL(ref.read());
-      break;
-    case Cpu::Op::ORA_IND_Y:
-      cycleCount += 5;
-      ref = IND_Y();
-      ORA(ref.read());
-      break;
-    case Cpu::Op::ORA_ZPG_X:
-      cycleCount += 4;
-      ref = ZPG_X();
-      ORA(ref.read());
-      break;
-    case Cpu::Op::ASL_ZPG_X:
-      cycleCount += 6;
-      ref = ZPG_X();
-      ref.write(ASL(ref.read()));
-      break;
-    case Cpu::Op::CLC_IMPL:
-      cycleCount += 2;
-      CLC();
-      break;
-    case Cpu::Op::ORA_ABS_Y:
-      cycleCount += 4;
-      ref = ABS_Y();
-      ORA(ref.read());
-      break;
-    case Cpu::Op::ORA_ABS_X:
-      cycleCount += 4;
-      ref = ABS_X();
-      ORA(ref.read());
-      break;
-    case Cpu::Op::ASL_ABS_X:
-      cycleCount += 4;
-      ref = ABS_X();
-      ref.write(ASL(ref.read()));
-      break;
+    case Op::BPL_REL:
+      return initInstruction(opcode, "BPL", "rel", 2, Type::ONE_OP);
+    case Op::ORA_IND_Y:
+      return initInstruction(opcode, "ORA", "ind,Y", 5, Type::ONE_OP);
+    case Op::ORA_ZPG_X:
+      return initInstruction(opcode, "ORA", "zpg,X", 4, Type::ONE_OP);
+    case Op::ASL_ZPG_X:
+      return initInstruction(opcode, "ASL", "zpg,X", 6, Type::ONE_OP);
+    case Op::CLC_IMPL:
+      return initInstruction(opcode, "CLC", "impl", 2, Type::NO_OP);
+    case Op::ORA_ABS_Y:
+      return initInstruction(opcode, "ORA", "abs,Y", 4, Type::TWO_OP);
+    case Op::ORA_ABS_X:
+      return initInstruction(opcode, "ORA", "abs,X", 4, Type::TWO_OP);
+    case Op::ASL_ABS_X:
+      return initInstruction(opcode, "ASL", "abs,X", 4, Type::TWO_OP);
 
     // HI-NIBBLE == 0x20
-    case Cpu::Op::JSR_ABS:
-      cycleCount += 6;
-      ref = ABS();
-      JSR(ref.read(), (++ref).read());
-      break;
-    case Cpu::Op::AND_X_IND:
-      cycleCount += 6;
-      ref = X_IND();
-      AND(ref.read());
-      break;
-    case Cpu::Op::BIT_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      BIT(ref.read());
-      break;
-    case Cpu::Op::AND_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      AND(ref.read());
-      break;
-    case Cpu::Op::ROL_ZPG:
-      cycleCount += 5;
-      ref = ZPG();
-      ref.write(ROL(ref.read()));
-      break;
-    case Cpu::Op::PLP_IMPL:
-      cycleCount += 4;
-      PLP();
-      break;
-    case Cpu::Op::AND_IMMED:
-      cycleCount += 2;
-      ref = IMMED();
-      AND(ref.read());
-      break;
-    case Cpu::Op::ROL_ACC:
-      cycleCount += 2;
-      reg.ac = ROL(reg.ac);
-      break;
-    case Cpu::Op::BIT_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      BIT(ref.read());
-      break;
-    case Cpu::Op::AND_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      AND(ref.read());
-      break;
-    case Cpu::Op::ROL_ABS:
-      cycleCount += 6;
-      ref = ABS();
-      ref.write(ROL(ref.read()));
-      break;
+    case Op::JSR_ABS:
+      return initInstruction(opcode, "JSR", "abs", 6, Type::TWO_OP);
+    case Op::AND_X_IND:
+      return initInstruction(opcode, "AND", "X,ind", 6, Type::ONE_OP);
+    case Op::BIT_ZPG:
+      return initInstruction(opcode, "BIT", "zpg", 3, Type::ONE_OP);
+    case Op::AND_ZPG:
+      return initInstruction(opcode, "AND", "zpg", 3, Type::ONE_OP);
+    case Op::ROL_ZPG:
+      return initInstruction(opcode, "ROL", "zpg", 5, Type::ONE_OP);
+    case Op::PLP_IMPL:
+      return initInstruction(opcode, "PLP", "impl", 4, Type::NO_OP);
+    case Op::AND_IMMED:
+      return initInstruction(opcode, "AND", "#", 2, Type::ONE_OP);
+    case Op::ROL_ACC:
+      return initInstruction(opcode, "ROL", "A", 2, Type::NO_OP);
+    case Op::BIT_ABS:
+      return initInstruction(opcode, "BIT", "abs", 4, Type::TWO_OP);
+    case Op::AND_ABS:
+      return initInstruction(opcode, "AND", "abs", 4, Type::TWO_OP);
+    case Op::ROL_ABS:
+      return initInstruction(opcode, "ROL", "abs", 6, Type::TWO_OP);
 
     // HI-NIBBLE == 0x30
-    case Cpu::Op::BMI_REL:
-      cycleCount += 2;
-      ref = REL();
-      BMI(ref.read());
-      break;
-    case Cpu::Op::AND_IND_Y:
-      cycleCount += 5;
-      ref = IND_Y();
-      AND(ref.read());
-      break;
-    case Cpu::Op::AND_ZPG_X:
-      cycleCount += 4;
-      ref = ZPG_X();
-      AND(ref.read());
-      break;
-    case Cpu::Op::ROL_ZPG_X:
-      cycleCount += 6;
-      ref = ZPG_X();
-      ref.write(ROL(ref.read()));
-      break;
-    case Cpu::Op::SEC_IMPL:
-      cycleCount += 2;
-      SEC();
-      break;
-    case Cpu::Op::AND_ABS_Y:
-      cycleCount += 4;
-      ref = ABS_Y();
-      AND(ref.read());
-      break;
-    case Cpu::Op::AND_ABS_X:
-      cycleCount += 4;
-      ref = ABS_X();
-      AND(ref.read());
-      break;
-    case Cpu::Op::ROL_ABS_X:
-      cycleCount += 7;
-      ref = ABS_X();
-      ref.write(ROL(ref.read()));
-      break;
+    case Op::BMI_REL:
+      return initInstruction(opcode, "BMI", "rel", 2, Type::ONE_OP);
+    case Op::AND_IND_Y:
+      return initInstruction(opcode, "AND", "ind,Y", 5, Type::ONE_OP);
+    case Op::AND_ZPG_X:
+      return initInstruction(opcode, "AND", "zpg,X", 4, Type::ONE_OP);
+    case Op::ROL_ZPG_X:
+      return initInstruction(opcode, "ROL", "zpg,X", 6, Type::ONE_OP);
+    case Op::SEC_IMPL:
+      return initInstruction(opcode, "SEC", "impl", 2, Type::NO_OP);
+    case Op::AND_ABS_Y:
+      return initInstruction(opcode, "AND", "abs,Y", 4, Type::TWO_OP);
+    case Op::AND_ABS_X:
+      return initInstruction(opcode, "AND", "abs,X", 4, Type::TWO_OP);
+    case Op::ROL_ABS_X:
+      return initInstruction(opcode, "ROL", "abs,X", 7, Type::TWO_OP);
 
     // HI-NIBBLE == 0x40
-    case Cpu::Op::RTI_IMPL:
-      cycleCount += 6;
-      RTI();
-      break;
-    case Cpu::Op::EOR_X_IND:
-      cycleCount += 6;
-      ref = X_IND();
-      EOR(ref.read());
-      break;
-    case Cpu::Op::EOR_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      EOR(ref.read());
-      break;
-    case Cpu::Op::LSR_ZPG:
-      cycleCount += 5;
-      ref = ZPG();
-      ref.write(LSR(ref.read()));
-      break;
-    case Cpu::Op::PHA_IMPL:
-      cycleCount += 3;
-      PHA();
-      break;
-    case Cpu::Op::EOR_IMMED:
-      cycleCount += 2;
-      ref = IMMED();
-      EOR(ref.read());
-      break;
-    case Cpu::Op::LSR_ACC:
-      cycleCount += 2;
-      reg.ac = LSR(reg.ac);
-      break;
-    case Cpu::Op::JMP_ABS:
-      cycleCount += 3;
-      ref = ABS();
-      JMP(ref.read(), (++ref).read());
-      break;
-    case Cpu::Op::EOR_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      EOR(ref.read());
-      break;
-    case Cpu::Op::LSR_ABS:
-      cycleCount += 6;
-      ref = ABS();
-      ref.write(LSR(ref.read()));
-      break;
+    case Op::RTI_IMPL:
+      return initInstruction(opcode, "RTI", "impl", 6, Type::NO_OP);
+    case Op::EOR_X_IND:
+      return initInstruction(opcode, "EOR", "X,ind", 6, Type::ONE_OP);
+    case Op::EOR_ZPG:
+      return initInstruction(opcode, "EOR", "zpg", 3, Type::ONE_OP);
+    case Op::LSR_ZPG:
+      return initInstruction(opcode, "LSR", "zpg", 5, Type::ONE_OP);
+    case Op::PHA_IMPL:
+      return initInstruction(opcode, "PHA", "impl", 3, Type::NO_OP);
+    case Op::EOR_IMMED:
+      return initInstruction(opcode, "EOR", "#", 2, Type::ONE_OP);
+    case Op::LSR_ACC:
+      return initInstruction(opcode, "LSR", "A", 2, Type::NO_OP);
+    case Op::JMP_ABS:
+      return initInstruction(opcode, "JMP", "abs", 3, Type::TWO_OP);
+    case Op::EOR_ABS:
+      return initInstruction(opcode, "EOR", "abs", 4, Type::TWO_OP);
+    case Op::LSR_ABS:
+      return initInstruction(opcode, "LSR", "abs", 6, Type::TWO_OP);
 
     // HI-NIBBLE == 0x50
-    case Cpu::Op::BVC_REL:
-      cycleCount += 2;
-      ref = REL();
-      BVC(ref.read());
-      break;
-    case Cpu::Op::EOR_IND_Y:
-      cycleCount += 5;
-      ref = IND_Y();
-      EOR(ref.read());
-      break;
-    case Cpu::Op::EOR_ZPG_X:
-      cycleCount += 4;
-      ref = ZPG_X();
-      EOR(ref.read());
-      break;
-    case Cpu::Op::LSR_ZPG_X:
-      cycleCount += 6;
-      ref = ZPG_X();
-      ref.write(LSR(ref.read()));
-      break;
-    case Cpu::Op::CLI_IMPL:
-      cycleCount += 2;
-      CLI();
-      break;
-    case Cpu::Op::EOR_ABS_Y:
-      cycleCount += 4;
-      ref = ABS_Y();
-      EOR(ref.read());
-      break;
-    case Cpu::Op::EOR_ABS_X:
-      cycleCount += 4;
-      ref = ABS_X();
-      EOR(ref.read());
-      break;
-    case Cpu::Op::LSR_ABS_X:
-      cycleCount += 7;
-      ref = ABS_X();
-      ref.write(LSR(ref.read()));
-      break;
+    case Op::BVC_REL:
+      return initInstruction(opcode, "BVC", "rel", 2, Type::ONE_OP);
+    case Op::EOR_IND_Y:
+      return initInstruction(opcode, "EOR", "ind,Y", 5, Type::ONE_OP);
+    case Op::EOR_ZPG_X:
+      return initInstruction(opcode, "EOR", "zpg,X", 4, Type::ONE_OP);
+    case Op::LSR_ZPG_X:
+      return initInstruction(opcode, "LSR", "zpg,X", 6, Type::ONE_OP);
+    case Op::CLI_IMPL:
+      return initInstruction(opcode, "CLI", "impl", 2, Type::NO_OP);
+    case Op::EOR_ABS_Y:
+      return initInstruction(opcode, "EOR", "abs,Y", 4, Type::TWO_OP);
+    case Op::EOR_ABS_X:
+      return initInstruction(opcode, "EOR", "abs,X", 4, Type::TWO_OP);
+    case Op::LSR_ABS_X:
+      return initInstruction(opcode, "LSR", "abs,X", 7, Type::TWO_OP);
 
     // HI-NIBBLE == 0x60
-    case Cpu::Op::RTS_IMPL:
-      cycleCount += 6;
-      RTS();
-      break;
-    case Cpu::Op::ADC_X_IND:
-      cycleCount += 6;
-      ref = X_IND();
-      ADC(ref.read());
-      break;
-    case Cpu::Op::ADC_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      ADC(ref.read());
-      break;
-    case Cpu::Op::ROR_ZPG:
-      cycleCount += 5;
-      ref = ZPG();
-      ref.write(ROR(ref.read()));
-      break;
-    case Cpu::Op::PLA_IMPL:
-      cycleCount += 4;
-      PLA();
-      break;
-    case Cpu::Op::ADC_IMMED:
-      cycleCount += 2;
-      ref = IMMED();
-      ADC(ref.read());
-      break;
-    case Cpu::Op::ROR_ACC:
-      cycleCount += 2;
-      reg.ac = ROR(reg.ac);
-      break;
-    case Cpu::Op::JMP_IND:
-      cycleCount += 5;
-      ref = IND();
-      JMP(ref.read(), (++ref).read());
-      break;
-    case Cpu::Op::ADC_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      ADC(ref.read());
-      break;
-    case Cpu::Op::ROR_ABS:
-      cycleCount += 6;
-      ref = ABS();
-      ref.write(ROR(ref.read()));
-      break;
+    case Op::RTS_IMPL:
+      return initInstruction(opcode, "RTS", "impl", 6, Type::NO_OP);
+    case Op::ADC_X_IND:
+      return initInstruction(opcode, "ADC", "X,ind", 6, Type::ONE_OP);
+    case Op::ADC_ZPG:
+      return initInstruction(opcode, "ADC", "zpg", 3, Type::ONE_OP);
+    case Op::ROR_ZPG:
+      return initInstruction(opcode, "ROR", "zpg", 5, Type::ONE_OP);
+    case Op::PLA_IMPL:
+      return initInstruction(opcode, "PLA", "impl", 4, Type::NO_OP);
+    case Op::ADC_IMMED:
+      return initInstruction(opcode, "ADC", "#", 2, Type::ONE_OP);
+    case Op::ROR_ACC:
+      return initInstruction(opcode, "ROR", "A", 2, Type::NO_OP);
+    case Op::JMP_IND:
+      return initInstruction(opcode, "JMP", "ind", 5, Type::TWO_OP);
+    case Op::ADC_ABS:
+      return initInstruction(opcode, "ADC", "abs", 4, Type::TWO_OP);
+    case Op::ROR_ABS:
+      return initInstruction(opcode, "ROR", "abs", 6, Type::TWO_OP);
 
     // HI-NIBBLE == 0x70
-    case Cpu::Op::BVS_REL:
-      cycleCount += 2;
-      ref = REL();
-      BVS(ref.read());
-      break;
-    case Cpu::Op::ADC_IND_Y:
-      cycleCount += 5;
-      ref = IND_Y();
-      ADC(ref.read());
-      break;
-    case Cpu::Op::ADC_ZPG_X:
-      cycleCount += 4;
-      ref = ZPG_X();
-      ADC(ref.read());
-      break;
-    case Cpu::Op::ROR_ZPG_X:
-      cycleCount += 6;
-      ref = ZPG_X();
-      ref.write(ROR(ref.read()));
-      break;
-    case Cpu::Op::SEI_IMPL:
-      cycleCount += 2;
-      SEI();
-      break;
-    case Cpu::Op::ADC_ABS_Y:
-      cycleCount += 5;
-      ref = ABS_Y();
-      ADC(ref.read());
-      break;
-    case Cpu::Op::ADC_ABS_X:
-      cycleCount += 6;
-      ref = ABS_X();
-      ADC(ref.read());
-      break;
-    case Cpu::Op::ROR_ABS_X:
-      cycleCount += 7;
-      ref = ABS_X();
-      ref.write(ROR(ref.read()));
-      break;
+    case Op::BVS_REL:
+      return initInstruction(opcode, "BVS", "rel", 2, Type::ONE_OP);
+    case Op::ADC_IND_Y:
+      return initInstruction(opcode, "ADC", "ind,Y", 5, Type::ONE_OP);
+    case Op::ADC_ZPG_X:
+      return initInstruction(opcode, "ADC", "zpg,X", 4, Type::ONE_OP);
+    case Op::ROR_ZPG_X:
+      return initInstruction(opcode, "ROR", "zpg,X", 6, Type::ONE_OP);
+    case Op::SEI_IMPL:
+      return initInstruction(opcode, "SEI", "impl", 2, Type::NO_OP);
+    case Op::ADC_ABS_Y:
+      return initInstruction(opcode, "ADC", "abs,Y", 4, Type::TWO_OP);
+    case Op::ADC_ABS_X:
+      return initInstruction(opcode, "ADC", "abs,X", 4, Type::TWO_OP);
+    case Op::ROR_ABS_X:
+      return initInstruction(opcode, "ROR", "abs,X", 7, Type::TWO_OP);
 
     // HI-NIBBLE == 0x80
-    case Cpu::Op::STA_X_IND:
-      cycleCount += 6;
-      ref = X_IND();
-      ref.write(STA());
-      break;
-    case Cpu::Op::STY_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      ref.write(STY());
-      break;
-    case Cpu::Op::STA_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      ref.write(STA());
-      break;
-    case Cpu::Op::STX_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      ref.write(STX());
-      break;
-    case Cpu::Op::DEY_IMPL:
-      cycleCount += 2;
-      DEY();
-      break;
-    case Cpu::Op::TXA_IMPL:
-      cycleCount += 2;
-      TXA();
-      break;
-    case Cpu::Op::STY_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      ref.write(STY());
-      break;
-    case Cpu::Op::STA_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      ref.write(STA());
-      break;
-    case Cpu::Op::STX_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      ref.write(STX());
-      break;
+    case Op::STA_X_IND:
+      return initInstruction(opcode, "STA", "X,ind", 6, Type::ONE_OP);
+    case Op::STY_ZPG:
+      return initInstruction(opcode, "STY", "zpg", 3, Type::ONE_OP);
+    case Op::STA_ZPG:
+      return initInstruction(opcode, "STA", "zpg", 3, Type::ONE_OP);
+    case Op::STX_ZPG:
+      return initInstruction(opcode, "STX", "zpg", 3, Type::ONE_OP);
+    case Op::DEY_IMPL:
+      return initInstruction(opcode, "DEY", "impl", 2, Type::NO_OP);
+    case Op::TXA_IMPL:
+      return initInstruction(opcode, "TXA", "impl", 2, Type::NO_OP);
+    case Op::STY_ABS:
+      return initInstruction(opcode, "STY", "abs", 4, Type::TWO_OP);
+    case Op::STA_ABS:
+      return initInstruction(opcode, "STA", "abs", 4, Type::TWO_OP);
+    case Op::STX_ABS:
+      return initInstruction(opcode, "STX", "abs", 4, Type::TWO_OP);
 
     // HI-NIBBLE == 0x90
-    case Cpu::Op::BCC_REL:
-      cycleCount += 2;
-      ref = REL();
-      BCC(ref.read());
-      break;
-    case Cpu::Op::STA_IND_Y:
-      cycleCount += 6;
-      ref = IND_Y();
-      ref.write(STA());
-      break;
-    case Cpu::Op::STY_ZPG_X:
-      cycleCount += 4;
-      ref = ZPG_X();
-      ref.write(STY());
-      break;
-    case Cpu::Op::STA_ZPG_X:
-      cycleCount += 4;
-      ref = ZPG_X();
-      ref.write(STA());
-      break;
-    case Cpu::Op::STX_ZPG_Y:
-      cycleCount += 4;
-      ref = ZPG_Y();
-      ref.write(STX());
-      break;
-    case Cpu::Op::TYA_IMPL:
-      cycleCount += 2;
-      TYA();
-      break;
-    case Cpu::Op::STA_ABS_Y:
-      cycleCount += 4;
-      ref = ABS_Y();
-      ref.write(STA());
-      break;
-    case Cpu::Op::TXS_IMPL:
-      cycleCount += 2;
-      TXS();
-      break;
-    case Cpu::Op::STA_ABS_X:
-      cycleCount += 4;
-      ref = ABS_X();
-      ref.write(STA());
-      break;
+    case Op::BCC_REL:
+      return initInstruction(opcode, "BCC", "rel", 2, Type::ONE_OP);
+    case Op::STA_IND_Y:
+      return initInstruction(opcode, "STA", "ind,Y", 6, Type::ONE_OP);
+    case Op::STY_ZPG_X:
+      return initInstruction(opcode, "STY", "zpg,X", 4, Type::ONE_OP);
+    case Op::STA_ZPG_X:
+      return initInstruction(opcode, "STA", "zpg,X", 4, Type::ONE_OP);
+    case Op::STX_ZPG_Y:
+      return initInstruction(opcode, "STX", "zpg,Y", 4, Type::ONE_OP);
+    case Op::TYA_IMPL:
+      return initInstruction(opcode, "TYA", "impl", 2, Type::NO_OP);
+    case Op::STA_ABS_Y:
+      return initInstruction(opcode, "STA", "abs,Y", 5, Type::TWO_OP);
+    case Op::TXS_IMPL:
+      return initInstruction(opcode, "TXS", "impl", 2, Type::NO_OP);
+    case Op::STA_ABS_X:
+      return initInstruction(opcode, "STA", "abs,X", 5, Type::TWO_OP);
 
     // HI-NIBBLE == 0xA0
-    case Cpu::Op::LDY_IMMED:
-      cycleCount += 2;
-      ref = IMMED();
-      LDY(ref.read());
-      break;
-    case Cpu::Op::LDA_X_IND:
-      cycleCount += 6;
-      ref = X_IND();
-      LDA(ref.read());
-      break;
-    case Cpu::Op::LDX_IMMED:
-      cycleCount += 2;
-      ref = IMMED();
-      LDX(ref.read());
-      break;
-    case Cpu::Op::LDY_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      LDY(ref.read());
-      break;
-    case Cpu::Op::LDA_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      LDA(ref.read());
-      break;
-    case Cpu::Op::LDX_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      LDX(ref.read());
-      break;
-    case Cpu::Op::TAY_IMPL:
-      cycleCount += 2;
-      TAY();
-      break;
-    case Cpu::Op::LDA_IMMED:
-      cycleCount += 2;
-      ref = IMMED();
-      LDA(ref.read());
-      break;
-    case Cpu::Op::TAX_IMPL:
-      cycleCount += 2;
-      TAX();
-      break;
-    case Cpu::Op::LDY_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      LDY(ref.read());
-      break;
-    case Cpu::Op::LDA_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      LDA(ref.read());
-      break;
-    case Cpu::Op::LDX_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      LDX(ref.read());
-      break;
+    case Op::LDY_IMMED:
+      return initInstruction(opcode, "LDY", "#", 2, Type::ONE_OP);
+    case Op::LDA_X_IND:
+      return initInstruction(opcode, "LDY", "X,ind", 6, Type::ONE_OP);
+    case Op::LDX_IMMED:
+      return initInstruction(opcode, "LDX", "#", 2, Type::ONE_OP);
+    case Op::LDY_ZPG:
+      return initInstruction(opcode, "LDY", "zpg", 3, Type::ONE_OP);
+    case Op::LDA_ZPG:
+      return initInstruction(opcode, "LDA", "zpg", 3, Type::ONE_OP);
+    case Op::LDX_ZPG:
+      return initInstruction(opcode, "LDX", "zpg", 3, Type::ONE_OP);
+    case Op::TAY_IMPL:
+      return initInstruction(opcode, "TAY", "impl", 2, Type::NO_OP);
+    case Op::LDA_IMMED:
+      return initInstruction(opcode, "LDA", "#", 2, Type::ONE_OP);
+    case Op::TAX_IMPL:
+      return initInstruction(opcode, "TAX", "impl", 2, Type::NO_OP);
+    case Op::LDY_ABS:
+      return initInstruction(opcode, "LDY", "abs", 4, Type::TWO_OP);
+    case Op::LDA_ABS:
+      return initInstruction(opcode, "LDA", "abs", 4, Type::TWO_OP);
+    case Op::LDX_ABS:
+      return initInstruction(opcode, "LDX", "abs", 4, Type::TWO_OP);
 
     // HI-NIBBLE == 0xB0
-    case Cpu::Op::BCS_REL:
-      cycleCount += 2;
-      ref = REL();
-      BCS(ref.read());
-      break;
-    case Cpu::Op::LDA_IND_Y:
-      cycleCount += 5;
-      ref = IND_Y();
-      LDA(ref.read());
-      break;
-    case Cpu::Op::LDY_ZPG_X:
-      cycleCount += 4;
-      ref = ZPG_X();
-      LDY(ref.read());
-      break;
-    case Cpu::Op::LDA_ZPG_X:
-      cycleCount += 4;
-      ref = ZPG_X();
-      LDA(ref.read());
-      break;
-    case Cpu::Op::LDX_ZPG_Y:
-      cycleCount += 4;
-      ref = ZPG_Y();
-      LDX(ref.read());
-      break;
-    case Cpu::Op::CLV_IMPL:
-      cycleCount += 2;
-      CLV();
-      break;
-    case Cpu::Op::LDA_ABS_Y:
-      cycleCount += 4;
-      ref = ABS_Y();
-      LDA(ref.read());
-      break;
-    case Cpu::Op::TSX_IMPL:
-      cycleCount += 2;
-      TSX();
-      break;
-    case Cpu::Op::LDY_ABS_X:
-      cycleCount += 4;
-      ref = ABS_X();
-      LDY(ref.read());
-      break;
-    case Cpu::Op::LDA_ABS_X:
-      cycleCount += 4;
-      ref = ABS_X();
-      LDA(ref.read());
-      break;
-    case Cpu::Op::LDX_ABS_Y:
-      cycleCount += 4;
-      ref = ABS_Y();
-      LDX(ref.read());
-      break;
+    case Op::BCS_REL:
+      return initInstruction(opcode, "BCS", "rel", 2, Type::ONE_OP);
+    case Op::LDA_IND_Y:
+      return initInstruction(opcode, "LDA", "ind,Y", 5, Type::ONE_OP);
+    case Op::LDY_ZPG_X:
+      return initInstruction(opcode, "LDY", "zpg,X", 4, Type::ONE_OP);
+    case Op::LDA_ZPG_X:
+      return initInstruction(opcode, "LDA", "zpg,X", 4, Type::ONE_OP);
+    case Op::LDX_ZPG_Y:
+      return initInstruction(opcode, "LDX", "zpg,Y", 4, Type::ONE_OP);
+    case Op::CLV_IMPL:
+      return initInstruction(opcode, "CLV", "impl", 2, Type::NO_OP);
+    case Op::LDA_ABS_Y:
+      return initInstruction(opcode, "LDA", "abs,Y", 4, Type::TWO_OP);
+    case Op::TSX_IMPL:
+      return initInstruction(opcode, "TSX", "impl", 2, Type::NO_OP);
+    case Op::LDY_ABS_X:
+      return initInstruction(opcode, "LDY", "abs,X", 4, Type::TWO_OP);
+    case Op::LDA_ABS_X:
+      return initInstruction(opcode, "LDA", "abs,X", 4, Type::TWO_OP);
+    case Op::LDX_ABS_Y:
+      return initInstruction(opcode, "LDX", "abs,Y", 4, Type::TWO_OP);
 
     // HI-NIBBLE == 0xC0
-    case Cpu::Op::CPY_IMMED:
-      cycleCount += 2;
-      ref = IMMED();
-      CPY(ref.read());
-      break;
-    case Cpu::Op::CMP_X_IND:
-      cycleCount += 6;
-      ref = X_IND();
-      CMP(ref.read());
-      break;
-    case Cpu::Op::CPY_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      CPY(ref.read());
-      break;
-    case Cpu::Op::CMP_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      CMP(ref.read());
-      break;
-    case Cpu::Op::DEC_ZPG:
-      cycleCount += 5;
-      ref = ZPG();
-      DEC(ref.read());
-      break;
-    case Cpu::Op::INY_IMPL:
-      cycleCount += 2;
-      INY();
-      break;
-    case Cpu::Op::CMP_IMMED:
-      cycleCount += 2;
-      ref = IMMED();
-      CMP(ref.read());
-      break;
-    case Cpu::Op::DEX_IMPL:
-      cycleCount += 2;
-      DEX();
-      break;
-    case Cpu::Op::CPY_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      CPY(ref.read());
-      break;
-    case Cpu::Op::CMP_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      CMP(ref.read());
-      break;
-    case Cpu::Op::DEC_ABS:
-      cycleCount += 6;
-      ref = ABS();
-      DEC(ref.read());
-      break;
+    case Op::CPY_IMMED:
+      return initInstruction(opcode, "CPY", "#", 2, Type::ONE_OP);
+    case Op::CMP_X_IND:
+      return initInstruction(opcode, "CMP", "X,ind", 6, Type::ONE_OP);
+    case Op::CPY_ZPG:
+      return initInstruction(opcode, "CPY", "zpg", 3, Type::ONE_OP);
+    case Op::CMP_ZPG:
+      return initInstruction(opcode, "CMP", "zpg", 3, Type::ONE_OP);
+    case Op::DEC_ZPG:
+      return initInstruction(opcode, "DEC", "zpg", 5, Type::ONE_OP);
+    case Op::INY_IMPL:
+      return initInstruction(opcode, "INY", "impl", 2, Type::NO_OP);
+    case Op::CMP_IMMED:
+      return initInstruction(opcode, "CMP", "#", 2, Type::ONE_OP);
+    case Op::DEX_IMPL:
+      return initInstruction(opcode, "DEX", "impl", 2, Type::NO_OP);
+    case Op::CPY_ABS:
+      return initInstruction(opcode, "CPY", "abs", 4, Type::TWO_OP);
+    case Op::CMP_ABS:
+      return initInstruction(opcode, "CMP", "abs", 4, Type::TWO_OP);
+    case Op::DEC_ABS:
+      return initInstruction(opcode, "CMP", "abs", 6, Type::TWO_OP);
 
     // HI-NIBBLE == 0xD0
-    case Cpu::Op::BNE_REL:
-      cycleCount += 2;
-      ref = REL();
-      BNE(ref.read());
-      break;
-    case Cpu::Op::CMP_IND_Y:
-      cycleCount += 5;
-      ref = IND_Y();
-      CPY(ref.read());
-      break;
-    case Cpu::Op::CMP_ZPG_X:
-      cycleCount += 4;
-      ref = ZPG_X();
-      CMP(ref.read());
-      break;
-    case Cpu::Op::DEC_ZPG_X:
-      cycleCount += 6;
-      ref = ZPG_X();
-      DEC(ref.read());
-      break;
-    case Cpu::Op::CLD_IMPL:
-      cycleCount += 2;
-      CLD();
-      break;
-    case Cpu::Op::CMP_ABS_Y:
-      cycleCount += 4;
-      ref = ABS_Y();
-      CPY(ref.read());
-      break;
-    case Cpu::Op::CMP_ABS_X:
-      cycleCount += 4;
-      ref = ABS_X();
-      CMP(ref.read());
-      break;
-    case Cpu::Op::DEC_ABS_X:
-      cycleCount += 7;
-      ref = ABS_X();
-      DEC(ref.read());
-      break;
+    case Op::BNE_REL:
+      return initInstruction(opcode, "BNE", "rel", 2, Type::ONE_OP);
+    case Op::CMP_IND_Y:
+      return initInstruction(opcode, "CMP", "ind,Y", 5, Type::ONE_OP);
+    case Op::CMP_ZPG_X:
+      return initInstruction(opcode, "CMP", "zpg,X", 4, Type::ONE_OP);
+    case Op::DEC_ZPG_X:
+      return initInstruction(opcode, "DEC", "zpg,X", 6, Type::ONE_OP);
+    case Op::CLD_IMPL:
+      return initInstruction(opcode, "CLD", "impl", 2, Type::NO_OP);
+    case Op::CMP_ABS_Y:
+      return initInstruction(opcode, "CMP", "abs,Y", 4, Type::TWO_OP);
+    case Op::CMP_ABS_X:
+      return initInstruction(opcode, "CMP", "abs,X", 4, Type::TWO_OP);
+    case Op::DEC_ABS_X:
+      return initInstruction(opcode, "DEC", "abs,X", 7, Type::TWO_OP);
 
     // HI-NIBBLE == 0xE0
-    case Cpu::Op::CPX_IMMED:
-      cycleCount += 2;
-      ref = IMMED();
-      CPX(ref.read());
-      break;
-    case Cpu::Op::SBC_X_IND:
-      cycleCount += 6;
-      ref = X_IND();
-      SBC(ref.read());
-      break;
-    case Cpu::Op::CPX_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      CPX(ref.read());
-      break;
-    case Cpu::Op::SBC_ZPG:
-      cycleCount += 3;
-      ref = ZPG();
-      SBC(ref.read());
-      break;
-    case Cpu::Op::INC_ZPG:
-      cycleCount += 5;
-      ref = ZPG();
-      INC(ref.read());
-      break;
-    case Cpu::Op::INX_IMPL:
-      cycleCount += 2;
-      INX();
-      break;
-    case Cpu::Op::SBC_IMMED:
-      cycleCount += 2;
-      ref = IMMED();
-      SBC(ref.read());
-      break;
-    case Cpu::Op::NOP_IMPL:
-      cycleCount += 2;
-      NOP();
-      break;
-    case Cpu::Op::CPX_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      CPX(ref.read());
-      break;
-    case Cpu::Op::SBC_ABS:
-      cycleCount += 4;
-      ref = ABS();
-      SBC(ref.read());
-      break;
-    case Cpu::Op::INC_ABS:
-      cycleCount += 6;
-      ref = ABS();
-      INC(ref.read());
-      break;
+    case Op::CPX_IMMED:
+      return initInstruction(opcode, "CPX", "#", 2, Type::ONE_OP);
+    case Op::SBC_X_IND:
+      return initInstruction(opcode, "SBC", "X,ind", 6, Type::ONE_OP);
+    case Op::CPX_ZPG:
+      return initInstruction(opcode, "CPX", "zpg", 3, Type::ONE_OP);
+    case Op::SBC_ZPG:
+      return initInstruction(opcode, "SBC", "zpg", 3, Type::ONE_OP);
+    case Op::INC_ZPG:
+      return initInstruction(opcode, "INC", "zpg", 5, Type::ONE_OP);
+    case Op::INX_IMPL:
+      return initInstruction(opcode, "INX", "impl", 2, Type::NO_OP);
+    case Op::SBC_IMMED:
+      return initInstruction(opcode, "SBC", "#", 2, Type::ONE_OP);
+    case Op::NOP_IMPL:
+      return initInstruction(opcode, "NOP", "impl", 2, Type::NO_OP);
+    case Op::CPX_ABS:
+      return initInstruction(opcode, "CPX", "abs", 4, Type::TWO_OP);
+    case Op::SBC_ABS:
+      return initInstruction(opcode, "SBC", "abs", 4, Type::TWO_OP);
+    case Op::INC_ABS:
+      return initInstruction(opcode, "INC", "abs", 6, Type::TWO_OP);
 
     // HI-NIBBLE == 0xF0
-    case Cpu::Op::BEQ_REL:
-      cycleCount += 2;
-      ref = REL();
-      BEQ(ref.read());
-      break;
-    case Cpu::Op::SBC_IND_Y:
-      cycleCount += 5;
-      ref = IND_Y();
-      SBC(ref.read());
-      break;
-    case Cpu::Op::SBC_ZPG_X:
-      cycleCount += 4;
-      ref = ZPG_X();
-      SBC(ref.read());
-      break;
-    case Cpu::Op::INC_ZPG_X:
-      cycleCount += 6;
-      ref = ZPG_X();
-      INC(ref.read());
-      break;
-    case Cpu::Op::SED_IMPL:
-      cycleCount += 2;
-      SED();
-      break;
-    case Cpu::Op::SBC_ABS_Y:
-      cycleCount += 4;
-      ref = ABS_Y();
-      SBC(ref.read());
-      break;
-    case Cpu::Op::SBC_ABS_X:
-      cycleCount += 4;
-      ref = ABS_X();
-      SBC(ref.read());
-      break;
+    case Op::BEQ_REL:
+      return initInstruction(opcode, "BEQ", "rel", 2, Type::ONE_OP);
+    case Op::SBC_IND_Y:
+      return initInstruction(opcode, "SBC", "ind,Y", 5, Type::ONE_OP);
+    case Op::SBC_ZPG_X:
+      return initInstruction(opcode, "SBC", "zpg,X", 4, Type::ONE_OP);
+    case Op::INC_ZPG_X:
+      return initInstruction(opcode, "INC", "zpg,X", 6, Type::ONE_OP);
+    case Op::SED_IMPL:
+      return initInstruction(opcode, "SED", "impl", 2, Type::NO_OP);
+    case Op::SBC_ABS_Y:
+      return initInstruction(opcode, "SBC", "abs,Y", 4, Type::TWO_OP);
+    case Op::SBC_ABS_X:
+      return initInstruction(opcode, "SBC", "abs,X", 4, Type::TWO_OP);
     case Cpu::Op::INC_ABS_X:
-      cycleCount += 7;
-      ref = ABS_X();
-      INC(ref.read());
-      break;
+      return initInstruction(opcode, "INC", "abs,X", 7, Type::TWO_OP);
     default:
       // opcode must be unrecognized, throw exception
       throw Exception::BadOpcode(opcode);
