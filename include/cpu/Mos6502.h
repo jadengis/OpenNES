@@ -19,6 +19,8 @@
 
 #include "common/CommonTypes.h"
 #include "cpu/CpuBase.h"
+#include "cpu/Mos6502Instruction.h"
+#include "memory/Ram.h"
 #include "memory/Reference.h"
 
 namespace Cpu {
@@ -26,20 +28,15 @@ namespace Cpu {
 class Mos6502 : public CpuBase {
   public:
 
-    // Mos6502 Instruction class
-    struct Instruction {
-      std::string name;
-      byte opcode;
-    };
-
     // Constructors
-    Mos6502() {
+    Mos6502() : stack(reg.sp) {
       this->reg.pc = 0;
       this->reg.ac = 0;
       this->reg.x = 0;
       this->reg.y = 0;
       this->reg.sr = 0;
-      this->reg.sp = 0;
+      // Stack pointer is initially full
+      this->reg.sp = 0xFF;
     }
 
     // CpuBase class methods
@@ -52,9 +49,9 @@ class Mos6502 : public CpuBase {
     /// Fetch opcode from memory
     virtual byte fetchOpcode() final;
     /// Decode opcode into Instruction object
-    virtual Instruction decodeOpcode(byte opcode) final;
+    virtual Mos6502Instruction decodeOpcode(byte opcode) final;
     /// Execute Instruction object
-    virtual void executeOpcode(Instruction inst) final;
+    virtual void executeOpcode(Mos6502Instruction inst) final;
 
     // Cpu state inspection methods
     int64 getCycleCount();
@@ -204,49 +201,49 @@ class Mos6502 : public CpuBase {
       byte  sp; // Stack Pointer
     } reg;
 
-    // Processor stack
-    // LIFO, top down, 8 bit range, 0x0100 - 0x01FF
+    /// Processor stack
+    /// LIFO, top down, 8 bit range, 0x0100 - 0x01FF
     class Stack {
       public:
+        /// Push data onto the processor stack
+        /// \param data Byte to push.
         inline void push(byte data) {
-          // store data at current location and decrement
-          top--;
-          *top = data;
+          // Retrieve stack pointer, write to the given location, and then
+          // decrement the stack pointer.
+          base.write(stackPointer--, data);
         }
 
+        /// Pull data from the processor stack
+        /// \return Byte from top of stack
         inline byte pull() {
-          // retrieve data, increment, and return data
-          auto temp = *top;
-          top++;
+          // increment the stack pointer, and read from the given location
+          auto temp = base.read(++stackPointer);
           return temp;
         }
 
-        Stack(std::unique_ptr<byte[]> mem_ptr = nullptr) {
-          // If we construct with a non-null unique_ptr, we will move ownership
-          // of that memory resource to this stack. Otherwise, we will make our
-          // own unique_ptr.
-          if(mem_ptr == nullptr) {
-            base = std::make_unique<byte[]>(std::numeric_limits<byte>::max() + 1);
-          }
-          else {
-            base = std::move(mem_ptr);
+        Stack(
+            byte& stackPointerRegister,
+            std::shared_ptr<Memory::Ram<byte>> bank = nullptr, 
+            std::size_t offset = 0) : stackPointer(stackPointerRegister) {
+          // If the memory Ram ptr passed in is null, create a new Ram to contain
+          // this stack.
+          if(bank == nullptr) {
+            bank = std::make_shared<Memory::Ram<byte>>(std::numeric_limits<byte>::max() + 1);
+            // if we built our own Ram, base is irrelevant, so set this to 0
+            offset = 0;
           }
           // Mos6502 stack is top-down, so we must offset top from base.
-          top = base.get() + std::numeric_limits<byte>::max();
+          base = Memory::Reference<byte>(bank, offset);
         }
 
-        ~Stack() {
-          // Set both pointers to be nullptr for safety
-          top = nullptr;
-          base = nullptr;
-        }
+        ~Stack() {}
+
       private:
-        // The stack consists of two pointers, one raw pointer, top,
-        // which will point to the 'top' of the stack, and one unique_ptr
-        // base, which will control the memory resource associated with this
-        // Stack.
-        byte* top;
-        std::unique_ptr<byte[]> base;
+        /// Reference to the Mos6502 stack pointer
+        byte& stackPointer;
+        /// Memory reference to the base memory location of the CPU stack
+        Memory::Reference<byte> base;
+
     } stack;
 };
 

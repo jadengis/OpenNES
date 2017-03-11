@@ -36,6 +36,15 @@ TEST_CASE("Reference read and write to Ram", "[Memory][Reference]") {
     REQUIRE(testData == data);
   }
 
+  SECTION("Copy the reference and use it to write and read data") {
+    byte data = 7;
+    // write the data at the referenced index
+    ref.write(data);
+    Memory::Reference<byte> anotherRef(ref);
+    byte testData = anotherRef.read();
+    REQUIRE(testData == data);
+  }
+
   SECTION("Increment a reference and read the value") {
     // write some data to the RAM
     byte data = 8;
@@ -51,4 +60,19 @@ TEST_CASE("Reference read and write to Ram", "[Memory][Reference]") {
     byte testData = (--ref).read();
     REQUIRE(testData == data);
   }
+
+  SECTION("Read and write values using index offsets") {
+    // write some data to the RAM
+    byte data = 10;
+    ram_p->write(7, data);
+    // read using and index
+    byte testData = ref.read(2);
+    REQUIRE(testData == data);
+    // write using and index
+    data = 15;
+    ref.write(2, data);
+    testData = ram_p->read(7);
+    REQUIRE(testData == data);
+  }
+
 }
