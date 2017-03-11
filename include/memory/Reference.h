@@ -18,7 +18,8 @@
 
 namespace Memory {
 
-/// Reference - This creates references to the underlying words in objects of
+/// \class Reference
+/// \brief This creates references to the underlying words in objects of
 /// the type Memory::Bank. These references should be use to access data in
 /// other subsystems.
 template<class Wordsize>
@@ -31,10 +32,22 @@ class Reference {
     virtual ~Reference() {};
 
     /// Write to referenced location
+    /// \param data Data to write that the given location
     inline void write(Wordsize data);
 
-    /// Read from references location
+    /// Write to referenced location, incremented by an index
+    /// \param data Data to write that the given location
+    /// \param offset Amount to increment from referenced location
+    inline void write(std::size_t offset, Wordsize data);
+
+    /// Read from referenced location
+    /// \return Data at the referenced location
     inline const Wordsize read() const;
+
+    /// Read from referenced location, incremented by an index
+    /// \param offset Amount to increment from the referenced location
+    /// \return Data at the referenced location
+    inline const Wordsize read(std::size_t offset) const;
 
     /// Increment the reference index before return.
     /// \return Reference to this for chaining.
@@ -82,9 +95,21 @@ void Reference<Wordsize>::write(Wordsize data) {
 }
 
 template<class Wordsize>
+void Reference<Wordsize>::write(std::size_t offset, Wordsize data) {
+  // write data to dataBank at the referenced location, incremented by offset
+  dataBank->write(index + offset, data);
+}
+
+template<class Wordsize>
 const Wordsize Reference<Wordsize>::read() const {
   // read the word from dataBank at index
   return dataBank->read(index);
+}
+
+template<class Wordsize>
+const Wordsize Reference<Wordsize>::read(std::size_t offset) const {
+  // read the word from dataBank at the referenced location, incremented by offset
+  return dataBank->read(index + offset);
 }
 
 template<class Wordsize>

@@ -29,13 +29,14 @@ class Mos6502 : public CpuBase {
   public:
 
     // Constructors
-    Mos6502() {
+    Mos6502() : stack(reg.sp) {
       this->reg.pc = 0;
       this->reg.ac = 0;
       this->reg.x = 0;
       this->reg.y = 0;
       this->reg.sr = 0;
-      this->reg.sp = 0;
+      // Stack pointer is initially full
+      this->reg.sp = 0xFF;
     }
 
     // CpuBase class methods
@@ -204,37 +205,44 @@ class Mos6502 : public CpuBase {
     /// LIFO, top down, 8 bit range, 0x0100 - 0x01FF
     class Stack {
       public:
+        /// Push data onto the processor stack
+        /// \param data Byte to push.
         inline void push(byte data) {
-          // store data at current location and decrement
-          --top;
-          top.write(data);
+          // Retrieve stack pointer, write to the given location, and then
+          // decrement the stack pointer.
+          base.write(stackPointer--, data);
         }
 
+        /// Pull data from the processor stack
+        /// \return Byte from top of stack
         inline byte pull() {
-          // retrieve data, increment, and return data
-          auto temp = top.read();
-          ++top;
+          // increment the stack pointer, and read from the given location
+          auto temp = base.read(++stackPointer);
           return temp;
         }
 
-        Stack(std::shared_ptr<Memory::Ram<byte>> bank = nullptr, std::size_t base = 0) {
+        Stack(
+            byte& stackPointerRegister,
+            std::shared_ptr<Memory::Ram<byte>> bank = nullptr, 
+            std::size_t offset = 0) : stackPointer(stackPointerRegister) {
           // If the memory Ram ptr passed in is null, create a new Ram to contain
           // this stack.
           if(bank == nullptr) {
             bank = std::make_shared<Memory::Ram<byte>>(std::numeric_limits<byte>::max() + 1);
             // if we built our own Ram, base is irrelevant, so set this to 0
-            base = 0;
+            offset = 0;
           }
           // Mos6502 stack is top-down, so we must offset top from base.
-          top = Memory::Reference<byte>(bank, base + std::numeric_limits<byte>::max());
+          base = Memory::Reference<byte>(bank, offset);
         }
 
         ~Stack() {}
 
       private:
-        // this stack consists of a memory reference to the top of the stack inside
-        // a Ram object.
-        Memory::Reference<byte> top;
+        /// Reference to the Mos6502 stack pointer
+        byte& stackPointer;
+        /// Memory reference to the base memory location of the CPU stack
+        Memory::Reference<byte> base;
 
     } stack;
 };

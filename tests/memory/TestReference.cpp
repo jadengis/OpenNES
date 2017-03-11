@@ -60,4 +60,19 @@ TEST_CASE("Reference read and write to Ram", "[Memory][Reference]") {
     byte testData = (--ref).read();
     REQUIRE(testData == data);
   }
+
+  SECTION("Read and write values using index offsets") {
+    // write some data to the RAM
+    byte data = 10;
+    ram_p->write(7, data);
+    // read using and index
+    byte testData = ref.read(2);
+    REQUIRE(testData == data);
+    // write using and index
+    data = 15;
+    ref.write(2, data);
+    testData = ram_p->read(7);
+    REQUIRE(testData == data);
+  }
+
 }

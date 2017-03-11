@@ -916,10 +916,12 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 stack operatio
       LDA(i);
       PHA();
     }
+    REQUIRE((0xFF - size) == getRegSP());
     for(byte i = size; i >= 1; i--) {
       PLA();
       REQUIRE(getRegAC() == i);
     }
+    REQUIRE(0xFF == getRegSP());
   }
 
   SECTION("Pulling accumulator off the stack sets the correct flags") {
