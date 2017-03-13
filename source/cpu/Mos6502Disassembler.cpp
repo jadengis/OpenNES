@@ -11,7 +11,7 @@
 ///
 //===----------------------------------------------------------------------===//
 #include "memory/Reference.h"
-#include "cpu/Exception.h"
+#include "cpu/CpuException.h"
 #include "cpu/Mos6502_Ops.h"
 #include "cpu/Mos6502Instruction.h"
 #include "cpu/Mos6502Disassembler.h"
@@ -392,7 +392,7 @@ Mos6502Instruction&& Mos6502Disassembler::disassembleInstruction() {
       return initInstruction(opcode, "INC", "abs,X", 7, Type::TWO_OP);
     default:
       // opcode must be unrecognized, throw exception
-      throw Exception::BadOpcode(opcode);
+      throw Exception::InvalidOpcodeException(opcode);
       break;
   }
 

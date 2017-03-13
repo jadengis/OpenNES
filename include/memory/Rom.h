@@ -14,24 +14,34 @@
 #define MEMORY_ROM_H
 
 #include "common/CommonTypes.h"
-#include "memory/Exception.h"
+#include "memory/MemoryException.h"
 #include "memory/Bank.h"
 
 namespace Memory {
 
+/// \class Rom
+/// \brief This class acts as a read only memory for an architecture of the given
+/// wordsize.
 template<class Wordsize> 
 class Rom : public Bank<Wordsize> {
   public:
+    // Constructors
     Rom(std::size_t size) : Bank(size) {};
+
+    // Destructor
     virtual ~Rom() {};
-    inline void Write(std::size_t index, Wordsize data) override;
-    virtual void Load() delete;
+
+    /// Throw an error when trying to write to a ROM
+    /// We cannot write to a Rom, so throw a ReadOnlyMemoryException when
+    /// this method is called.
+    inline void write(std::size_t index, Wordsize data) override;
+    virtual void load() delete;
 };
 
 template <class Wordsize>
-void Rom<Wordsize>::Write(std::size_t index, Wordsize data) {
+void Rom<Wordsize>::write(std::size_t index, Wordsize data) {
   // Cannot write to a Rom, so throw a ReadOnlyMemory exception
-  throw Exception::ReadOnlyMemory();
+  throw Exception::ReadOnlyMemoryException();
 }
 
 } // namespace Memory

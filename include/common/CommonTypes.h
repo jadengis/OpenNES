@@ -1,5 +1,18 @@
-#ifndef COMMON_H
-#define COMMON_H
+//===-- include/common/CommonTypes.h - Common Types -------------*- C++ -*-===//
+//
+//                           The OsNES Project
+//
+// This file is distributed under GPL v2. See LICENSE.md for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// This file contains definitions of common type names used through out the
+/// code base (in particular preferred aliases).
+///
+//===----------------------------------------------------------------------===//
+#ifndef COMMON_TYPES_H
+#define COMMON_TYPES_H
 
 #include <limits>
 #include <memory>
@@ -26,23 +39,4 @@ using byte = unsigned char;
 // use the type 'addr' when referring to 16 bit addresses
 using addr = unsigned short;
 
-// com - The common namespace for all common helper functions and
-//       constant values used throughout the source.
-namespace com {
-  // Common enum type for referencing bit positions
-  enum class BitPosition {
-    bit0 = 0,
-    bit1 = 1,
-    bit2 = 2,
-    bit3 = 3,
-    bit4 = 4,
-    bit5 = 5,
-    bit6 = 6,
-    bit7 = 7
-  };
-
-  // Useful masks
-  static const uint_native BYTE_MASK     = 0xFF;
-  static const byte        ONE_BIT_MASK  = 0x01;
-}
-#endif // COMMON_H //:~
+#endif // COMMON_TYPES_H //:~

@@ -14,21 +14,27 @@
 #define MEMORY_RAM_H
 
 #include "common/CommonTypes.h"
-#include "memory/Exception.h"
+#include "memory/MemoryException.h"
 #include "memory/Bank.h"
 
 namespace Memory {
 
+/// \class Ram
+/// \brief This class act as a random access memory for an architecture with the
+/// given wordsize.
 template<class Wordsize> 
 class Ram : public Bank<Wordsize> {
   public:
+    // Constructors
     Ram(std::size_t size) : Bank<Wordsize>(size) {};
+
+    // Destructor
     virtual ~Ram() {};
 
-    /// Throw an error when trying to write
-    /// We cannot write to a Rom, so throw a ReadOnlyMemory Exception when
-    /// this method is called.
-    inline void write(std::size_t index, Wordsize data) override;
+    /// Write the data to the random access memory at the given index
+    /// \param index Memory location to write to
+    /// \param data Data to write at the given location
+    void write(std::size_t index, Wordsize data) override;
 };
 
 template<class Wordsize>
