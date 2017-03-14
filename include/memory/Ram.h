@@ -34,7 +34,7 @@ class Ram : public Bank<Wordsize> {
     /// Write the data to the random access memory at the given index
     /// \param index Memory location to write to
     /// \param data Data to write at the given location
-    void write(std::size_t index, Wordsize data) override;
+    inline void write(std::size_t index, Wordsize data) override;
 };
 
 template<class Wordsize>
