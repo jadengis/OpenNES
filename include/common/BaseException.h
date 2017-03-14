@@ -34,7 +34,7 @@ class BaseException {
     virtual BaseException& operator= (const BaseException&) noexcept;
 
     // Destructor
-    virtual ~BaseException();
+    virtual ~BaseException() {}
 
     /// Return the name of the current exception class. Must be overwritten
     /// in inherited exception classes.
@@ -51,10 +51,9 @@ class BaseException {
     
 
   private:
-    /// Method for acquiring a stack trace.
+    /// Method for acquiring a stack trace,and storing it in this object.
     /// \param skip Number of frames to skip during formatting. defaults to 1.
-    /// \return The stack trace at the current call time.
-    std::string&& obtainStackTrace(uint64 skip = 1);
+    void obtainStackTrace(uint64 skip = 1);
 
     /// Name of the exception class
     const std::string className;

@@ -23,8 +23,8 @@ using namespace Exception;
 BaseException::BaseException() noexcept : className(CLASS_NAME) {
   // Populate this exception with some default values.
   this->errorMessage = this->className + ": " +
-    "An uncaught exception was thrown during runtime.";
-  this->stackTrace = obtainStackTrace();
+    "An uncaught exception was thrown during runtime.\n";
+  obtainStackTrace();
 }
 
 // main constructor, use this constructor with inherited classes to
@@ -33,8 +33,8 @@ BaseException::BaseException(
     std::string&& errorMessage, 
     std::string&& newClassName) noexcept : className(newClassName) {
   // Populate this exception with some default values.
-  this->errorMessage = this->className + ": " + errorMessage;
-  this->stackTrace = obtainStackTrace();
+  this->errorMessage = this->className + ": " + errorMessage + "\n";
+  obtainStackTrace();
 }
 
 // copy constructor
@@ -66,7 +66,7 @@ const std::string& BaseException::printStackTrace() const {
 }
 
 // Private methods
-std::string&& obtainStackTrace(uint64 skip) {
+void BaseException::obtainStackTrace(uint64 skip) {
   // This implementation for this function is inspired by a Gist found 
   // here: https://gist.github.com/fmela/591333/c64f4eb86037bb237862a8283df70cdfc25f01d3
   std::size_t callStackSize = 0;
@@ -93,5 +93,6 @@ std::string&& obtainStackTrace(uint64 skip) {
   if(callStackSize == maxStackSize) {
     traceBuffer << "[truncated]\n";
   }
-  return std::move(traceBuffer.str());
+  // Store the trace in this object.
+  this->stackTrace = traceBuffer.str();
 }
