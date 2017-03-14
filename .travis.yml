@@ -5,8 +5,7 @@ language: cpp
 env:
   global:
     - BUILD_FLAGS="-std=c++14 -I ${TRAVIS_BUILD_DIR}/include -c -O0 -g --coverage"
-    - LINK_FLAGS="--coverage -rdynamic -L ${TRAVIS_BUILD_DIR}/source/cpu -lcpu -L${TRAVIS_BUILD_DIR}/source/common -lcommon -v \
-                  ${TRAVIS_BUILD_DIR}/source/cpu/Mos6502.o"
+    - LINK_FLAGS="--coverage -rdynamic -L ${TRAVIS_BUILD_DIR}/source/cpu -lcpu -L${TRAVIS_BUILD_DIR}/source/common -lcommon -v ${TRAVIS_BUILD_DIR}/source/cpu/Mos6502.o"
 
     - TEST_FLAGS="-I ${TRAVIS_BUILD_DIR}/source/cpu"
   matrix:
