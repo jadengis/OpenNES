@@ -19,7 +19,21 @@
 #define MOS6502_INST_H
 #include "cpu/Mos6502.h"
 
-using namespace com;
+// Useful Masks
+static const uint_native BYTE_MASK = 0xFF;
+static const byte ONE_BIT_MASK  = 0x01;
+
+// Enum type for referencing bit positions
+enum class BitPosition {
+  BIT_0 = 0,
+  BIT_1 = 1,
+  BIT_2 = 2,
+  BIT_3 = 3,
+  BIT_4 = 4,
+  BIT_5 = 5,
+  BIT_6 = 6,
+  BIT_7 = 7
+};
 
 // Static Functions
 static inline byte checkZero(byte x);
@@ -37,7 +51,7 @@ inline void Cpu::Mos6502::LDA(const byte opd) {
   reg.ac = opd;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.ac);
-  reg.srf.n = checkNthBit(reg.ac, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.ac, BitPosition::BIT_7);
   return;
 }
 
@@ -47,7 +61,7 @@ inline void Cpu::Mos6502::LDX(const byte opd) {
   reg.x = opd;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.x);
-  reg.srf.n = checkNthBit(reg.x, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.x, BitPosition::BIT_7);
   return;
 }
 
@@ -57,7 +71,7 @@ inline void Cpu::Mos6502::LDY(const byte opd) {
   reg.y = opd;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.y);
-  reg.srf.n = checkNthBit(reg.y, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.y, BitPosition::BIT_7);
   return;
 }
 
@@ -126,7 +140,7 @@ inline byte Cpu::Mos6502::INC(byte opd) {
   opd = opd + 1;
   // set appropriate status register flags
   reg.srf.z = checkZero(opd);
-  reg.srf.n = checkNthBit(opd, BitPosition::bit7);
+  reg.srf.n = checkNthBit(opd, BitPosition::BIT_7);
   return opd;
 }
 
@@ -135,7 +149,7 @@ inline void Cpu::Mos6502::INX() {
   reg.x = reg.x + 1;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.x);
-  reg.srf.n = checkNthBit(reg.x, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.x, BitPosition::BIT_7);
   return;
 }
 
@@ -144,7 +158,7 @@ inline void Cpu::Mos6502::INY() {
   reg.y = reg.y + 1;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.y);
-  reg.srf.n = checkNthBit(reg.y, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.y, BitPosition::BIT_7);
   return;
 }
 
@@ -153,7 +167,7 @@ inline byte Cpu::Mos6502::DEC(byte opd) {
   opd = opd - 1;
   // set appropriate status register flags
   reg.srf.z = checkZero(opd);
-  reg.srf.n = checkNthBit(opd, BitPosition::bit7);
+  reg.srf.n = checkNthBit(opd, BitPosition::BIT_7);
   return opd;
 }
 
@@ -162,7 +176,7 @@ inline void Cpu::Mos6502::DEX() {
   reg.x = reg.x - 1;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.x);
-  reg.srf.n = checkNthBit(reg.x, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.x, BitPosition::BIT_7);
   return;
 }
 
@@ -171,7 +185,7 @@ inline void Cpu::Mos6502::DEY() {
   reg.y = reg.y - 1;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.y);
-  reg.srf.n = checkNthBit(reg.y, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.y, BitPosition::BIT_7);
   return;
 }
 
@@ -186,7 +200,7 @@ inline void Cpu::Mos6502::AND(const byte opd) {
   reg.ac = reg.ac & opd;
   // Set the remaining status register flags
   reg.srf.z = checkZero(reg.ac);
-  reg.srf.n = checkNthBit(reg.ac, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.ac, BitPosition::BIT_7);
   return;
 }
 
@@ -196,7 +210,7 @@ inline void Cpu::Mos6502::EOR(const byte opd) {
   reg.ac = reg.ac ^ opd;
   // Set the remaining status register flags
   reg.srf.z = checkZero(reg.ac);
-  reg.srf.n = checkNthBit(reg.ac, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.ac, BitPosition::BIT_7);
   return;
 }
 
@@ -206,7 +220,7 @@ inline void Cpu::Mos6502::ORA(const byte opd) {
   reg.ac = reg.ac | opd;
   // Set the remaining status register flags
   reg.srf.z = checkZero(reg.ac);
-  reg.srf.n = checkNthBit(reg.ac, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.ac, BitPosition::BIT_7);
   return;
 }
 
@@ -300,7 +314,7 @@ inline void Cpu::Mos6502::BVS(const byte opd) {
 // Compare Memory with Accumulator
 inline void Cpu::Mos6502::CMP(const byte opd) {
   // set appropriate bit flags
-  reg.srf.n = checkNthBit(reg.ac - opd, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.ac - opd, BitPosition::BIT_7);
   reg.srf.z = reg.ac == opd; 
   reg.srf.c = reg.ac >= opd; 
   return;
@@ -309,7 +323,7 @@ inline void Cpu::Mos6502::CMP(const byte opd) {
 // Compare Memory and Index X
 inline void Cpu::Mos6502::CPX(const byte opd) {
   // set appropriate bit flags
-  reg.srf.n = checkNthBit(reg.x - opd, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.x - opd, BitPosition::BIT_7);
   reg.srf.z = reg.x == opd; 
   reg.srf.c = reg.x >= opd; 
   return;
@@ -318,7 +332,7 @@ inline void Cpu::Mos6502::CPX(const byte opd) {
 // Compare Memory and Index Y
 inline void Cpu::Mos6502::CPY(const byte opd) {
   // set appropriate bit flags
-  reg.srf.n = checkNthBit(reg.y - opd, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.y - opd, BitPosition::BIT_7);
   reg.srf.z = reg.y == opd; 
   reg.srf.c = reg.y >= opd; 
   return;
@@ -329,8 +343,8 @@ inline void Cpu::Mos6502::BIT(const byte opd) {
   // zero flag is set to result of A AND M
   reg.srf.z = checkZero(reg.ac & opd);
   // M7 -> N, M6 -> V
-  reg.srf.n = checkNthBit(opd, BitPosition::bit7);
-  reg.srf.v = checkNthBit(opd, BitPosition::bit6);
+  reg.srf.n = checkNthBit(opd, BitPosition::BIT_7);
+  reg.srf.v = checkNthBit(opd, BitPosition::BIT_6);
   return;
 }
 
@@ -342,19 +356,19 @@ inline void Cpu::Mos6502::BIT(const byte opd) {
 // Shift Left One Bit (Memory or Accumulator)
 inline byte Cpu::Mos6502::ASL(byte opd) {
   // Set the carry bit.
-  reg.srf.c = checkNthBit(opd, BitPosition::bit7);
+  reg.srf.c = checkNthBit(opd, BitPosition::BIT_7);
   // Shift memory (or accumulator) left 1
   opd = opd << 1;
   // Set the remaining SR flags
   reg.srf.z = checkZero(opd);
-  reg.srf.n = checkNthBit(opd, BitPosition::bit7);
+  reg.srf.n = checkNthBit(opd, BitPosition::BIT_7);
   return opd;
 }
 
 // Shift One Bit Right (Memory or Accumulator)
 inline byte Cpu::Mos6502::LSR(byte opd) {
   // Set the carry bit
-  reg.srf.c = checkNthBit(opd, BitPosition::bit0);
+  reg.srf.c = checkNthBit(opd, BitPosition::BIT_0);
   // Shift memory (or accumulator) left 1
   opd = opd >> 1;
   // Set the remaining SR flags
@@ -367,12 +381,12 @@ inline byte Cpu::Mos6502::ROL(byte opd) {
   // Store old carry
   byte old_c = reg.srf.c;
   // Set the carry bit
-  reg.srf.c = checkNthBit(opd, BitPosition::bit7);
+  reg.srf.c = checkNthBit(opd, BitPosition::BIT_7);
   // Shift left by 1 and OR in old carry
   opd = (opd << 1) | old_c;
   // Set the remaining SR flags
   reg.srf.z = checkZero(opd);
-  reg.srf.n = checkNthBit(opd, BitPosition::bit7);
+  reg.srf.n = checkNthBit(opd, BitPosition::BIT_7);
   return opd;
 }
 
@@ -381,12 +395,12 @@ inline byte Cpu::Mos6502::ROR(byte opd) {
   // Store old carry
   byte old_c = reg.srf.c;
   // Set the carry bit
-  reg.srf.c = checkNthBit(opd, BitPosition::bit0);
+  reg.srf.c = checkNthBit(opd, BitPosition::BIT_0);
   // Shift right by 1 and OR in old carry
   opd = (opd >> 1) | (old_c << 7);
   // Set the remaining SR flags
   reg.srf.z = checkZero(opd);
-  reg.srf.n = checkNthBit(opd, BitPosition::bit7);
+  reg.srf.n = checkNthBit(opd, BitPosition::BIT_7);
   return opd;
 }
 
@@ -401,7 +415,7 @@ inline void Cpu::Mos6502::TAX() {
   reg.x = reg.ac;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.x);
-  reg.srf.n = checkNthBit(reg.x, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.x, BitPosition::BIT_7);
   return;
 }
 
@@ -411,7 +425,7 @@ inline void Cpu::Mos6502::TAY() {
   reg.y = reg.ac;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.y);
-  reg.srf.n = checkNthBit(reg.y, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.y, BitPosition::BIT_7);
   return;
 }
 
@@ -421,7 +435,7 @@ inline void Cpu::Mos6502::TXA() {
   reg.ac = reg.x;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.ac);
-  reg.srf.n = checkNthBit(reg.ac, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.ac, BitPosition::BIT_7);
   return;
 }
 
@@ -431,7 +445,7 @@ inline void Cpu::Mos6502::TYA() {
   reg.ac = reg.y;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.ac);
-  reg.srf.n = checkNthBit(reg.ac, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.ac, BitPosition::BIT_7);
   return;
 }
 
@@ -446,7 +460,7 @@ inline void Cpu::Mos6502::TSX() {
   reg.x = reg.sp;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.x);
-  reg.srf.n = checkNthBit(reg.x, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.x, BitPosition::BIT_7);
   return;
 }
 
@@ -456,7 +470,7 @@ inline void Cpu::Mos6502::TXS() {
   reg.sp = reg.x;
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.sp);
-  reg.srf.n = checkNthBit(reg.sp, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.sp, BitPosition::BIT_7);
   return;
 }
 
@@ -477,7 +491,7 @@ inline void Cpu::Mos6502::PLA() {
   reg.ac = stack.pull();
   // set appropriate status register flags
   reg.srf.z = checkZero(reg.ac);
-  reg.srf.n = checkNthBit(reg.ac, BitPosition::bit7);
+  reg.srf.n = checkNthBit(reg.ac, BitPosition::BIT_7);
   return;
 }
 

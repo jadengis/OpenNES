@@ -12,7 +12,7 @@
 ///
 //===----------------------------------------------------------------------===//
 #include "memory/Reference.h"
-#include "cpu/Exception.h"
+#include "cpu/CpuException.h"
 #include "cpu/Mos6502.h"
 #include "cpu/Mos6502Instruction.h"
 

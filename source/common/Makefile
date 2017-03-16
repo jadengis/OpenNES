@@ -1,11 +1,11 @@
 ###############################################################################
-# OpenNES OpenNES/tests/Makefile
+# OsNES osnes/source/Makefile
 #
-# This Makefile will build all the OsNES subsystems (CPU, PPU, Memory etc.)
+# This Makefile will be used to build all C++ files in the source directory.
 ###############################################################################
 
 ifndef TOP
-	TOP := ..
+	TOP := ../..
 endif
 # For including common make utility commands
 include $(TOP)/Makefile.util
@@ -13,32 +13,30 @@ include $(TOP)/Makefile.util
 ###############################################################################
 # Flags and Definitions
 ###############################################################################
-LFLAGS := $(LFLAGS) -rdynamic $(TOP)/source/cpu/libcpu.a $(TOP)/source/common/libcommon.a
 
+LIB = libcommon.a
+
+CFLAGS  := $(CFLAGS)
+LDFLAGS := 
+
+###############################################################################
+# Source
+###############################################################################
 .KEEP_STATE:
-EXECUTABLE = test.out
 SOURCES = $(wildcard *.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)
-SUBSYSTEMS := $(sort $(dir $(wildcard */ )))
-
-TESTS = $(foreach dir, $(SUBSYSTEMS),$(wildcard $(dir)*.o))
 
 ###############################################################################
 # Targets
 ###############################################################################
-.PHONY: all $(SUBSYSTEMS)
 
-all: $(EXECUTABLE)
-	$(CXX) $(LFLAGS) -o $(EXECUTABLE) $(OBJECTS) $(TESTS) 
+all: $(LIB)
 
-$(EXECUTABLE): $(OBJECTS) $(SUBSYSTEMS)
-	
+$(LIB) : $(OBJECTS)
+	$(AR) rsv $(LIB) $(OBJECTS)
+
 %.o : %.cpp
 	$(CXX) $(CFLAGS) $< -o $@
 
-$(SUBSYSTEMS):
-	$(MAKE) -C $@
-
-clean: 
-	$(foreach subsystem, $(SUBSYSTEMS), $(MAKE) -C $(subsystem) clean;)
-	$(RM) $(TORM)
+clean:
+	$(RM) *.o *.d *.a *.gcno *.gcda
