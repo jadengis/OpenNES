@@ -33,13 +33,17 @@ void Mos6502::shutdown() {
 
 // Run-time Emulation functions
 byte Mos6502::fetchOpcode() {
+  // TODO: implement
+  return 0;
 }
 
-Mos6502Instruction Mos6502::decodeOpcode(byte opcode) {
-}
+//Mos6502Instruction Mos6502::decodeOpcode(byte opcode) {
+  // TODO: implement
+//}
 
-void Mos6502::executeOpcode(Mos6502Instruction inst) {
-}
+//void Mos6502::executeOpcode(Mos6502Instruction inst) {
+  // TODO: implement
+//}
 
 // Cpu state inspection methods.
 int64 Mos6502::getCycleCount() {
