@@ -8,6 +8,18 @@
 project (OpenNES)
 cmake_minimum_required (VERSION 3.7.2)
 
+
+# Ensure that we do not perform in-source builds, as this makes cleanup
+# challenging.
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+  message(FATAL_ERROR "In-source builds are not allowed for this project.
+    Please use a build directory.")
+endif()
+
+# Set Executable and library output paths
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
+
 # Set current version if not set
 if (NOT DEFINED OPENNES_VERSION_MAJOR)
   set (OPENNES_VERSION_MAJOR 0)
@@ -29,7 +41,6 @@ endif()
 # Determine properties of the current build machine
 message(STATUS "Detected Architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 
-
 # Detect 64bit or 32bit
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(__ARCH_64__ 1)
@@ -38,7 +49,6 @@ else()
   set(__ARCH_32__ 1)
   add_definitions(-D__ARCH_32__=1)
 endif()
-
 
 # Determine platform specific configurations
 if(__ARCH_64__ AND CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|amd64|AMD64")
@@ -60,14 +70,29 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSIO
   message(FATAL_ERROR "OpenNES requires Clang 3.8 or greater (found ${CMAKE_CXX_COMPILER_VERSION})")
 endif()
 
+# Set C++ language standard for the whole project
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Set Compiler options for the current CMAKE_BUILD_TYPE
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Werror")
+# Set project level compiler options for all build types
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g --coverage")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
 
-# project include directory
-include_directories (${PROJECT_SOURCE_DIR}/include)
+# Set project level executable link flags
+# We are using execinfo.h for backtraces, so we require -rdynamic
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
-# add the main source directory
-add_subdirectory (${PROJECT_SOURCE_DIR}/source)
+
+# project include directory
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Enable testing congifuration
+enable_testing()
+add_custom_target(unittests)
+add_custom_command(TARGET unittests POST_BUILD COMMAND ${CMAKE_CTEST_COMMAND})
+
+# add the source directories
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/source)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
+

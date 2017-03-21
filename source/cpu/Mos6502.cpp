@@ -37,13 +37,19 @@ byte Mos6502::fetchOpcode() {
   return 0;
 }
 
-//Mos6502Instruction Mos6502::decodeOpcode(byte opcode) {
-  // TODO: implement
-//}
+Mos6502Instruction Mos6502::decodeOpcode(byte opcode) {
+   // TODO: implement
+   Mos6502Instruction inst;
+   inst.opcode = opcode;
+   return inst;
+}
 
-//void Mos6502::executeOpcode(Mos6502Instruction inst) {
-  // TODO: implement
-//}
+void Mos6502::executeOpcode(Mos6502Instruction inst) {
+   // TODO: implement
+   byte opcode = inst.opcode;
+   printf("%hhu\n",opcode);
+   return;
+}
 
 // Cpu state inspection methods.
 int64 Mos6502::getCycleCount() {
