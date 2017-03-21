@@ -32,8 +32,21 @@
 *.gcno
 *.gcda
 
+# CMake generate files
+build
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+
 # vim swp files
 *.swp
 
 # ctags tags file
 tags
+

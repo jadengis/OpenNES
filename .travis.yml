@@ -2,14 +2,11 @@ sudo: required
 dist: trusty
 language: cpp
 
-env:
-  global:
-    - BUILD_FLAGS="-std=c++14 -I ${TRAVIS_BUILD_DIR}/include -c -O0 -g --coverage"
-    - LINK_FLAGS="--coverage -rdynamic -L ${TRAVIS_BUILD_DIR}/source/cpu -lcpu -L${TRAVIS_BUILD_DIR}/source/common -lcommon -v ${TRAVIS_BUILD_DIR}/source/cpu/Mos6502.o  ${TRAVIS_BUILD_DIR}/source/common/BaseException.o"
-
-    - TEST_FLAGS="-I ${TRAVIS_BUILD_DIR}/source/cpu"
-  matrix:
-    - TRAVIS_EMPTY_JOB_WORKAROUND=true
+# env:
+#   global:
+#     - TEST_FLAGS="-I ${TRAVIS_BUILD_DIR}/source/cpu"
+#   matrix:
+#     - TRAVIS_EMPTY_JOB_WORKAROUND=true
 
 matrix:
   exclude:
@@ -25,7 +22,7 @@ matrix:
       env:
         - COMPILER=g++-6
         - COV=gcov-6
-        - EXTRA_FLAGS=""
+        - BUILD_TYPE="Debug"
     - compiler: clang
       addons:
         apt:
@@ -38,21 +35,27 @@ matrix:
       env: 
         - COMPILER=clang++-3.9
         - COV="llvm-cov gcov"
-        - EXTRA_FLAGS=""
+        - BUILD_TYPE="Debug"
 
 # Prepare the Build environments
 before_install:
+  - sudo add-apt-repository ppa:george-edison55/cmake-3.x --yes
   - sudo apt-get update -qq
   # - if [ "$CXX" == "clang++" ]; then a=$(sudo find / -name llvm-cov | grep 3.8 | head -1); sudo ln -sfn ${a} /usr/bin/llvm-cov; fi
   - export CXX=${COMPILER}
   - ${CXX} --version
   - ${COV} --version
 
+install:
+  - sudo apt-get install cmake
+
 # Build Steps
 script:
-  - make --environment-overrides -C ${TRAVIS_BUILD_DIR} CFLAGS="${BUILD_FLAGS} ${EXTRA_FLAGS}"
-  - make --environment-overrides -C ${TRAVIS_BUILD_DIR} test CFLAGS="${BUILD_FLAGS} ${TEST_FLAGS}" LFLAGS="${LINK_FLAGS}"
-  - ${TRAVIS_BUILD_DIR}/tests/test.out
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+  - make
+  - make unittests
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -x ${COV}

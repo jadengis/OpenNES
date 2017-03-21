@@ -33,12 +33,22 @@ void Mos6502::shutdown() {
 
 // Run-time Emulation functions
 byte Mos6502::fetchOpcode() {
+  // TODO: implement
+  return 0;
 }
 
 Mos6502Instruction Mos6502::decodeOpcode(byte opcode) {
+   // TODO: implement
+   Mos6502Instruction inst;
+   inst.opcode = opcode;
+   return inst;
 }
 
 void Mos6502::executeOpcode(Mos6502Instruction inst) {
+   // TODO: implement
+   byte opcode = inst.opcode;
+   printf("%hhu\n",opcode);
+   return;
 }
 
 // Cpu state inspection methods.
