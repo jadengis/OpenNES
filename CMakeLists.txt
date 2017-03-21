@@ -6,7 +6,7 @@
 #
 # ===----------------------------------------------------------------------=== #
 project (OpenNES)
-cmake_minimum_required (VERSION 3.7.2)
+cmake_minimum_required (VERSION 3.2.2)
 
 
 # Ensure that we do not perform in-source builds, as this makes cleanup
