@@ -57,7 +57,7 @@ int64 Mos6502::getCycleCount() {
 }
 
 addr Mos6502::getRegPC() {
-  return reg.pc;
+  return reg.pc.val;
 }
 
 byte Mos6502::getRegAC() {

@@ -39,4 +39,24 @@ using byte = unsigned char;
 // use the type 'addr' when referring to 16 bit addresses
 using addr = unsigned short;
 
+/// \union Vaddr
+/// \brief Data structure for referring to virtual memory addresses
+union Vaddr {
+  /// The raw 16-bit address
+  addr val;
+  struct {
+    #ifdef __BIG_ENDIAN__
+      /// The high 8 bits of the address
+      byte hh;
+      /// The low 8 bits of the address
+      byte ll;
+    #else // Little Endian
+      /// The low 8 bits of the address
+      byte ll;
+      /// The high 8 bits of the address
+      byte hh;
+    #endif
+  };
+};
+
 #endif // COMMON_TYPES_H //:~

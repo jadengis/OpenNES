@@ -30,7 +30,7 @@ class Mos6502 : public CpuBase {
 
     // Constructors
     Mos6502() : stack(reg.sp) {
-      this->reg.pc = 0;
+      this->reg.pc.val = 0;
       this->reg.ac = 0;
       this->reg.x = 0;
       this->reg.y = 0;
@@ -159,18 +159,7 @@ class Mos6502 : public CpuBase {
     int64 cycleCount;
     // Register structure
     struct {
-      union {
-        addr pc; // Program Counter
-        struct {
-#ifdef __BIG_ENDIAN__
-          byte pch;
-          byte pcl;
-#else // Little Endian
-          byte pcl;
-          byte pch;
-#endif // __BIG_ENDIAN__
-        };
-      };
+      Vaddr pc; // Program counter
       byte  ac; // Accumulator
       byte  x;  // X Register
       byte  y;  // Y Register
