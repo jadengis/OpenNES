@@ -15,25 +15,21 @@
 #define MEMORY_BANK_H
 
 #include "common/CommonTypes.h"
+#include "memory/AbstractMemory.h"
 
 namespace Memory {
 
 template<class Wordsize> 
-class Bank {
+class Bank : public AbstractMemory<Wordsize> {
   public:
     // Constructors and Destructors
     inline Bank(std::size_t size);
     virtual ~Bank() {};
 
-    /// Write word \p data at \p index
-    /// \param index Index into the dataBank array
-    /// \param data Word to store at \p index
-    virtual void write(std::size_t index, Wordsize data) = 0;
-
     /// Read word from \p index
     /// \param index Index into the dataBank array
     /// \returns word at the given index
-    virtual inline const Wordsize read(std::size_t index) const final;
+    inline const Wordsize read(std::size_t index) const final;
 
     /// Get the size of the memory
     /// \returns the size of the memory
