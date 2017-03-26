@@ -1,4 +1,4 @@
-//===-- include/cpu/mos6502.h - Mos6502 Cpu Class ---------------*- C++ -*-===//
+//===-- include/cpu/Mos6502.h - Mos6502 Cpu Class ---------------*- C++ -*-===//
 //
 //                           The OsNES Project
 //
@@ -18,14 +18,14 @@
 #include <array>
 
 #include "common/CommonTypes.h"
-#include "cpu/CpuBase.h"
+#include "cpu/AbstractCpu.h"
 #include "cpu/Mos6502Instruction.h"
 #include "memory/Ram.h"
 #include "memory/Reference.h"
 
 namespace Cpu {
 
-class Mos6502 : public CpuBase {
+class Mos6502 : public AbstractCpu {
   public:
 
     // Constructors
@@ -42,6 +42,7 @@ class Mos6502 : public CpuBase {
     // CpuBase class methods
     void init() override;
     void run() override;
+    void reset() override;
     void trace() override;
     void shutdown() override;
 

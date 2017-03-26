@@ -1,4 +1,4 @@
-//===-- include/cpu/cpu.h - Cpu Base Class ----------------------*- C++ -*-===//
+//===-- include/cpu/AbstractCpu.h - Cpu Base Class --------------*- C++ -*-===//
 //
 //                           The OsNES Project
 //
@@ -13,16 +13,17 @@
 //===----------------------------------------------------------------------===//
 #include "common/CommonTypes.h"
 
-#ifndef CPU_BASE_H
-#define CPU_BASE_H
+#ifndef ABSTRACT_CPU_H
+#define ABSTRACT_CPU_H
 
 namespace Cpu {
 
-class CpuBase {
+class AbstractCpu {
   public:
-    virtual ~CpuBase() {};
+    virtual ~AbstractCpu() {};
     virtual void init() = 0;
     virtual void run() = 0;
+    virtual void reset() = 0;
     virtual void trace() = 0;
     virtual void shutdown() = 0;
 };
