@@ -1,4 +1,4 @@
-//===-- include/cpu/mos6502.h - Mos6502 Cpu Class ---------------*- C++ -*-===//
+//===-- include/cpu/Mos6502.h - Mos6502 Cpu Class ---------------*- C++ -*-===//
 //
 //                           The OsNES Project
 //
@@ -18,19 +18,19 @@
 #include <array>
 
 #include "common/CommonTypes.h"
-#include "cpu/CpuBase.h"
+#include "cpu/AbstractCpu.h"
 #include "cpu/Mos6502Instruction.h"
 #include "memory/Ram.h"
 #include "memory/Reference.h"
 
 namespace Cpu {
 
-class Mos6502 : public CpuBase {
+class Mos6502 : public AbstractCpu {
   public:
 
     // Constructors
     Mos6502() : stack(reg.sp) {
-      this->reg.pc = 0;
+      this->reg.pc.val = 0;
       this->reg.ac = 0;
       this->reg.x = 0;
       this->reg.y = 0;
@@ -42,6 +42,7 @@ class Mos6502 : public CpuBase {
     // CpuBase class methods
     void init() override;
     void run() override;
+    void reset() override;
     void trace() override;
     void shutdown() override;
 
@@ -159,18 +160,7 @@ class Mos6502 : public CpuBase {
     int64 cycleCount;
     // Register structure
     struct {
-      union {
-        addr pc; // Program Counter
-        struct {
-#ifdef __BIG_ENDIAN__
-          byte pch;
-          byte pcl;
-#else // Little Endian
-          byte pcl;
-          byte pch;
-#endif // __BIG_ENDIAN__
-        };
-      };
+      Vaddr pc; // Program counter
       byte  ac; // Accumulator
       byte  x;  // X Register
       byte  y;  // Y Register

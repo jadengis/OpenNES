@@ -25,6 +25,9 @@ void Mos6502::init() {
 void Mos6502::run() {
 }
 
+void Mos6502::reset() {
+}
+
 void Mos6502::trace() {
 }
 
@@ -57,7 +60,7 @@ int64 Mos6502::getCycleCount() {
 }
 
 addr Mos6502::getRegPC() {
-  return reg.pc;
+  return reg.pc.val;
 }
 
 byte Mos6502::getRegAC() {

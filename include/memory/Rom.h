@@ -26,7 +26,7 @@ template<class Wordsize>
 class Rom : public Bank<Wordsize> {
   public:
     // Constructors
-    Rom(std::size_t size) : Bank(size) {};
+    Rom(std::size_t size) : Bank<Wordsize>(size) {};
 
     // Destructor
     virtual ~Rom() {};
@@ -35,7 +35,7 @@ class Rom : public Bank<Wordsize> {
     /// We cannot write to a Rom, so throw a ReadOnlyMemoryException when
     /// this method is called.
     inline void write(std::size_t index, Wordsize data) override;
-    virtual void load() delete;
+    virtual void load() = delete;
 };
 
 template <class Wordsize>

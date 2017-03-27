@@ -27,6 +27,7 @@ class Ram : public Bank<Wordsize> {
   public:
     // Constructors
     Ram(std::size_t size) : Bank<Wordsize>(size) {};
+    Ram(std::size_t size, Vaddr vaddr) : Bank<Wordsize>(size, vaddr) {};
 
     // Destructor
     virtual ~Ram() {};

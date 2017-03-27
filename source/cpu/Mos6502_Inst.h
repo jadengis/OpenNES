@@ -234,8 +234,8 @@ inline void Cpu::Mos6502::JMP(const byte opd_lo, const byte opd_hi) {
   // opd_lo is the low byte of the new PC and opd_hi is the high byte of new PC
   // (PC+1 = opd_lo) -> PCL
   // (PC+2 = opd_hi) -> PCH
-  reg.pcl = opd_lo;
-  reg.pch = opd_hi;
+  reg.pc.ll = opd_lo;
+  reg.pc.hh = opd_hi;
   return;
 }
 
@@ -243,7 +243,7 @@ inline void Cpu::Mos6502::JMP(const byte opd_lo, const byte opd_hi) {
 inline void Cpu::Mos6502::BCC(const byte opd) {
   if(reg.srf.c == 0) {
     // Condition true, branch to PC + offset
-    reg.pc = computeBranch(reg.pc, opd);
+    reg.pc.val = computeBranch(reg.pc.val, opd);
   }
   return;
 }
@@ -252,7 +252,7 @@ inline void Cpu::Mos6502::BCC(const byte opd) {
 inline void Cpu::Mos6502::BCS(const byte opd) {
   if(reg.srf.c == 1) {
     // Condition true, branch to PC + offset
-    reg.pc = computeBranch(reg.pc, opd);
+    reg.pc.val = computeBranch(reg.pc.val, opd);
   }
   return;
 }
@@ -261,7 +261,7 @@ inline void Cpu::Mos6502::BCS(const byte opd) {
 inline void Cpu::Mos6502::BEQ(const byte opd) {
   if(reg.srf.z == 1) {
     // Condition true, branch to PC + offset
-    reg.pc = computeBranch(reg.pc,opd);
+    reg.pc.val = computeBranch(reg.pc.val,opd);
   }
   return;
 }
@@ -270,7 +270,7 @@ inline void Cpu::Mos6502::BEQ(const byte opd) {
 inline void Cpu::Mos6502::BMI(const byte opd) {
   if(reg.srf.n == 1) {
     // Condition true, branch to PC + offset
-    reg.pc = computeBranch(reg.pc,opd);
+    reg.pc.val = computeBranch(reg.pc.val,opd);
   }
   return;
 }
@@ -279,7 +279,7 @@ inline void Cpu::Mos6502::BMI(const byte opd) {
 inline void Cpu::Mos6502::BNE(const byte opd) {
   if(reg.srf.z == 0) {
     // Condition true, branch to PC + offset
-    reg.pc = computeBranch(reg.pc,opd);
+    reg.pc.val = computeBranch(reg.pc.val,opd);
   }
   return;
 }
@@ -288,7 +288,7 @@ inline void Cpu::Mos6502::BNE(const byte opd) {
 inline void Cpu::Mos6502::BPL(const byte opd) {
   if(reg.srf.n == 0) {
     // Condition true, branch to PC + offset
-    reg.pc = computeBranch(reg.pc,opd);
+    reg.pc.val = computeBranch(reg.pc.val,opd);
   }
   return;
 }
@@ -297,7 +297,7 @@ inline void Cpu::Mos6502::BPL(const byte opd) {
 inline void Cpu::Mos6502::BVC(const byte opd) {
   if(reg.srf.v == 0) {
     // Condition true, branch to PC + offset
-    reg.pc = computeBranch(reg.pc,opd);
+    reg.pc.val = computeBranch(reg.pc.val,opd);
   }
   return;
 }
@@ -306,7 +306,7 @@ inline void Cpu::Mos6502::BVC(const byte opd) {
 inline void Cpu::Mos6502::BVS(const byte opd) {
   if(reg.srf.v == 1) {
     // Condition true, branch to PC + offset
-    reg.pc = computeBranch(reg.pc,opd);
+    reg.pc.val = computeBranch(reg.pc.val,opd);
   }
   return;
 }
@@ -512,20 +512,20 @@ inline void Cpu::Mos6502::JSR(const byte opd_lo, const byte opd_hi) {
   // opd_lo and opd_hi.
   // opd_lo -> PCL
   // opd_hi -> PCH
-  reg.pc = reg.pc + 2;
-  stack.push(reg.pch);
-  stack.push(reg.pcl);
-  reg.pcl = opd_lo;
-  reg.pch = opd_hi;
+  reg.pc.val = reg.pc.val + 2;
+  stack.push(reg.pc.hh);
+  stack.push(reg.pc.ll);
+  reg.pc.ll = opd_lo;
+  reg.pc.hh = opd_hi;
   return;
 }
 
 inline void Cpu::Mos6502::RTI() {
   // pull status register from stack, followed by program counter
   // BRK implementation pushes PCH then PCL then SR so must pull in reverse order
-  reg.sr  = stack.pull();
-  reg.pcl = stack.pull();
-  reg.pch = stack.pull();
+  reg.sr = stack.pull();
+  reg.pc.ll = stack.pull();
+  reg.pc.hh = stack.pull();
   return;
 }
 
@@ -533,9 +533,9 @@ inline void Cpu::Mos6502::RTI() {
 inline void Cpu::Mos6502::RTS() {
   // pull program counter from the stack and increment to land on new instruction
   // JSR implementation pushes PCH then PCL so must pull PCL then PCH
-  reg.pcl = stack.pull();
-  reg.pch = stack.pull();
-  reg.pc  = reg.pc + 1;
+  reg.pc.ll = stack.pull();
+  reg.pc.hh = stack.pull();
+  reg.pc.val = reg.pc.val + 1;
   return;
 }
 
@@ -599,9 +599,9 @@ inline void Cpu::Mos6502::NOP() {
 // Force Break
 inline void Cpu::Mos6502::BRK() {
   // interrupt, push PC+2, push SR
-  reg.pc = reg.pc + 2;
-  stack.push(reg.pch);
-  stack.push(reg.pcl);
+  reg.pc.val = reg.pc.val + 2;
+  stack.push(reg.pc.hh);
+  stack.push(reg.pc.ll);
   stack.push(reg.sr);
   reg.srf.i = 1; // Set interrupt flag
   return;
