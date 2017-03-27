@@ -32,7 +32,7 @@ class Mapper {
     /// This function maps a virtual address to its associated hardware unit.
     /// \param address Address to find the hardware for.
     /// \returns A shared pointer to the hardware resource.
-    virtual std::shared_ptr<Bank<Wordsize>> mapToHardware(Vaddr address) const = 0;
+    virtual std::shared_ptr<Bank<Wordsize>> mapToHardware(Vaddr vaddr) const = 0;
 
 };
 

@@ -6,4 +6,4 @@
 #
 # ===----------------------------------------------------------------------=== #
 set(SRCS TestException.cpp)
-add_test_suite(CommonTests ${SRCS})
+add_test_suite(CommonTests "${SRCS}")
