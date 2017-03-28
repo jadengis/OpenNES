@@ -1,6 +1,6 @@
 //===-- include/cpu/AbstractCpu.h - Cpu Base Class --------------*- C++ -*-===//
 //
-//                           The OsNES Project
+//                           The OpenNES Project
 //
 // This file is distributed under GPL v2. See LICENSE.md for details.
 //
@@ -8,7 +8,7 @@
 ///
 /// \file
 /// This file contains the Cpu template which serves as an abstract base class
-/// for all Cpu style classes in the OsNES project.
+/// for all Cpu style classes in the OpenNES project.
 ///
 //===----------------------------------------------------------------------===//
 #include "common/CommonTypes.h"

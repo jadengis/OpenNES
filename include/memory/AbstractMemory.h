@@ -1,6 +1,6 @@
 //===-- include/memory/AbstactMemory.h - Abstact Memory ---------*- C++ -*-===//
 //
-//                           The OsNES Project
+//                           The OpenNES Project
 //
 // This file is distributed under GPL v2. See LICENSE.md for details.
 //  

@@ -1,6 +1,6 @@
 //===-- include/cpu/Mos6502Disassembler.h - Mos6502 Disassembler *- C++ -*-===//
 //
-//                           The OsNES Project
+//                           The OpenNES Project
 //
 // This file is distributed under GPL v2. See LICENSE.md for details.
 //

@@ -1,6 +1,6 @@
 //===-- include/memory/Rom.h - Rom Class ------------------------*- C++ -*-===//
 //
-//                           The OsNES Project
+//                           The OpenNES Project
 //
 // This file is distributed under GPL v2. See LICENSE.md for details.
 //  

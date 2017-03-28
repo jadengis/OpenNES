@@ -1,6 +1,6 @@
-//===-- source/cpu/mos6502.cpp - Mos6502 Cpu Class Impl ---------*- C++ -*-===//
+//===-- source/cpu/Mos6502_Inst.h - Mos6502 Cpu Class Impl ------*- C++ -*-===//
 //
-//                           The OsNES Project
+//                           The OpenNES Project
 //
 // This file is distributed under GPL v2. See LICENSE.md for details.
 //
@@ -12,7 +12,7 @@
 /// be implemented here.
 ///
 /// Instruction implementation details are based on the descriptions here:
-/// http://e-tradition.net/bytes/6502/6502_instruction_set.html
+/// http://e-tradition.net/bytes/6502/6502_instruction_set.html.
 ///
 //===----------------------------------------------------------------------===//
 #ifndef MOS6502_INST_H

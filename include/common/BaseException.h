@@ -1,6 +1,6 @@
 //===-- include/common/BaseException.h - Base Exception ---------*- C++ -*-===//
 //
-//                           The OsNES Project
+//                           The OpenNES Project
 //
 // This file is distributed under GPL v2. See LICENSE.md for details.
 //
@@ -23,7 +23,7 @@
 namespace Exception {
 
 /// \class BaseException
-/// \brief Base exception class for OsNES. This class provides the basic
+/// \brief Base exception class for OpenNES. This class provides the basic
 /// functionality for exceptions used in the project. Inheritors should be
 /// simples extensions of this class, providing only the convenience of a
 /// more specific type (and perhaps an informative message).
