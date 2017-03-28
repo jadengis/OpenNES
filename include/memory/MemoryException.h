@@ -17,6 +17,9 @@
 
 namespace Exception {
 
+/// \class ReadOnlyMemoryException
+/// \brief This is the exception to throw when attempting to write to a read only
+/// memory.
 class ReadOnlyMemoryException : public BaseException {
   public:
     // Construction Methods

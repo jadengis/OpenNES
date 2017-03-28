@@ -24,13 +24,13 @@ class AbstractMemory {
     virtual ~AbstractMemory() {}
 
     /// Write data word to the index in memory.
-    /// \param index Index into the memory array
-    /// \param data Word to store at the index
+    /// \param index Index into the memory array.
+    /// \param data Word to store at the index.
     virtual void write(std::size_t index, Wordsize data) = 0;
 
     /// Read data word from the index into memory.
-    /// \param index Index into the memory array
-    /// \returns Word at the given index
+    /// \param index Index into the memory array.
+    /// \returns Word at the given index.
     virtual const Wordsize read(std::size_t index) const = 0;
 
 };

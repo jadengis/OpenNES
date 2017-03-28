@@ -17,6 +17,8 @@
 
 namespace Exception {
 
+/// \class InvalidOpcodeException
+/// \brief The exception type to throw when encountering an undefined opcode.
 class InvalidOpcodeException : public BaseException {
   public:
     // Construction Methods

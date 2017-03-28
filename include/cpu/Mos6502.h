@@ -8,7 +8,7 @@
 ///
 /// \file
 /// Functional specification for the MOS 6502 CPU. Any and all details related 
-/// to the overall operation ofthe 6502 should be declared here.
+/// to the overall operation of the 6502 should be declared here.
 ///
 //===----------------------------------------------------------------------===//
 #ifndef MOS_6502_H
@@ -25,10 +25,14 @@
 
 namespace Cpu {
 
+/// \class Mos6502
+/// \brief This class is an abstract base that provides common functionality and
+/// structure for emulation the Mos6502. Inheritors of this class can use the
+/// public and protected interface of this class to provide a more concrete
+/// method of emulation.
 class Mos6502 : public AbstractCpu {
   public:
-
-    // Constructors
+    /// Default constructor. Bootstrap a Mos6502 CPU object.
     Mos6502() : stack(reg.sp) {
       this->reg.pc.val = 0;
       this->reg.ac = 0;
@@ -39,124 +43,238 @@ class Mos6502 : public AbstractCpu {
       this->reg.sp = 0xFF;
     }
 
-    // CpuBase class methods
+    //===------------------------------===//
+    // AbstractCpu class methods
+    //===------------------------------===//
     void init() override;
     void run() override;
     void reset() override;
     void trace() override;
     void shutdown() override;
 
+
     // Run-time emulation functions
-    /// Fetch opcode from memory
+    /// Fetch opcode from memory. This will retrieve the opcode at the current
+    /// value of the program counter and return it for decoding.
+    /// \returns Byte at the current value of the program counter.
     virtual byte fetchOpcode() final;
-    /// Decode opcode into Instruction object
+
+    /// Decode opcode into Mos6502Instruction object. This object provides a lot
+    /// of information about the opcodes instruction that can be used for tracing
+    /// and execution.
+    /// \param opcode The opcode to decode into a Mos6502Instruction.
+    /// \returns Decoded Mos6502Instruction object.
     virtual Mos6502Instruction decodeOpcode(byte opcode) final;
-    /// Execute Instruction object
+
+    /// Execute input instruction. This function will execute a Mos6502Instruction
+    /// on the CPU.
+    /// \param Mos6502Instruction object to execute.
     virtual void executeOpcode(Mos6502Instruction inst) final;
 
     // Cpu state inspection methods
+
+    /// Get the remaining number of cycles to execute for the current instruction.
+    /// \returns The current cycle count.
     int64 getCycleCount();
+
+    /// Get the current address pointed to by the program counter.
+    /// \returns The current value of the program counter.
     addr getRegPC();
+
+    /// Get the current value of the accumulator.
+    /// \returns The current value of the accumulator.
     byte getRegAC();
+
+    /// Get the current value of the X-index register.
+    /// \returns The current value of the X-index register.
     byte getRegX();
+
+    /// Get the current value of the Y-index register.
+    /// \returns The current value of the Y-index register.
     byte getRegY();
+
+    /// Get the current value of the status register.
+    /// \returns The current value of the status register.
     byte getRegSR();
+
+    /// Get the current value of the stack pointer register.
+    /// \returns The current value of the stack pointer register.
     byte getRegSP();
 
-    // SR Flag Masks
-    static const byte SR_N = 0x80; // Negative
-    static const byte SR_V = 0x40; // Overflow
-    static const byte SR_B = 0x10; // Break
-    static const byte SR_D = 0x08; // Decimal (use BCD for arithmetics)
-    static const byte SR_I = 0x04; // Interrupt (IRQ disable)
-    static const byte SR_Z = 0x02; // Zero
-    static const byte SR_C = 0x01; // Carry
+    // Status register flag masks
+    /// Status register negative flag mask
+    static const byte SR_N = 0x80;
+    /// Status register overflow flag mask
+    static const byte SR_V = 0x40;
+    /// Status register break flag mask
+    static const byte SR_B = 0x10;
+    /// Status register decimal flag mask
+    static const byte SR_D = 0x08;
+    /// Status register interrupt disable flag mask
+    static const byte SR_I = 0x04;
+    /// Status register zero flag mask
+    static const byte SR_Z = 0x02;
+    /// Status register carry flag mask
+    static const byte SR_C = 0x01;
 
   protected:
-    // Addressing mode functions
-    // Absolute addressing
-    Memory::Reference<byte> ABS();
-    // Absolute addressing X-indexed
-    Memory::Reference<byte> ABS_X();
-    // Absolute addressing Y-indexed
-    Memory::Reference<byte> ABS_Y();
-    // Immediate addressing
-    Memory::Reference<byte> IMMED();
-    // Indirect addressing
-    Memory::Reference<byte> IND();
-    // X-indexed indirect addressing
-    Memory::Reference<byte> X_IND();
-    // Indirect addressing Y-indexed
-    Memory::Reference<byte> IND_Y();
-    // Relative addressing
-    Memory::Reference<byte> REL();
-    // Zeropage addressing
-    Memory::Reference<byte> ZPG();
-    // Zeropage addressing X-indexed
-    Memory::Reference<byte> ZPG_X();
-    // Zeropage addressing Y-indexed
-    Memory::Reference<byte> ZPG_Y();
-
+    //===------------------------------===//
     // CPU Instruction emulation functions
-    inline void ADC(const byte);
-    inline void AND(const byte);
-    inline byte ASL(byte);
-    inline void BCC(const byte);
-    inline void BCS(const byte);
-    inline void BEQ(const byte);
-    inline void BIT(const byte);
-    inline void BMI(const byte);
-    inline void BNE(const byte);
-    inline void BPL(const byte);
+    //===------------------------------===//
+    /// Add memory to accumulator with carry.
+    /// \param opd Byte read from memory.
+    inline void ADC(const byte opd);
+    /// AND memory with accumulator.
+    /// \param opd Byte read from memory.
+    inline void AND(const byte opd);
+    /// Arithmetic shift left.
+    /// \param opd Byte read from memory.
+    /// \returns Byte to write to memory.
+    inline byte ASL(byte opd);
+    /// Branch on carry clear.
+    /// \param opd Byte read from memory.
+    inline void BCC(const byte opd);
+    /// Branch on carry set.
+    /// \param opd Byte read from memory.
+    inline void BCS(const byte opd);
+    /// Branch on equal (zero set).
+    /// \param opd Byte read from memory.
+    inline void BEQ(const byte opd);
+    /// Bit test.
+    /// \param opd Byte read from memory.
+    inline void BIT(const byte opd);
+    /// Branch on minus (negative set).
+    /// \param opd Byte read from memory.
+    inline void BMI(const byte opd);
+    /// Branch on not equal (zero clear).
+    /// \param opd Byte read from memory.
+    inline void BNE(const byte opd);
+    /// Branch on plus (negative clear).
+    /// \param opd Byte read from memory.
+    inline void BPL(const byte opd);
+    /// Force interrupt.
     inline void BRK();
-    inline void BVC(const byte);
-    inline void BVS(const byte);
+    /// Branch on overflow clear.
+    /// \param opd Byte read from memory.
+    inline void BVC(const byte opd);
+    /// Branch on overflow set.
+    /// \param opd Byte read from memory.
+    inline void BVS(const byte opd);
+    /// Clear carry flag.
     inline void CLC();
+    /// Clear decimal flag.
     inline void CLD();
+    /// Clear interrupt disable flag.
     inline void CLI();
+    /// Clear overflow flag.
     inline void CLV();
-    inline void CMP(const byte);
-    inline void CPX(const byte);
-    inline void CPY(const byte);
-    inline byte DEC(byte);
+    /// Compare memory with accumulator.
+    /// \param opd Byte read from memory.
+    inline void CMP(const byte opd);
+    /// Compare memory with X-index register.
+    /// \param opd Byte read from memory.
+    inline void CPX(const byte opd);
+    /// Compare memory with Y-index register.
+    /// \param opd Byte read from memory.
+    inline void CPY(const byte opd);
+    /// Decrement memory by one.
+    /// \param opd Byte read from memory.
+    /// \returns Byte to write to memory.
+    inline byte DEC(byte opd);
+    /// Decrement X-index register by one.
     inline void DEX();
+    /// Decrement Y-index register by one.
     inline void DEY();
-    inline void EOR(const byte);
-    inline byte INC(byte);
+    /// Exclusive OR memory with accumulator.
+    /// \param opd Byte read from memory.
+    inline void EOR(const byte opd);
+    /// Increment memory by one.
+    /// \param opd Byte read from memory.
+    /// \returns Byte to write to memory.
+    inline byte INC(byte opd);
+    /// Increment X-index register by one.
     inline void INX();
+    /// Increment Y-index register by one.
     inline void INY();
-    inline void JMP(const byte, const byte);
-    inline void JSR(const byte, const byte);
+    /// Jump to new location.
+    /// \param opdLo Low byte of the new address.
+    /// \param opdHi High byte of the new address.
+    inline void JMP(const byte opdLo, const byte opdHi);
+    /// Jump to new location saving return address.
+    /// \param opdLo Low byte of the new address.
+    /// \param opdHi High byte of the new address.
+    inline void JSR(const byte opdLo, const byte opdHi);
+    /// Load accumulator with memory.
+    /// \param opd Byte read from memory.
     inline void LDA(const byte);
+    /// Load X-index register with memory.
+    /// \param opd Byte read from memory.
     inline void LDX(const byte);
+    /// Load Y-index register with memory.
+    /// \param opd Byte read from memory.
     inline void LDY(const byte);
+    /// Logical shift right.
+    /// \param opd Byte read from memory.
+    /// \returns Byte to write to memory.
     inline byte LSR(byte);
+    /// No operation
     inline void NOP();
+    /// OR memory with accumulator.
+    /// \param opd Byte read from memory.
     inline void ORA(const byte);
+    /// Push accumulator on processor stack.
     inline void PHA();
+    /// Push processor status on processor stack.
     inline void PHP();
+    /// Pul accumulator from processor stack.
     inline void PLA();
+    /// Pull processor status from processor stack.
     inline void PLP();
+    /// Rotate one bit left.
+    /// \param opd Byte read from memory.
+    /// \returns Byte to write to memory.
     inline byte ROL(byte);
+    /// Rotate one bit right.
+    /// \param opd Byte read from memory.
+    /// \returns Byte to write to memory.
     inline byte ROR(byte);
+    /// Return from interrupt.
     inline void RTI();
+    /// Return from subroutine.
     inline void RTS();
+    /// Subtract memory from accumulator with borrow.
+    /// \param opd Byte read from memory.
     inline void SBC(const byte);
+    /// Set carry flag.
     inline void SEC();
+    /// Set decimal flag.
     inline void SED();
+    /// Set interrupt flag.
     inline void SEI();
+    /// Store accumulator in memory.
+    /// \returns Byte to write to memory.
     inline byte STA();
+    /// Store X-index register in memory.
+    /// \returns Byte to write to memory.
     inline byte STX();
+    /// Store Y-index register in memory.
+    /// \returns Byte to write to memory.
     inline byte STY();
+    /// Transfer accumulator to X-index register.
     inline void TAX();
+    /// Transfer accumulator to Y-index register.
     inline void TAY();
+    /// Transfer stack pointer to X-index register.
     inline void TSX();
+    /// Transfer X-index register to accumulator.
     inline void TXA();
+    /// Transfer X-index register to stack pointer.
     inline void TXS();
+    /// Transfer Y-index register to accumulator.
     inline void TYA();
 
   private:
-    // Cycles required to execute current instruction
+    /// Cycles required to execute current instruction
     int64 cycleCount;
     // Register structure
     struct {
@@ -191,8 +309,9 @@ class Mos6502 : public AbstractCpu {
       byte  sp; // Stack Pointer
     } reg;
 
-    /// Processor stack
-    /// LIFO, top down, 8 bit range, 0x0100 - 0x01FF
+    /// \class Stack
+    /// \brief Mos6502 processor stack.
+    /// LIFO, top down, 8 bit range, 0x0100 - 0x01FF.
     class Stack {
       public:
         /// Push data onto the processor stack
@@ -241,4 +360,4 @@ class Mos6502 : public AbstractCpu {
 
 } // namespace Cpu
 
-#endif // MOS_6502_H //:~
+#endif // MOS_6502_H //

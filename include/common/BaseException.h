@@ -23,10 +23,14 @@
 namespace Exception {
 
 /// \class BaseException
-/// \brief Base exception class for OsNES.
+/// \brief Base exception class for OsNES. This class provides the basic
+/// functionality for exceptions used in the project. Inheritors should be
+/// simples extensions of this class, providing only the convenience of a
+/// more specific type (and perhaps an informative message).
 class BaseException {
   public:
     // Construction Methods
+    /// Default exception constructor. Bootstrap the exception.
     BaseException() noexcept;
     BaseException(std::string&& errorMessage,
         std::string&& className = "BaseException") noexcept;
@@ -38,15 +42,15 @@ class BaseException {
 
     /// Return the name of the current exception class. Must be overwritten
     /// in inherited exception classes.
-    /// \return Name of the current exception class
+    /// \return Name of the current exception class.
     virtual const std::string& printClassName() const final;
 
-    /// Return the error message from the event that caused this exception
-    /// \return The internal error message
+    /// Return the error message from the event that caused this exception.
+    /// \return The internal error message.
     virtual const std::string& printErrorMessage() const;
 
     /// Return the stack trace acquired when the exception was created.
-    /// \return The stack trace from throw time
+    /// \return The stack trace from throw time.
     virtual const std::string& printStackTrace() const final;
     
 
