@@ -31,7 +31,7 @@ class Rom : public Bank<Wordsize> {
     // Destructor
     virtual ~Rom() {};
 
-    /// Throw an error when trying to write to a ROM
+    /// Throw an error when trying to write to a ROM.
     /// We cannot write to a Rom, so throw a ReadOnlyMemoryException when
     /// this method is called.
     inline void write(std::size_t index, Wordsize data) override;

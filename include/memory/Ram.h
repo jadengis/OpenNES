@@ -41,7 +41,7 @@ class Ram : public Bank<Wordsize> {
 template<class Wordsize>
 void Ram<Wordsize>::write(std::size_t index, Wordsize data) {
   // write the data at the given index
-  this->dataBank[index] = data;
+  this->getDataBank()[index] = data;
 }
 
 } // namespace Memory
