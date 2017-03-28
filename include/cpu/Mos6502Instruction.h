@@ -1,13 +1,13 @@
 //===-- include/cpu/Mos6502Intruction.h - Mos6502 Instruction ---*- C++ -*-===//
 //
-//                           The OsNES Project
+//                           The OpenNES Project
 //
 // This file is distributed under GPL v2. See LICENSE.md for details.
 //
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// Data structure representing and instruction for the Mos6502
+/// Data structure representing and instruction for the Mos6502.
 ///
 //===----------------------------------------------------------------------===//
 #ifndef MOS_6502_INSTRUCTION_H
@@ -27,24 +27,24 @@ struct Mos6502Instruction {
         ONE_OP = 1,
         TWO_OP = 2
       };
-      /// Opcode for the given instruction 
+      /// Opcode for the given instruction.
       byte opcode;
-      /// Name of the instruction
+      /// Name of the instruction.
       std::string name;
-      /// Addressing mode for the given instruction
+      /// Addressing mode for the given instruction.
       std::string addr;
       /// Instruction type
       InstructionType type;
       struct {
-        /// Low byte operand for the given instuction, if it exists
+        /// Low byte operand for the given instuction, if it exists.
         byte lo;
-        /// High byte operand for the given instuction, if it exists
+        /// High byte operand for the given instuction, if it exists.
         byte hi;
       } operand;
-      /// Cycles to execute for the given instruction
+      /// Cycles to execute for the given instruction.
       byte cycles;
     };
 
 } // namespace Cpu
 
-#endif // MOS_6502_INSTRUCTION_H //:~
+#endif // MOS_6502_INSTRUCTION_H //

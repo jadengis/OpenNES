@@ -1,6 +1,6 @@
 //===-- tests/common/TestException.cpp - Base Exception Test ----*- C++ -*-===//
 //
-//                           The OsNES Project
+//                           The OpenNES Project
 //
 // This file is distributed under GPL v2. See LICENSE.md for details. The Catch
 // framework IS NOT distributed under LICENSE.md.

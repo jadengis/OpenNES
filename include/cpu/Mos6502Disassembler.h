@@ -1,13 +1,13 @@
 //===-- include/cpu/Mos6502Disassembler.h - Mos6502 Disassembler *- C++ -*-===//
 //
-//                           The OsNES Project
+//                           The OpenNES Project
 //
 // This file is distributed under GPL v2. See LICENSE.md for details.
 //
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// This file contains the declaration if the Mos6502 Disassambler.
+/// This file contains the declaration of the Mos6502 Disassambler.
 ///
 //===----------------------------------------------------------------------===//
 #ifndef MOS_6502_DISASSEMBLER_H
@@ -20,7 +20,7 @@
 namespace Cpu {
 
 /// \class Mos6502Disassembler
-/// \brief This class is a disassembler for the Mos6502 architecture
+/// \brief This class is a disassembler for the Mos6502 architecture.
 struct Mos6502Disassembler {
   public:
     /// Look into the given opcode and return a formatted Mos6502Instruction.
@@ -70,4 +70,4 @@ void Mos6502Disassembler::setReadPosition(Memory::Reference<byte> readPosition) 
 
 } // namespace Cpu
 
-#endif // MOS_6502_DISASSEMBLER_H //:~
+#endif // MOS_6502_DISASSEMBLER_H //

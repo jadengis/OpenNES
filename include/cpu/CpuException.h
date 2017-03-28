@@ -1,6 +1,6 @@
 //===-- include/cpu/CpuException.h - Cpu Exceptions ----------------*- C++ -*-===//
 //
-//                           The OsNES Project
+//                           The OpenNES Project
 //
 // This file is distributed under GPL v2. See LICENSE.md for details.
 //
@@ -17,6 +17,8 @@
 
 namespace Exception {
 
+/// \class InvalidOpcodeException
+/// \brief The exception type to throw when encountering an undefined opcode.
 class InvalidOpcodeException : public BaseException {
   public:
     // Construction Methods

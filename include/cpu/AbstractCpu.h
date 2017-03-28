@@ -1,6 +1,6 @@
 //===-- include/cpu/AbstractCpu.h - Cpu Base Class --------------*- C++ -*-===//
 //
-//                           The OsNES Project
+//                           The OpenNES Project
 //
 // This file is distributed under GPL v2. See LICENSE.md for details.
 //
@@ -8,7 +8,7 @@
 ///
 /// \file
 /// This file contains the Cpu template which serves as an abstract base class
-/// for all Cpu style classes in the OsNES project.
+/// for all Cpu style classes in the OpenNES project.
 ///
 //===----------------------------------------------------------------------===//
 #include "common/CommonTypes.h"
@@ -18,16 +18,36 @@
 
 namespace Cpu {
 
+/// \class AbstractCpu
+/// \brief This class represents an abstract CPU.
+/// It provides the interface that any CPU must implement regardless of architecture.
 class AbstractCpu {
   public:
+    /// Virtual destructor for AbstractCpu
     virtual ~AbstractCpu() {};
+
+    /// Initialize the CPU. This can include all necessary steps to boot the CPU into
+    /// running mode.
     virtual void init() = 0;
+
+    /// Put the CPU into running mode. In running mode, the CPU should fetch, decode
+    /// and execute instructions in time with the clock.
     virtual void run() = 0;
+    
+    /// Reset the CPU. This can involved setting the program counter to its RESET 
+    /// value.
     virtual void reset() = 0;
+
+    /// Trace the CPU. Tracing the CPU should be used for debugging and should provide
+    /// information about the status of the CPU e.g. contents of registers, stack, 
+    /// current instruction etc.
     virtual void trace() = 0;
+
+    /// Shutdown the CPU. That is, perform all steps required to safety shutdown the
+    /// CPU.
     virtual void shutdown() = 0;
 };
 
 } // namespace Cpu
 
-#endif // CPU_BASE_H //
+#endif // ABSTRACT_CPU_H //

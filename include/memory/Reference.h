@@ -1,6 +1,6 @@
 //===-- include/memory/Reference.h - Reference Class ------------*- C++ -*-===//
 //
-//                           The OsNES Project
+//                           The OpenNES Project
 //
 // This file is distributed under GPL v2. See LICENSE.md for details.
 //  
@@ -31,22 +31,22 @@ class Reference {
     inline Reference(const Reference<Wordsize>& reference);
     virtual ~Reference() {};
 
-    /// Write to referenced location
-    /// \param data Data to write that the given location
+    /// Write to referenced location.
+    /// \param data Data to write that the given location.
     inline void write(Wordsize data);
 
-    /// Write to referenced location, incremented by an index
+    /// Write to referenced location, incremented by an index.
     /// \param data Data to write that the given location
-    /// \param offset Amount to increment from referenced location
+    /// \param offset Amount to increment from referenced location.
     inline void write(std::size_t offset, Wordsize data);
 
-    /// Read from referenced location
-    /// \return Data at the referenced location
+    /// Read from referenced location.
+    /// \return Data at the referenced location.
     inline const Wordsize read() const;
 
-    /// Read from referenced location, incremented by an index
-    /// \param offset Amount to increment from the referenced location
-    /// \return Data at the referenced location
+    /// Read from referenced location, incremented by an index.
+    /// \param offset Amount to increment from the referenced location.
+    /// \return Data at the referenced location.
     inline const Wordsize read(std::size_t offset) const;
 
     /// Increment the reference index before return.
@@ -58,10 +58,10 @@ class Reference {
     inline const Reference& operator--();
 
   private:
-    /// Index into the underlying memory bank
+    /// Index into the underlying memory bank.
     std::size_t index;
 
-    /// The memory bank pointed to by the reference
+    /// The memory bank pointed to by the reference.
     std::shared_ptr<Bank<Wordsize>> dataBank;
 };
 

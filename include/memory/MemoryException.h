@@ -1,6 +1,6 @@
 //===-- include/memory/MemoryException.h - Memory Exceptions ----*- C++ -*-===//
 //
-//                           The OsNES Project
+//                           The OpenNES Project
 //
 // This file is distributed under GPL v2. See LICENSE.md for details.
 //
@@ -17,6 +17,9 @@
 
 namespace Exception {
 
+/// \class ReadOnlyMemoryException
+/// \brief This is the exception to throw when attempting to write to a read only
+/// memory.
 class ReadOnlyMemoryException : public BaseException {
   public:
     // Construction Methods

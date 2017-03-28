@@ -1,7 +1,18 @@
-// Instruction Opcodes for the MOS 6502 CPU.
-// This list is in increasing order, and the addressing mode is included
-// in the opname.
-// Note: immed is used instead of # to list immediate addressing.
+//===-- include/cpu/Mos6502_Ops.h - Mos6502 Opcodes -------------*- C++ -*-===//
+//
+//                           The OpenNES Project
+//
+// This file is distributed under GPL v2. See LICENSE.md for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// This file contains instruction opcodes for the Mos6502 CPU.
+/// This list is in increasing order, and the addressing mode is included
+/// in the opname.
+/// Note: immed is used instead of # to list immediate addressing.
+///
+//===----------------------------------------------------------------------===//
 
 namespace Op {
   // HI-NIBBLE == 0x00
