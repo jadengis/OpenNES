@@ -15,13 +15,15 @@
 #define MOS_6502_H
 
 #include <string>
-#include <array>
 
 #include "common/CommonTypes.h"
 #include "cpu/AbstractCpu.h"
+#include "cpu/Mos6502Mmu.h"
+#include "cpu/Mos6502Disassembler.h"
 #include "cpu/Mos6502Instruction.h"
 #include "memory/Ram.h"
 #include "memory/Reference.h"
+#include "memory/Mapper.h"
 
 namespace Cpu {
 
@@ -33,7 +35,7 @@ namespace Cpu {
 class Mos6502 : public AbstractCpu {
   public:
     /// Default constructor. Bootstrap a Mos6502 CPU object.
-    Mos6502() : stack(reg.sp) {
+    Mos6502(Mapper& memMap) : stack(reg.sp), mmu(reg.x, reg.y, memMap) {
       this->reg.pc.val = 0;
       this->reg.ac = 0;
       this->reg.x = 0;
@@ -52,8 +54,6 @@ class Mos6502 : public AbstractCpu {
     void trace() override;
     void shutdown() override;
 
-
-    // Run-time emulation functions
     /// Fetch opcode from memory. This will retrieve the opcode at the current
     /// value of the program counter and return it for decoding.
     /// \returns Byte at the current value of the program counter.
@@ -72,34 +72,9 @@ class Mos6502 : public AbstractCpu {
     virtual void executeOpcode(Mos6502Instruction inst) final;
 
     // Cpu state inspection methods
-
     /// Get the remaining number of cycles to execute for the current instruction.
     /// \returns The current cycle count.
     int64 getCycleCount();
-
-    /// Get the current address pointed to by the program counter.
-    /// \returns The current value of the program counter.
-    addr getRegPC();
-
-    /// Get the current value of the accumulator.
-    /// \returns The current value of the accumulator.
-    byte getRegAC();
-
-    /// Get the current value of the X-index register.
-    /// \returns The current value of the X-index register.
-    byte getRegX();
-
-    /// Get the current value of the Y-index register.
-    /// \returns The current value of the Y-index register.
-    byte getRegY();
-
-    /// Get the current value of the status register.
-    /// \returns The current value of the status register.
-    byte getRegSR();
-
-    /// Get the current value of the stack pointer register.
-    /// \returns The current value of the stack pointer register.
-    byte getRegSP();
 
     // Status register flag masks
     /// Status register negative flag mask
@@ -273,6 +248,34 @@ class Mos6502 : public AbstractCpu {
     /// Transfer Y-index register to accumulator.
     inline void TYA();
 
+    /// Get the current address pointed to by the program counter.
+    /// \returns The current value of the program counter.
+    addr getRegPC() const;
+
+    /// Get the current value of the accumulator.
+    /// \returns The current value of the accumulator.
+    byte getRegAC() const;
+
+    /// Get the current value of the X-index register.
+    /// \returns The current value of the X-index register.
+    byte getRegX() const;
+
+    /// Get the current value of the Y-index register.
+    /// \returns The current value of the Y-index register.
+    byte getRegY() const;
+
+    /// Get the current value of the status register.
+    /// \returns The current value of the status register.
+    byte getRegSR() const;
+
+    /// Get the current value of the stack pointer register.
+    /// \returns The current value of the stack pointer register.
+    byte getRegSP() const;
+    
+    /// Get the internal memory management object for the Mos6502 object.
+    /// \returns The internal Mos6502Mmu object.
+    const Mos6502Mmu& getMmu() const;
+
   private:
     /// Cycles required to execute current instruction
     int64 cycleCount;
@@ -354,6 +357,9 @@ class Mos6502 : public AbstractCpu {
         Memory::Reference<byte> base;
 
     } stack;
+
+    /// The memory management unit for the Mos6502.
+    const Mos6502Mmu mmu;
 };
 
 #include "cpu/Mos6502_Ops.h"
