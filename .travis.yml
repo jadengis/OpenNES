@@ -55,7 +55,7 @@ script:
   - cd build
   - cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
   - make
-  - make unittests
+  - make CTEST_OUTPUT_ON_FAILURE=1 unittests
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -x ${COV}
