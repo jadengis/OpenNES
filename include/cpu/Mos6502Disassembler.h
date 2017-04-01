@@ -50,7 +50,7 @@ struct Mos6502Disassembler {
         byte opcode,
         std::string&& name,
         std::string&& addr,
-        int64 cycles,
+        byte cycles,
         Mos6502Instruction::InstructionType type);
 
     /// Memory location to start reading bytes from.

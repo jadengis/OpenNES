@@ -25,7 +25,7 @@ Mos6502Instruction&& Mos6502Disassembler::initInstruction(
     byte opcode, 
     std::string&& name, 
     std::string&& addr, 
-    int64 cycles,
+    byte cycles,
     Type type) {
   // declare an empty Mos6502Instruction
   Mos6502Instruction instruction;
