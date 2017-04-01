@@ -18,7 +18,7 @@
 #include "cpu/interpreter/InterpretedMos6502.h"
 #include "memory/Reference.h"
 
-#include "../Mos6502_Inst.h"
+#include "Mos6502_Inst.h"
 
 using namespace Cpu;
 using namespace Memory;

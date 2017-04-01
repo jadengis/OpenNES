@@ -93,7 +93,7 @@ Mos6502Instruction&& Mos6502Disassembler::disassembleInstruction() {
     case Op::ORA_ABS_X:
       return initInstruction(opcode, "ORA", "abs,X", 4, Type::TWO_OP);
     case Op::ASL_ABS_X:
-      return initInstruction(opcode, "ASL", "abs,X", 4, Type::TWO_OP);
+      return initInstruction(opcode, "ASL", "abs,X", 7, Type::TWO_OP);
 
     // HI-NIBBLE == 0x20
     case Op::JSR_ABS:
