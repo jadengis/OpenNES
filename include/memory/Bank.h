@@ -49,7 +49,7 @@ class Bank : public AbstractMemory<Wordsize> {
   protected:
     /// Get a reference to the internal dataBank.
     /// \returns A reference to the internal dataBank
-    inline const std::vector<Wordsize>& getDataBank() const;
+    inline std::vector<Wordsize>& getDataBank();
 
   private:
     /// The array of data comprising the memory bank
@@ -90,7 +90,7 @@ Vaddr Bank<Wordsize>::getBaseAddress() const {
 }
 
 template<class Wordsize>
-const std::vector<Wordsize> Bank<Wordsize>::getDataBank() const {
+std::vector<Wordsize>& Bank<Wordsize>::getDataBank() {
   return dataBank;
 }
 

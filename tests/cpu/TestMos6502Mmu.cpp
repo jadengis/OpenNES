@@ -23,38 +23,10 @@
 #include "memory/Ram.h"
 #include "cpu/Mos6502Mmu.h"
 
+#include "MockMapper.h"
+
 using namespace Memory;
 using namespace Cpu;
-
-#define NUM_BANKS 0x10
-#define BANK_SIZE 0x1000
-
-/// \class MockMapper
-/// \brief A fake memory mapper for testing.
-class MockMapper : public Mapper<byte> {
-  public:
-    MockMapper();
-    ~MockMapper() {}
-    std::shared_ptr<Bank<byte>> mapToHardware(Vaddr vaddr) const override;
-  private:
-    /// An array of ptrs to Ram banks that can be mapped to
-    std::array<std::shared_ptr<Ram<byte>>, NUM_BANKS> dataBanks;
-};
-
-MockMapper::MockMapper() {
-  Vaddr vaddr;
-  // bootstrap the mock mapper.
-  for(std::size_t i = 0; i < NUM_BANKS; i++) {
-    vaddr.val = i * BANK_SIZE;
-    dataBanks[i] = std::make_shared<Ram<byte>>(BANK_SIZE, vaddr);
-  }
-}
-
-std::shared_ptr<Bank<byte>> MockMapper::mapToHardware(Vaddr vaddr) const {
-  // mask out the high 4 bits and use as an index into the array
-  std::size_t index = (vaddr.val >> 12) & 0xF;
-  return dataBanks[index];
-}
 
 TEST_CASE("Mos6502 Memory Management Unit functionality tests", "[Mos6502],[Mmu]") {
   // instantiate the base objects needed to use the MMU

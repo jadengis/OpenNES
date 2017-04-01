@@ -35,7 +35,9 @@ namespace Cpu {
 class Mos6502 : public AbstractCpu {
   public:
     /// Default constructor. Bootstrap a Mos6502 CPU object.
-    Mos6502(Mapper& memMap) : stack(reg.sp), mmu(reg.x, reg.y, memMap) {
+    Mos6502(Memory::Mapper<byte>& memMap) :
+        stack(reg.sp),
+        mmu(reg.x, reg.y, memMap) {
       this->reg.pc.val = 0;
       this->reg.ac = 0;
       this->reg.x = 0;
@@ -74,7 +76,7 @@ class Mos6502 : public AbstractCpu {
     // Cpu state inspection methods
     /// Get the remaining number of cycles to execute for the current instruction.
     /// \returns The current cycle count.
-    int64 getCycleCount();
+    int64 getCycleCount() const;
 
     // Status register flag masks
     /// Status register negative flag mask
@@ -172,54 +174,52 @@ class Mos6502 : public AbstractCpu {
     /// Increment Y-index register by one.
     inline void INY();
     /// Jump to new location.
-    /// \param opdLo Low byte of the new address.
-    /// \param opdHi High byte of the new address.
-    inline void JMP(const byte opdLo, const byte opdHi);
+    /// \param vaddr Address to jump to..
+    inline void JMP(const Vaddr vaddr);
     /// Jump to new location saving return address.
-    /// \param opdLo Low byte of the new address.
-    /// \param opdHi High byte of the new address.
-    inline void JSR(const byte opdLo, const byte opdHi);
+    /// \param vaddr Address to jump to..
+    inline void JSR(const Vaddr vaddr);
     /// Load accumulator with memory.
     /// \param opd Byte read from memory.
-    inline void LDA(const byte);
+    inline void LDA(const byte opd);
     /// Load X-index register with memory.
     /// \param opd Byte read from memory.
-    inline void LDX(const byte);
+    inline void LDX(const byte opd);
     /// Load Y-index register with memory.
     /// \param opd Byte read from memory.
-    inline void LDY(const byte);
+    inline void LDY(const byte opd);
     /// Logical shift right.
     /// \param opd Byte read from memory.
     /// \returns Byte to write to memory.
-    inline byte LSR(byte);
+    inline byte LSR(byte opd);
     /// No operation
     inline void NOP();
     /// OR memory with accumulator.
     /// \param opd Byte read from memory.
-    inline void ORA(const byte);
+    inline void ORA(const byte opd);
     /// Push accumulator on processor stack.
     inline void PHA();
     /// Push processor status on processor stack.
     inline void PHP();
-    /// Pul accumulator from processor stack.
+    /// Pull accumulator from processor stack.
     inline void PLA();
     /// Pull processor status from processor stack.
     inline void PLP();
     /// Rotate one bit left.
     /// \param opd Byte read from memory.
     /// \returns Byte to write to memory.
-    inline byte ROL(byte);
+    inline byte ROL(byte opd);
     /// Rotate one bit right.
     /// \param opd Byte read from memory.
     /// \returns Byte to write to memory.
-    inline byte ROR(byte);
+    inline byte ROR(byte opd);
     /// Return from interrupt.
     inline void RTI();
     /// Return from subroutine.
     inline void RTS();
     /// Subtract memory from accumulator with borrow.
     /// \param opd Byte read from memory.
-    inline void SBC(const byte);
+    inline void SBC(const byte opd);
     /// Set carry flag.
     inline void SEC();
     /// Set decimal flag.
@@ -255,6 +255,10 @@ class Mos6502 : public AbstractCpu {
     /// Get the current value of the accumulator.
     /// \returns The current value of the accumulator.
     byte getRegAC() const;
+
+    /// Set the current value of the accumulator.
+    /// \param value The value to copy into the accumulator.
+    void setRegAC(const byte value);
 
     /// Get the current value of the X-index register.
     /// \returns The current value of the X-index register.

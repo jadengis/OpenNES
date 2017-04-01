@@ -31,7 +31,7 @@ namespace Cpu {
 class InterpretedMos6502 : public Mos6502 {
   public:
     /// Default constructor. Bootstrap an IntrepretedMos6502 CPU object.
-    InterpretedMos6502();
+    InterpretedMos6502(Memory::Mapper<byte>&);
     ~InterpretedMos6502();
 
   protected:
@@ -408,7 +408,7 @@ class InterpretedMos6502 : public Mos6502 {
 
     /// Pull processor status from stack, implied addressing
     /// \param inst Decoded instruction information.
-    void phaImplied(const Mos6502Instruction& inst);
+    void plpImplied(const Mos6502Instruction& inst);
 
     // Rotate left
     /// Rotate left one bit, accumulator

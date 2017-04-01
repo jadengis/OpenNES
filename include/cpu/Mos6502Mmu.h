@@ -41,54 +41,54 @@ class Mos6502Mmu {
     /// Absolute addressing mode, operand is at the address.
     /// \param vaddr The virtual address to provide a reference for.
     /// \returns Memory reference for the input address.
-    Memory::Reference<byte> absolute(Vaddr vaddr);
+    Memory::Reference<byte> absolute(Vaddr vaddr) const;
 
     /// Absolute addressing X-indexed, operand is at the address incremented by X
     /// with carry.
     /// \param vaddr The virtual address to provide a reference for.
     /// \returns Memory reference for the input address.
-    Memory::Reference<byte> absoluteXIndexed(Vaddr vaddr);
+    Memory::Reference<byte> absoluteXIndexed(Vaddr vaddr) const;
 
     /// Absolute addressing Y-indexed, operand is at the address incremented by Y
     /// with carry.
     /// \param vaddr The virtual address to provide a reference for.
     /// \returns Memory reference for the input address.
-    Memory::Reference<byte> absoluteYIndexed(Vaddr vaddr);
+    Memory::Reference<byte> absoluteYIndexed(Vaddr vaddr) const;
 
     /// Indirect addressing, operand is at the effective address; effective address 
     /// is the value at the given address.
     /// \param vaddr The virtual address to provide a reference for.
     /// \returns Memory reference for the input address.
-    Memory::Reference<byte> indirect(Vaddr vaddr);
+    Memory::Reference<byte> indirect(Vaddr vaddr) const;
 
     /// X-indexed indirect addressing, operand is effective zeropage address; 
     /// effective address is byte (BB) incremented by X without carry.
     /// \param vaddr The virtual address to provide a reference for.
     /// \returns Memory reference for the input address.
-    Memory::Reference<byte> xIndexedIndirect(Vaddr vaddr);
+    Memory::Reference<byte> xIndexedIndirect(Vaddr vaddr) const;
 
     /// Indirect addressing Y-indexed, operand is effective address incremented by
     /// Y with carry; effective address is word at zeropage address.
     /// \param vaddr The virtual address to provide a reference for.
     /// \returns Memory reference for the input address.
-    Memory::Reference<byte> indirectYIndexed(Vaddr vaddr);
+    Memory::Reference<byte> indirectYIndexed(Vaddr vaddr) const;
 
     /// Zeropage addressing, operand is at address; address hibyte is 0.
     /// \param vaddr The virtual address to provide a reference for.
     /// \returns Memory reference for the input address.
-    Memory::Reference<byte> zeropage(Vaddr vaddr);
+    Memory::Reference<byte> zeropage(Vaddr vaddr) const;
 
     /// Zeropage addressing X-indexed, operand is address incremented by X;
     /// address hibyte = zero ($00xx); no page transition.
     /// \param vaddr The virtual address to provide a reference for.
     /// \returns Memory reference for the input address.
-    Memory::Reference<byte> zeropageXIndexed(Vaddr vaddr);
+    Memory::Reference<byte> zeropageXIndexed(Vaddr vaddr) const;
 
     /// Zeropage addressing Y-indexed, operand is address incremented by Y;
     /// address hibyte = zero ($00xx); no page transition.
     /// \param vaddr The virtual address to provide a reference for.
     /// \returns Memory reference for the input address.
-    Memory::Reference<byte> zeropageYIndexed(Vaddr vaddr);
+    Memory::Reference<byte> zeropageYIndexed(Vaddr vaddr) const;
 
   private:
     /// External register value to use as X-index

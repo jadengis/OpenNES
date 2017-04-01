@@ -7,6 +7,8 @@
 # ===----------------------------------------------------------------------=== #
 set(SRCS Mos6502.cpp
          Mos6502Mmu.cpp
-         Mos6502Disassembler.cpp)
+         Mos6502Disassembler.cpp
+         interpreter/InterpretedMos6502.cpp
+         )
 
 add_library(cpu ${SRCS})

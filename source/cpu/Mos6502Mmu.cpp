@@ -57,27 +57,27 @@ Reference<byte> Mos6502Mmu::zeropageImpl(Vaddr vaddr) const {
 //===---------------------------------------------------------------------===//
 // Mos6502Mmu member functions
 //===---------------------------------------------------------------------===//
-Reference<byte> Mos6502Mmu::absolute(Vaddr vaddr) {
+Reference<byte> Mos6502Mmu::absolute(Vaddr vaddr) const {
   return absoluteImpl(vaddr);
 }
 
-Reference<byte> Mos6502Mmu::absoluteXIndexed(Vaddr vaddr) {
+Reference<byte> Mos6502Mmu::absoluteXIndexed(Vaddr vaddr) const {
   // Add with carry the index X to the virtual address
   vaddr.val += indexRegX;
   return absoluteImpl(vaddr);
 }
 
-Reference<byte> Mos6502Mmu::absoluteYIndexed(Vaddr vaddr) {
+Reference<byte> Mos6502Mmu::absoluteYIndexed(Vaddr vaddr) const {
   // Add with carry the index Y to the virtual address
   vaddr.val += indexRegY;
   return absoluteImpl(vaddr);
 }
 
-Reference<byte> Mos6502Mmu::indirect(Vaddr vaddr) {
+Reference<byte> Mos6502Mmu::indirect(Vaddr vaddr) const {
   return absoluteImpl(indirectImpl(vaddr));
 }
 
-Reference<byte> Mos6502Mmu::xIndexedIndirect(Vaddr vaddr) {
+Reference<byte> Mos6502Mmu::xIndexedIndirect(Vaddr vaddr) const {
   // Increment the low byte of our address without carry; ensure high byte is zero.
   vaddr.ll += indexRegX;
   vaddr.hh = 0;
@@ -85,23 +85,23 @@ Reference<byte> Mos6502Mmu::xIndexedIndirect(Vaddr vaddr) {
   return absoluteImpl(indirectImpl(vaddr));
 }
 
-Reference<byte> Mos6502Mmu::indirectYIndexed(Vaddr vaddr) {
+Reference<byte> Mos6502Mmu::indirectYIndexed(Vaddr vaddr) const {
   // Compute the effective address, increment by Y and read from that address.
   Vaddr effectiveAddress = indirectImpl(vaddr);
   effectiveAddress.val += indexRegY;
   return absoluteImpl(effectiveAddress);
 }
 
-Reference<byte> Mos6502Mmu::zeropage(Vaddr vaddr) {
+Reference<byte> Mos6502Mmu::zeropage(Vaddr vaddr) const {
   return zeropageImpl(vaddr);
 }
 
-Reference<byte> Mos6502Mmu::zeropageXIndexed(Vaddr vaddr) {
+Reference<byte> Mos6502Mmu::zeropageXIndexed(Vaddr vaddr) const {
   vaddr.ll += indexRegX;
   return zeropageImpl(vaddr);
 }
 
-Reference<byte> Mos6502Mmu::zeropageYIndexed(Vaddr vaddr) {
+Reference<byte> Mos6502Mmu::zeropageYIndexed(Vaddr vaddr) const {
   vaddr.ll += indexRegY;
   return zeropageImpl(vaddr);
 }
