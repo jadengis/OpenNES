@@ -27,7 +27,7 @@ class CpuException : public BaseException {
     CpuException(
         std::string&& errorMessage,
         std::string&& className = "CpuException") :
-      BaseException(errorMessage, className) {}
+      BaseException(std::move(errorMessage), std::move(className)) {}
     CpuException(const CpuException& originalException) noexcept :
         BaseException(originalException) {}
 
@@ -47,7 +47,7 @@ class InvalidOpcodeException : public CpuException {
           std::to_string(static_cast<uint64>(opcode)),
           "InvalidOpcodeException") {}
     InvalidOpcodeException(const InvalidOpcodeException& originalException) noexcept :
-        BaseException(originalException) {}
+        CpuException(originalException) {}
 
     // Destructors
     ~InvalidOpcodeException() {}

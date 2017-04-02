@@ -27,7 +27,7 @@ class MemoryException : public BaseException {
     MemoryException(
         std::string&& errorMessage,
         std::string&& className = "MemoryException") :
-      BaseException(errorMessage, className) {}
+      BaseException(std::move(errorMessage), std::move(className)) {}
     MemoryException(const MemoryException& originalException) noexcept :
         BaseException(originalException) {}
 
@@ -39,7 +39,7 @@ class MemoryException : public BaseException {
 /// \class ReadOnlyMemoryException
 /// \brief This is the exception to throw when attempting to write to a read only
 /// memory.
-class ReadOnlyMemoryException : public BaseException {
+class ReadOnlyMemoryException : public MemoryException {
   public:
     // Construction Methods
     ReadOnlyMemoryException() : MemoryException(
@@ -48,7 +48,7 @@ class ReadOnlyMemoryException : public BaseException {
     ReadOnlyMemoryException(
         std::string&& errorMessage,
         std::string&& className = "ReadOnlyMemoryException") :
-      MemoryException(errorMessage, className) {}
+      MemoryException(std::move(errorMessage), std::move(className)) {}
     ReadOnlyMemoryException(const ReadOnlyMemoryException& originalException) noexcept :
         MemoryException(originalException) {}
 
