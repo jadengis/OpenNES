@@ -55,30 +55,30 @@ void Mos6502::executeOpcode(Mos6502Instruction inst) {
 }
 
 // Cpu state inspection methods.
-int64 Mos6502::getCycleCount() {
+int64 Mos6502::getCycleCount() const {
   return cycleCount;
 }
 
-addr Mos6502::getRegPC() {
+addr Mos6502::getRegPC() const {
   return reg.pc.val;
 }
 
-byte Mos6502::getRegAC() {
+byte Mos6502::getRegAC() const {
   return reg.ac;
 }
 
-byte Mos6502::getRegX() {
+byte Mos6502::getRegX() const {
   return reg.x;
 }
 
-byte Mos6502::getRegY() {
+byte Mos6502::getRegY() const {
   return reg.y;
 }
 
-byte Mos6502::getRegSR() {
+byte Mos6502::getRegSR() const {
   return reg.sr;
 }
 
-byte Mos6502::getRegSP() {
+byte Mos6502::getRegSP() const {
   return reg.sp;
 }

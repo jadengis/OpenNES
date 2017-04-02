@@ -21,6 +21,17 @@
 #include "cpu/Mos6502.h"
 #include "Mos6502_Inst.h"
 
+#include "MockMapper.h"
+
+static MockMapper memMap;
+
+/// \class TestMos6502
+/// \brief Class for testing Mos6502 methods.
+class TestMos6502 : public Cpu::Mos6502 {
+  public:
+    TestMos6502() : Mos6502(::memMap) {}
+};
+
 #define SET_OVERFLOW() \
   ADC(100);\
   ADC(100);
@@ -40,7 +51,7 @@
   CHECK((getRegSR() & Cpu::Mos6502::SR_C) == 0);\
   REQUIRE((getRegSR() & Cpu::Mos6502::SR_N) != 0);
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 ADC", "[Mos6502][ADC]") {
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 ADC", "[Mos6502][ADC]") {
   // initialized accumulator should be zero
   REQUIRE(getRegAC() == 0);
 
@@ -105,7 +116,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 ADC", "[Mos650
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 SBC", "[Mos6502][SBC]") {
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 SBC", "[Mos6502][SBC]") {
   // initialized accumulator should be zero
   REQUIRE(getRegAC() == 0);
 
@@ -175,7 +186,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 SBC", "[Mos650
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 AND", "[Mos6502][AND]") {
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 AND", "[Mos6502][AND]") {
   // initialized accumulator should be zero
   REQUIRE(getRegAC() == 0);
 
@@ -211,7 +222,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 AND", "[Mos650
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 ORA", "[Mos6502][ORA]") {
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 ORA", "[Mos6502][ORA]") {
   // initialized accumulator should be zero
   REQUIRE(getRegAC() == 0);
 
@@ -243,7 +254,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 ORA", "[Mos650
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 EOR", "[Mos6502][EOR]") {
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 EOR", "[Mos6502][EOR]") {
   // initialized accumulator should be zero
   REQUIRE(getRegAC() == 0);
 
@@ -279,7 +290,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 EOR", "[Mos650
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 BIT instruction",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 BIT instruction",
     "[Mos6502],[BIT]") {
   SECTION("Test bits instructions has the correct behaviour") {
     // Load accumulator with some value
@@ -298,7 +309,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 BIT instructio
   }
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 shift instructions",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 shift instructions",
     "[Mos6502][Shift]") {
   SECTION("Shifting left by one bit gives the correct result") {
     // Take one bit in the far right position and check that it shifts the
@@ -341,7 +352,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 shift instruct
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 rotate instructions",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 rotate instructions",
     "[Mos6502],[Rotate]") {
   SECTION("Rotating left by one bit gives the correct result") {
     // Take one bit in the far right position and check that it shifts the
@@ -396,7 +407,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 rotate instruc
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 branch instructions",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 branch instructions",
     "[Mos6502][Branch]") {
   // initialized accumulator should be zero
   REQUIRE(getRegPC() == 0);
@@ -561,7 +572,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 branch instruc
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 clear and set instructions",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 clear and set instructions",
     "[Mos6502][Clear][Set]") {
   // Status register should be initialized to zero.
   REQUIRE(getRegSR() == 0);
@@ -603,7 +614,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 clear and set 
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 compare instructions",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 compare instructions",
     "[Mos6502],[Compare]") {
   // accumulator should initially be set to 0
   REQUIRE(getRegAC() == 0);
@@ -651,7 +662,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 compare instru
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 decrement instructions",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 decrement instructions",
     "[Mos6502],[Decrement]") {
   SECTION("Memory to memory decrement has the correct behaviour") {
     byte data = 5;
@@ -712,7 +723,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 decrement inst
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 increment instructions",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 increment instructions",
     "[Mos6502],[Increment]") {
   SECTION("Memory to memory increment has the correct behaviour") {
     byte data = 5;
@@ -771,7 +782,7 @@ SECTION("Memory to memory increment sets the correct flags") {
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 load instructions",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 load instructions",
     "[Mos6502],[Load]") {
   SECTION("Loading the accumulator puts the correct value in register") {
     // Load value and then check correctness
@@ -832,23 +843,31 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 load instructi
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 jump instructions",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 jump instructions",
     "[Mos6502],[Jump]") {
+  // Declare an address object
+  Vaddr vaddr;
   // PC should be 0 on initialization
   REQUIRE(getRegPC() == 0);
 
   SECTION("Jumping to a new pc value has the correct behavior") {
-    JMP(0x12, 0x34);
+    vaddr.ll = 0x12;
+    vaddr.hh = 0x34;
+    JMP(vaddr);
     REQUIRE(getRegPC() == 0x3412);
   }
 
   SECTION("Jumping with return has the correct behaviour") {
     // Set the value of PC to something initially
-    JMP(0x34, 0x12);
+    vaddr.ll = 0x34;
+    vaddr.hh = 0x12;
+    JMP(vaddr);
     REQUIRE(getRegPC() == 0x1234);
 
     // Jump with return to a new address
-    JSR(0x12, 0x34);
+    vaddr.ll = 0x12;
+    vaddr.hh = 0x34;
+    JSR(vaddr);
     REQUIRE(getRegPC() == 0x3412);
 
     // When you return from subroutine, add 3 to original pc
@@ -858,7 +877,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 jump instructi
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 interrupts",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 interrupts",
     "[Mos6502],[Interrupt]") {
   // Setup the processor in some state
   SEC();
@@ -867,7 +886,8 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 interrupts",
   REQUIRE((getRegSR() & Cpu::Mos6502::SR_D) != 0);
   byte oldSR = getRegSR();
   // Jump to some non-trivial location
-  JMP(0x12, 0x34);
+  Vaddr vaddr = {0x3412};
+  JMP(vaddr);
   REQUIRE(getRegPC() == 0x3412);
   addr oldPC = getRegPC();
   SECTION("Breaking and then returning from the interrupt behaves correctly") {
@@ -882,10 +902,11 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 interrupts",
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 no op",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 no op",
     "[Mos6502],[Noop]") {
   // put the Cpu into some non-trivial state
-  JMP(0x12, 0x34);
+  Vaddr vaddr = {0x3412};
+  JMP(vaddr);
   addr oldPC = getRegPC();
   LDA(4);
   byte oldAC = getRegAC();
@@ -907,7 +928,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 no op",
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 stack operations",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 stack operations",
     "[Mos6502],[Stack]") {
   SECTION("Pushing and pulling the accumulator works correctly") {
     // Loop a few values, pushing onto the stack, pulling off, and then checking
@@ -963,7 +984,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 stack operatio
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 store operations",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 store operations",
     "[Mos6502],[Store]") {
   SECTION("Store accumulator works correctly") {
     byte data = 5;
@@ -988,7 +1009,7 @@ TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 store operatio
 
 }
 
-TEST_CASE_METHOD(Cpu::Mos6502, "Functionality testing for Mos6502 transfer instructions",
+TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 transfer instructions",
     "[Mos6502],[Transfer]") {
   SECTION("Transfer from accumulator to X-index works correctly") {
     // Load, transfer then check

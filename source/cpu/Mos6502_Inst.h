@@ -230,12 +230,11 @@ inline void Cpu::Mos6502::ORA(const byte opd) {
 // ----------------------------------------------------------------------------
 
 // Jump to New Location
-inline void Cpu::Mos6502::JMP(const byte opd_lo, const byte opd_hi) {
-  // opd_lo is the low byte of the new PC and opd_hi is the high byte of new PC
-  // (PC+1 = opd_lo) -> PCL
-  // (PC+2 = opd_hi) -> PCH
-  reg.pc.ll = opd_lo;
-  reg.pc.hh = opd_hi;
+inline void Cpu::Mos6502::JMP(const Vaddr vaddr) {
+  // vaddr.ll is the low byte of the new PC and vaddr.hh is the high byte of new PC
+  // (PC+1 = vaddr.ll) -> PCL
+  // (PC+2 = vaddr.hh -> PCH
+  reg.pc.val = vaddr.val;
   return;
 }
 
@@ -507,16 +506,15 @@ inline void Cpu::Mos6502::PLP() {
 // ----------------------------------------------------------------------------
 
 // Jump to New Location Saving Return Address
-inline void Cpu::Mos6502::JSR(const byte opd_lo, const byte opd_hi) {
+inline void Cpu::Mos6502::JSR(const Vaddr vaddr) {
   // Push the value PC+2 onto the stack then assigned the new PC bytes from
-  // opd_lo and opd_hi.
-  // opd_lo -> PCL
-  // opd_hi -> PCH
+  // vaddr.ll and vaddr.hh.
+  // vaddr.ll -> PCL
+  // vaddr.hh -> PCH
   reg.pc.val = reg.pc.val + 2;
   stack.push(reg.pc.hh);
   stack.push(reg.pc.ll);
-  reg.pc.ll = opd_lo;
-  reg.pc.hh = opd_hi;
+  reg.pc.val = vaddr.val;
   return;
 }
 
