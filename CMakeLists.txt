@@ -16,6 +16,9 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     Please use a build directory.")
 endif()
 
+# Export Compile commands
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Set Executable and library output paths
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
