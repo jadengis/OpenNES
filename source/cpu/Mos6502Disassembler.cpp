@@ -21,7 +21,7 @@ using namespace Cpu;
 // Aliases for this file
 using Type = Mos6502Instruction::InstructionType;
 
-Mos6502Instruction&& Mos6502Disassembler::initInstruction(
+Mos6502Instruction Mos6502Disassembler::initInstruction(
     byte opcode, 
     std::string&& name, 
     std::string&& addr, 
@@ -48,10 +48,10 @@ Mos6502Instruction&& Mos6502Disassembler::initInstruction(
       instruction.operand.hi = (++readPosition).read();
       break;
   }
-  return std::move(instruction);
+  return instruction;
 }
 
-Mos6502Instruction&& Mos6502Disassembler::disassembleInstruction() {
+Mos6502Instruction Mos6502Disassembler::disassembleInstruction() {
   // Read the opcode from the reference
   byte opcode = readPosition.read();
 
