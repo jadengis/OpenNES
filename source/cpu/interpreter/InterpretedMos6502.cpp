@@ -15,6 +15,7 @@
 #include <unordered_map>
 
 #include "common/CommonTypes.h"
+#include "cpu/Mos6502_Ops.h"
 #include "cpu/interpreter/InterpretedMos6502.h"
 #include "memory/Reference.h"
 
@@ -24,8 +25,204 @@ using namespace Cpu;
 using namespace Memory;
 
 InterpretedMos6502::InterpretedMos6502(Memory::Mapper<byte>& memMap) :
-    Mos6502(memMap) {}
+    Mos6502(memMap) {
+  initializeInstructionMap();    
+}
+
 InterpretedMos6502::~InterpretedMos6502() {}
+
+using std::placeholders::_1;
+
+void InterpretedMos6502::initializeInstructionMap() {
+  // Here we will build the instruction map
+  // ADC
+  instructionMap[Op::ADC_IMMED] = std::bind(&InterpretedMos6502::adcImmediate, this, _1);
+  instructionMap[Op::ADC_ZPG] = std::bind(&InterpretedMos6502::adcZeropage, this, _1);
+  instructionMap[Op::ADC_ZPG_X] = std::bind(&InterpretedMos6502::adcZeropageX, this, _1);
+  instructionMap[Op::ADC_ABS] = std::bind(&InterpretedMos6502::adcAbsolute, this, _1);
+  instructionMap[Op::ADC_ABS_X] = std::bind(&InterpretedMos6502::adcAbsoluteX, this, _1); 
+  instructionMap[Op::ADC_ABS_Y] = std::bind(&InterpretedMos6502::adcAbsoluteY, this, _1); 
+  instructionMap[Op::ADC_X_IND] = std::bind(&InterpretedMos6502::adcXIndirect, this, _1); 
+  instructionMap[Op::ADC_IND_Y] = std::bind(&InterpretedMos6502::adcIndirectY, this, _1); 
+  // AND
+  instructionMap[Op::AND_IMMED] = std::bind(&InterpretedMos6502::andImmediate, this, _1); 
+  instructionMap[Op::AND_ZPG] = std::bind(&InterpretedMos6502::andZeropage, this, _1); 
+  instructionMap[Op::AND_ZPG_X] = std::bind(&InterpretedMos6502::andZeropageX, this, _1); 
+  instructionMap[Op::AND_ABS] = std::bind(&InterpretedMos6502::andAbsolute, this, _1); 
+  instructionMap[Op::AND_ABS_X] = std::bind(&InterpretedMos6502::andAbsoluteX, this, _1); 
+  instructionMap[Op::AND_ABS_Y] = std::bind(&InterpretedMos6502::andAbsoluteY, this, _1); 
+  instructionMap[Op::AND_X_IND] = std::bind(&InterpretedMos6502::andXIndirect, this, _1); 
+  instructionMap[Op::AND_IND_Y] = std::bind(&InterpretedMos6502::andIndirectY, this, _1); 
+  // ASL
+  instructionMap[Op::ASL_ACC] = std::bind(&InterpretedMos6502::aslAccumulator, this, _1);
+  instructionMap[Op::ASL_ZPG] = std::bind(&InterpretedMos6502::aslZeropage, this, _1);
+  instructionMap[Op::ASL_ZPG_X] = std::bind(&InterpretedMos6502::aslZeropageX, this, _1);
+  instructionMap[Op::ASL_ABS] = std::bind(&InterpretedMos6502::aslAbsolute, this, _1);
+  instructionMap[Op::ASL_ABS_X] = std::bind(&InterpretedMos6502::aslAbsoluteX, this, _1);
+  // Branch
+  instructionMap[Op::BCC_REL] = std::bind(&InterpretedMos6502::bccRelative, this, _1);
+  instructionMap[Op::BCS_REL] = std::bind(&InterpretedMos6502::bcsRelative, this, _1);
+  instructionMap[Op::BEQ_REL] = std::bind(&InterpretedMos6502::beqRelative, this, _1);
+  instructionMap[Op::BMI_REL] = std::bind(&InterpretedMos6502::bmiRelative, this, _1);
+  instructionMap[Op::BNE_REL] = std::bind(&InterpretedMos6502::bneRelative, this, _1);
+  instructionMap[Op::BPL_REL] = std::bind(&InterpretedMos6502::bplRelative, this, _1);
+  instructionMap[Op::BVC_REL] = std::bind(&InterpretedMos6502::bvcRelative, this, _1);
+  instructionMap[Op::BVS_REL] = std::bind(&InterpretedMos6502::bvsRelative, this, _1);
+  // BIT
+  instructionMap[Op::BIT_ZPG] = std::bind(&InterpretedMos6502::bitZeropage, this, _1);
+  instructionMap[Op::BIT_ABS] = std::bind(&InterpretedMos6502::bitAbsolute, this, _1);
+  // BRK
+  instructionMap[Op::BRK_IMPL] = std::bind(&InterpretedMos6502::brkImplied, this, _1);
+  // Clears
+  instructionMap[Op::CLC_IMPL] = std::bind(&InterpretedMos6502::clcImplied, this, _1);
+  instructionMap[Op::CLD_IMPL] = std::bind(&InterpretedMos6502::cldImplied, this, _1);
+  instructionMap[Op::CLI_IMPL] = std::bind(&InterpretedMos6502::cliImplied, this, _1);
+  instructionMap[Op::CLV_IMPL] = std::bind(&InterpretedMos6502::clvImplied, this, _1);
+  // CMP
+  instructionMap[Op::CMP_IMMED] = std::bind(&InterpretedMos6502::cmpImmediate, this, _1);
+  instructionMap[Op::CMP_ZPG] = std::bind(&InterpretedMos6502::cmpZeropage, this, _1);
+  instructionMap[Op::CMP_ZPG_X] = std::bind(&InterpretedMos6502::cmpZeropageX, this, _1);
+  instructionMap[Op::CMP_ABS] = std::bind(&InterpretedMos6502::cmpAbsolute, this, _1);
+  instructionMap[Op::CMP_ABS_X] = std::bind(&InterpretedMos6502::cmpAbsoluteX, this, _1);
+  instructionMap[Op::CMP_ABS_Y] = std::bind(&InterpretedMos6502::cmpAbsoluteY, this, _1);
+  instructionMap[Op::CMP_X_IND] = std::bind(&InterpretedMos6502::cmpXIndirect, this, _1);
+  instructionMap[Op::CMP_IND_Y] = std::bind(&InterpretedMos6502::cmpIndirectY, this, _1);
+  // CPX
+  instructionMap[Op::CPX_IMMED] = std::bind(&InterpretedMos6502::cpxImmediate, this, _1);
+  instructionMap[Op::CPX_ZPG] = std::bind(&InterpretedMos6502::cpxZeropage, this, _1);
+  instructionMap[Op::CPX_ABS] = std::bind(&InterpretedMos6502::cpxAbsolute, this, _1);
+  // CPY
+  instructionMap[Op::CPY_IMMED] = std::bind(&InterpretedMos6502::cpyImmediate, this, _1);
+  instructionMap[Op::CPY_ZPG] = std::bind(&InterpretedMos6502::cpyZeropage, this, _1);
+  instructionMap[Op::CPY_ABS] = std::bind(&InterpretedMos6502::cpyAbsolute, this, _1);
+  // DEC
+  instructionMap[Op::DEC_ZPG] = std::bind(&InterpretedMos6502::decZeropage, this, _1);
+  instructionMap[Op::DEC_ZPG_X] = std::bind(&InterpretedMos6502::decZeropageX, this, _1);
+  instructionMap[Op::DEC_ABS] = std::bind(&InterpretedMos6502::decAbsolute, this, _1);
+  instructionMap[Op::DEC_ABS_X] = std::bind(&InterpretedMos6502::decAbsoluteX, this, _1);
+  // DEX
+  instructionMap[Op::DEX_IMPL] = std::bind(&InterpretedMos6502::dexImplied, this, _1);
+  // DEY
+  instructionMap[Op::DEY_IMPL] = std::bind(&InterpretedMos6502::deyImplied, this, _1);
+  // EOR
+  instructionMap[Op::EOR_IMMED] = std::bind(&InterpretedMos6502::eorImmediate, this, _1);
+  instructionMap[Op::EOR_ZPG] = std::bind(&InterpretedMos6502::eorZeropage, this, _1);
+  instructionMap[Op::EOR_ZPG_X] = std::bind(&InterpretedMos6502::eorZeropageX, this, _1);
+  instructionMap[Op::EOR_ABS] = std::bind(&InterpretedMos6502::eorAbsolute, this, _1);
+  instructionMap[Op::EOR_ABS_X] = std::bind(&InterpretedMos6502::eorAbsoluteX, this, _1); 
+  instructionMap[Op::EOR_ABS_Y] = std::bind(&InterpretedMos6502::eorAbsoluteY, this, _1); 
+  instructionMap[Op::EOR_X_IND] = std::bind(&InterpretedMos6502::eorXIndirect, this, _1); 
+  instructionMap[Op::EOR_IND_Y] = std::bind(&InterpretedMos6502::eorIndirectY, this, _1); 
+  // INC
+  instructionMap[Op::INC_ZPG] = std::bind(&InterpretedMos6502::incZeropage, this, _1);
+  instructionMap[Op::INC_ZPG_X] = std::bind(&InterpretedMos6502::incZeropageX, this, _1);
+  instructionMap[Op::INC_ABS] = std::bind(&InterpretedMos6502::incAbsolute, this, _1);
+  instructionMap[Op::INC_ABS_X] = std::bind(&InterpretedMos6502::incAbsoluteX, this, _1);
+  // INX
+  instructionMap[Op::INX_IMPL] = std::bind(&InterpretedMos6502::inxImplied, this, _1);
+  // INY
+  instructionMap[Op::INY_IMPL] = std::bind(&InterpretedMos6502::inyImplied, this, _1);
+  // JMP
+  instructionMap[Op::JMP_ABS] = std::bind(&InterpretedMos6502::jmpAbsolute, this, _1);
+  instructionMap[Op::JMP_IND] = std::bind(&InterpretedMos6502::jmpIndirect, this, _1);
+  // JSR
+  instructionMap[Op::JSR_ABS] = std::bind(&InterpretedMos6502::jsrAbsolute, this, _1);
+  // LDA
+  instructionMap[Op::LDA_IMMED] = std::bind(&InterpretedMos6502::ldaImmediate, this, _1);
+  instructionMap[Op::LDA_ZPG] = std::bind(&InterpretedMos6502::ldaZeropage, this, _1);
+  instructionMap[Op::LDA_ZPG_X] = std::bind(&InterpretedMos6502::ldaZeropageX, this, _1);
+  instructionMap[Op::LDA_ABS] = std::bind(&InterpretedMos6502::ldaAbsolute, this, _1);
+  instructionMap[Op::LDA_ABS_X] = std::bind(&InterpretedMos6502::ldaAbsoluteX, this, _1);
+  instructionMap[Op::LDA_ABS_Y] = std::bind(&InterpretedMos6502::ldaAbsoluteY, this, _1);
+  instructionMap[Op::LDA_X_IND] = std::bind(&InterpretedMos6502::ldaXIndirect, this, _1);
+  instructionMap[Op::LDA_IND_Y] = std::bind(&InterpretedMos6502::ldaIndirectY, this, _1);
+  // LDX
+  instructionMap[Op::LDX_IMMED] = std::bind(&InterpretedMos6502::ldxImmediate, this, _1);
+  instructionMap[Op::LDX_ZPG] = std::bind(&InterpretedMos6502::ldxZeropage, this, _1);
+  instructionMap[Op::LDX_ZPG_Y] = std::bind(&InterpretedMos6502::ldxZeropageY, this, _1);
+  instructionMap[Op::LDX_ABS] = std::bind(&InterpretedMos6502::ldxAbsolute, this, _1);
+  instructionMap[Op::LDX_ABS_Y] = std::bind(&InterpretedMos6502::ldxAbsoluteY, this, _1);
+  // LDY
+  instructionMap[Op::LDY_IMMED] = std::bind(&InterpretedMos6502::ldyImmediate, this, _1);
+  instructionMap[Op::LDY_ZPG] = std::bind(&InterpretedMos6502::ldyZeropage, this, _1);
+  instructionMap[Op::LDY_ZPG_X] = std::bind(&InterpretedMos6502::ldyZeropageX, this, _1);
+  instructionMap[Op::LDY_ABS] = std::bind(&InterpretedMos6502::ldyAbsolute, this, _1);
+  instructionMap[Op::LDY_ABS_X] = std::bind(&InterpretedMos6502::ldyAbsoluteX, this, _1);
+  // LSR
+  instructionMap[Op::LSR_ACC] = std::bind(&InterpretedMos6502::lsrAccumulator, this, _1);
+  instructionMap[Op::LSR_ZPG] = std::bind(&InterpretedMos6502::lsrZeropage, this, _1);
+  instructionMap[Op::LSR_ZPG_X] = std::bind(&InterpretedMos6502::lsrZeropageX, this, _1);
+  instructionMap[Op::LSR_ABS] = std::bind(&InterpretedMos6502::lsrAbsolute, this, _1);
+  instructionMap[Op::LSR_ABS_X] = std::bind(&InterpretedMos6502::lsrAbsoluteX, this, _1);
+  // NOP
+  instructionMap[Op::NOP_IMPL] = std::bind(&InterpretedMos6502::nopImplied, this, _1);
+  // ORA
+  instructionMap[Op::ORA_IMMED] = std::bind(&InterpretedMos6502::oraImmediate, this, _1);
+  instructionMap[Op::ORA_ZPG] = std::bind(&InterpretedMos6502::oraZeropage, this, _1);
+  instructionMap[Op::ORA_ZPG_X] = std::bind(&InterpretedMos6502::oraZeropageX, this, _1);
+  instructionMap[Op::ORA_ABS] = std::bind(&InterpretedMos6502::oraAbsolute, this, _1);
+  instructionMap[Op::ORA_ABS_X] = std::bind(&InterpretedMos6502::oraAbsoluteX, this, _1); 
+  instructionMap[Op::ORA_ABS_Y] = std::bind(&InterpretedMos6502::oraAbsoluteY, this, _1); 
+  instructionMap[Op::ORA_X_IND] = std::bind(&InterpretedMos6502::oraXIndirect, this, _1); 
+  instructionMap[Op::ORA_IND_Y] = std::bind(&InterpretedMos6502::oraIndirectY, this, _1); 
+  // Stack Operations
+  instructionMap[Op::PHA_IMPL] = std::bind(&InterpretedMos6502::phaImplied, this, _1);
+  instructionMap[Op::PHP_IMPL] = std::bind(&InterpretedMos6502::phpImplied, this, _1);
+  instructionMap[Op::PLA_IMPL] = std::bind(&InterpretedMos6502::plaImplied, this, _1);
+  instructionMap[Op::PLP_IMPL] = std::bind(&InterpretedMos6502::plpImplied, this, _1);
+  // ROL
+  instructionMap[Op::ROL_ACC] = std::bind(&InterpretedMos6502::rolAccumulator, this, _1);
+  instructionMap[Op::ROL_ZPG] = std::bind(&InterpretedMos6502::rolZeropage, this, _1);
+  instructionMap[Op::ROL_ZPG_X] = std::bind(&InterpretedMos6502::rolZeropageX, this, _1);
+  instructionMap[Op::ROL_ABS] = std::bind(&InterpretedMos6502::rolAbsolute, this, _1);
+  instructionMap[Op::ROL_ABS_X] = std::bind(&InterpretedMos6502::rolAbsoluteX, this, _1);
+  // ROR
+  instructionMap[Op::ROR_ACC] = std::bind(&InterpretedMos6502::rorAccumulator, this, _1);
+  instructionMap[Op::ROR_ZPG] = std::bind(&InterpretedMos6502::rorZeropage, this, _1);
+  instructionMap[Op::ROR_ZPG_X] = std::bind(&InterpretedMos6502::rorZeropageX, this, _1);
+  instructionMap[Op::ROR_ABS] = std::bind(&InterpretedMos6502::rorAbsolute, this, _1);
+  instructionMap[Op::ROR_ABS_X] = std::bind(&InterpretedMos6502::rorAbsoluteX, this, _1);
+  // Returns
+  instructionMap[Op::RTI_IMPL] = std::bind(&InterpretedMos6502::rtiImplied, this, _1);
+  instructionMap[Op::RTS_IMPL] = std::bind(&InterpretedMos6502::rtsImplied, this, _1);
+  // SBC
+  instructionMap[Op::SBC_IMMED] = std::bind(&InterpretedMos6502::sbcImmediate, this, _1);
+  instructionMap[Op::SBC_ZPG] = std::bind(&InterpretedMos6502::sbcZeropage, this, _1);
+  instructionMap[Op::SBC_ZPG_X] = std::bind(&InterpretedMos6502::sbcZeropageX, this, _1);
+  instructionMap[Op::SBC_ABS] = std::bind(&InterpretedMos6502::sbcAbsolute, this, _1);
+  instructionMap[Op::SBC_ABS_X] = std::bind(&InterpretedMos6502::sbcAbsoluteX, this, _1); 
+  instructionMap[Op::SBC_ABS_Y] = std::bind(&InterpretedMos6502::sbcAbsoluteY, this, _1); 
+  instructionMap[Op::SBC_X_IND] = std::bind(&InterpretedMos6502::sbcXIndirect, this, _1); 
+  instructionMap[Op::SBC_IND_Y] = std::bind(&InterpretedMos6502::sbcIndirectY, this, _1); 
+  // Sets
+  instructionMap[Op::SEC_IMPL] = std::bind(&InterpretedMos6502::secImplied, this, _1); 
+  instructionMap[Op::SED_IMPL] = std::bind(&InterpretedMos6502::sedImplied, this, _1); 
+  instructionMap[Op::SEI_IMPL] = std::bind(&InterpretedMos6502::seiImplied, this, _1); 
+  // STA
+  instructionMap[Op::STA_ZPG] = std::bind(&InterpretedMos6502::staZeropage, this, _1);
+  instructionMap[Op::STA_ZPG_X] = std::bind(&InterpretedMos6502::staZeropageX, this, _1);
+  instructionMap[Op::STA_ABS] = std::bind(&InterpretedMos6502::staAbsolute, this, _1);
+  instructionMap[Op::STA_ABS_X] = std::bind(&InterpretedMos6502::staAbsoluteX, this, _1); 
+  instructionMap[Op::STA_ABS_Y] = std::bind(&InterpretedMos6502::staAbsoluteY, this, _1); 
+  instructionMap[Op::STA_X_IND] = std::bind(&InterpretedMos6502::staXIndirect, this, _1); 
+  instructionMap[Op::STA_IND_Y] = std::bind(&InterpretedMos6502::staIndirectY, this, _1); 
+  // STX
+  instructionMap[Op::STX_ZPG] = std::bind(&InterpretedMos6502::stxZeropage, this, _1);
+  instructionMap[Op::STX_ZPG_Y] = std::bind(&InterpretedMos6502::stxZeropageY, this, _1);
+  instructionMap[Op::STX_ABS] = std::bind(&InterpretedMos6502::stxAbsolute, this, _1);
+  // STY
+  instructionMap[Op::STY_ZPG] = std::bind(&InterpretedMos6502::styZeropage, this, _1);
+  instructionMap[Op::STY_ZPG_X] = std::bind(&InterpretedMos6502::styZeropageX, this, _1);
+  instructionMap[Op::STY_ABS] = std::bind(&InterpretedMos6502::styAbsolute, this, _1);
+  // Transfers
+  instructionMap[Op::TAX_IMPL] = std::bind(&InterpretedMos6502::taxImplied, this, _1);
+  instructionMap[Op::TAY_IMPL] = std::bind(&InterpretedMos6502::tayImplied, this, _1);
+  instructionMap[Op::TSX_IMPL] = std::bind(&InterpretedMos6502::tsxImplied, this, _1);
+  instructionMap[Op::TXA_IMPL] = std::bind(&InterpretedMos6502::txaImplied, this, _1);
+  instructionMap[Op::TXS_IMPL] = std::bind(&InterpretedMos6502::txsImplied, this, _1);
+  instructionMap[Op::TYA_IMPL] = std::bind(&InterpretedMos6502::tyaImplied, this, _1);
+  
+}
 
 //===----------------------------------------------------------------------===//
 // For all instruction emulation functions, we use the instruction information to

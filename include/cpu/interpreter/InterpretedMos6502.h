@@ -560,6 +560,9 @@ class InterpretedMos6502 : public Mos6502 {
     void tyaImplied(const Mos6502Instruction& inst);
 
   private:
+    /// This method will initialize the function objects and store them in the
+    /// instruction map.
+    void initializeInstructionMap();
     /// Map between opcode and their interpreted implementation.
     std::unordered_map<byte, std::function<void(const Mos6502Instruction&)>> instructionMap;
 };
