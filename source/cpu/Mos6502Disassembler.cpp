@@ -261,7 +261,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction() {
     case Op::LDY_IMMED:
       return initInstruction(opcode, "LDY", "#", 2, Type::ONE_OP);
     case Op::LDA_X_IND:
-      return initInstruction(opcode, "LDY", "X,ind", 6, Type::ONE_OP);
+      return initInstruction(opcode, "LDA", "X,ind", 6, Type::ONE_OP);
     case Op::LDX_IMMED:
       return initInstruction(opcode, "LDX", "#", 2, Type::ONE_OP);
     case Op::LDY_ZPG:
@@ -329,7 +329,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction() {
     case Op::CMP_ABS:
       return initInstruction(opcode, "CMP", "abs", 4, Type::TWO_OP);
     case Op::DEC_ABS:
-      return initInstruction(opcode, "CMP", "abs", 6, Type::TWO_OP);
+      return initInstruction(opcode, "DEC", "abs", 6, Type::TWO_OP);
 
     // HI-NIBBLE == 0xD0
     case Op::BNE_REL:

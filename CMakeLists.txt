@@ -5,8 +5,8 @@
 #  This file is distributed under GPL v2. See LICENSE.md for details.
 #
 # ===----------------------------------------------------------------------=== #
-project (OpenNES)
 cmake_minimum_required (VERSION 3.2.2)
+project (OpenNES)
 
 
 # Ensure that we do not perform in-source builds, as this makes cleanup
@@ -79,13 +79,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Set project level compiler options for all build types
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -Wno-unused-parameter")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g --coverage")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
 
 # Set project level executable link flags
 # We are using execinfo.h for backtraces, so we require -rdynamic
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic --coverage")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
+# coverage generation seems broken for Clang, so only include these flags for GCC
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+endif()
 
 # project include directory
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
