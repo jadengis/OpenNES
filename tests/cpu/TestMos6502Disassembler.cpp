@@ -1595,6 +1595,21 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     
   }
 
+  SECTION("ORA X-indirect instruction disassembles correctly.") {
+    loadRam(ramPtr, Op::ORA_IND_Y, 0x0E); 
+    Reference<byte> ref(ramPtr, 0);
+    // Disassemble
+    Mos6502Instruction inst = dis.disassembleInstruction(ref);
+
+    CHECK(inst.opcode == Op::ORA_IND_Y);
+    CHECK(inst.name == "ORA");
+    CHECK(inst.addr == "ind,Y");
+    CHECK(inst.operand.lo == 0x0E);
+    CHECK(inst.operand.hi == 0x00);
+    CHECK(inst.cycles == 5);
+    
+  }
+
   SECTION("TAX implied instruction disassembles correctly.") {
     loadRam(ramPtr, Op::TAX_IMPL); 
     Reference<byte> ref(ramPtr, 0);
