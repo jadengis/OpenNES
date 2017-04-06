@@ -37,6 +37,7 @@ class Mos6502 : public AbstractCpu {
     /// Default constructor. Bootstrap a Mos6502 CPU object.
     Mos6502(Memory::Mapper<byte>& memMap) :
         stack(reg.sp),
+        dis(),
         mmu(reg.x, reg.y, memMap) {
       this->reg.pc.val = 0;
       this->reg.ac = 0;
@@ -47,36 +48,21 @@ class Mos6502 : public AbstractCpu {
       this->reg.sp = 0xFF;
     }
 
-    //===------------------------------===//
-    // AbstractCpu class methods
-    //===------------------------------===//
     void init() override;
     void run() override;
+    void step() override;
     void reset() override;
     void trace() override;
     void shutdown() override;
 
-    /// Fetch opcode from memory. This will retrieve the opcode at the current
-    /// value of the program counter and return it for decoding.
-    /// \returns Byte at the current value of the program counter.
-    virtual byte fetchOpcode() final;
-
-    /// Decode opcode into Mos6502Instruction object. This object provides a lot
-    /// of information about the opcodes instruction that can be used for tracing
-    /// and execution.
-    /// \param opcode The opcode to decode into a Mos6502Instruction.
-    /// \returns Decoded Mos6502Instruction object.
-    virtual Mos6502Instruction decodeOpcode(byte opcode) final;
-
-    /// Execute input instruction. This function will execute a Mos6502Instruction
-    /// on the CPU.
-    /// \param Mos6502Instruction object to execute.
-    virtual void executeOpcode(Mos6502Instruction inst) final;
-
     // Cpu state inspection methods
     /// Get the remaining number of cycles to execute for the current instruction.
     /// \returns The current cycle count.
-    int64 getCycleCount() const;
+    inline byte getCycleCount() const;
+
+    /// Increment the cycle count by the input value
+    /// \param value Number of cycles to add to the count.
+    inline void incrementCycles(const byte value);
 
     // Status register flag masks
     /// Status register negative flag mask
@@ -95,9 +81,28 @@ class Mos6502 : public AbstractCpu {
     static const byte SR_C = 0x01;
 
   protected:
-    //===------------------------------===//
-    // CPU Instruction emulation functions
-    //===------------------------------===//
+    /// Fetch opcode from memory. This will retrieve the opcode at the current
+    /// value of the program counter and return it for decoding.
+    void fetchOpcode() final;
+
+    /// Decode opcode into Mos6502Instruction object. This object provides a lot
+    /// of information about the opcodes instruction that can be used for tracing
+    /// and execution.
+    void decodeOpcode() final;
+
+    /// Execute input instruction. This function will execute a Mos6502Instruction
+    /// on the CPU.
+    void executeOpcode() final;
+
+    /// Implementation specific details of fetchOpcode
+    virtual void fetchOpcodeImpl() = 0;
+
+    /// Implementation specific details of decodeOpcode
+    virtual void decodeOpcodeImpl() = 0;
+
+    /// Implementation specific details of executeOpcode
+    virtual void executeOpcodeImpl() = 0;
+
     /// Add memory to accumulator with carry.
     /// \param opd Byte read from memory.
     inline void ADC(const byte opd);
@@ -248,47 +253,72 @@ class Mos6502 : public AbstractCpu {
     /// Transfer Y-index register to accumulator.
     inline void TYA();
 
+    /// Get the current opcode from the instruction register.
+    /// \returns The opcode in the instruction register.
+    inline byte getRegIR() const;
+
+    /// Set the current value of the instruction register.
+    /// \param value The value to copy into the instruction register.
+    inline void setRegIR(const byte value);
+
     /// Get the current address pointed to by the program counter.
     /// \returns The current value of the program counter.
-    addr getRegPC() const;
+    inline addr getRegPC() const;
+
+    /// Increment the program counter by the input amount.
+    /// \param value Amount to increment the program counter.
+    inline void incrementRegPC(const addr value);
 
     /// Get the current value of the accumulator.
     /// \returns The current value of the accumulator.
-    byte getRegAC() const;
+    inline byte getRegAC() const;
 
     /// Set the current value of the accumulator.
     /// \param value The value to copy into the accumulator.
-    void setRegAC(const byte value);
+    inline void setRegAC(const byte value);
 
     /// Get the current value of the X-index register.
     /// \returns The current value of the X-index register.
-    byte getRegX() const;
+    inline byte getRegX() const;
 
     /// Get the current value of the Y-index register.
     /// \returns The current value of the Y-index register.
-    byte getRegY() const;
+    inline byte getRegY() const;
 
     /// Get the current value of the status register.
     /// \returns The current value of the status register.
-    byte getRegSR() const;
+    inline byte getRegSR() const;
 
     /// Get the current value of the stack pointer register.
     /// \returns The current value of the stack pointer register.
-    byte getRegSP() const;
+    inline byte getRegSP() const;
+
+    /// Get the internal disassembler object for the Mos6502 object.
+    /// \returns The internal disassembler.
+    inline Mos6502Disassembler& getDis();
     
     /// Get the internal memory management object for the Mos6502 object.
     /// \returns The internal Mos6502Mmu object.
-    const Mos6502Mmu& getMmu() const;
+    inline const Mos6502Mmu& getMmu() const;
 
   private:
+    // Mos6502 private static consts
+    /// Low byte location of memory containing non-maskable interrupt vector
+    static constexpr const Vaddr& NMI_VECTOR = { 0xFFFA };
+    /// Low byte location of memory containing reset vector
+    static constexpr const Vaddr& RESET_VECTOR = { 0xFFFC };
+    /// Low byte location of memory containing maskable interrupt vector
+    static constexpr const Vaddr& IRQ_VECTOR = { 0xFFFE };
+
     /// Cycles required to execute current instruction
-    int64 cycleCount;
+    byte cycleCount;
     // Register structure
     struct {
+      byte ir; // Instruction register
       Vaddr pc; // Program counter
-      byte  ac; // Accumulator
-      byte  x;  // X Register
-      byte  y;  // Y Register
+      byte ac; // Accumulator
+      byte x;  // X Register
+      byte y;  // Y Register
       union {
         byte sr; // Status Register [NV-BDIZC]
         struct {
@@ -362,9 +392,70 @@ class Mos6502 : public AbstractCpu {
 
     } stack;
 
+    /// The disassembler for the Mos6502.
+    Mos6502Disassembler dis;
+
     /// The memory management unit for the Mos6502.
     const Mos6502Mmu mmu;
+
 };
+
+// Inlinable Cpu state inspection methods.
+byte Mos6502::getCycleCount() const {
+  return cycleCount;
+}
+
+void Mos6502::incrementCycles(const byte value) {
+  this->cycleCount += value;
+}
+
+byte Mos6502::getRegIR() const {
+  return reg.ir;
+}
+
+void Mos6502::setRegIR(const byte value) {
+  this->reg.ir = value;
+}
+
+addr Mos6502::getRegPC() const {
+  return reg.pc.val;
+}
+
+void Mos6502::incrementRegPC(const addr value) {
+  this->reg.pc.val += value;
+}
+
+byte Mos6502::getRegAC() const {
+  return reg.ac;
+}
+
+void Mos6502::setRegAC(const byte value) {
+  this->reg.ac = value;
+}
+
+byte Mos6502::getRegX() const {
+  return reg.x;
+}
+
+byte Mos6502::getRegY() const {
+  return reg.y;
+}
+
+byte Mos6502::getRegSR() const {
+  return reg.sr;
+}
+
+byte Mos6502::getRegSP() const {
+  return reg.sp;
+}
+
+Mos6502Disassembler& Mos6502::getDis() {
+  return dis;
+}
+
+const Mos6502Mmu& Mos6502::getMmu() const {
+  return mmu;
+}
 
 #include "cpu/Mos6502_Ops.h"
 

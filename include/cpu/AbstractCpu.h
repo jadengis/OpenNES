@@ -38,6 +38,9 @@ class AbstractCpu {
     /// value.
     virtual void reset() = 0;
 
+    /// Execute one cycle on the Cpu.
+    virtual void step() = 0;
+
     /// Trace the CPU. Tracing the CPU should be used for debugging and should provide
     /// information about the status of the CPU e.g. contents of registers, stack, 
     /// current instruction etc.
@@ -46,6 +49,18 @@ class AbstractCpu {
     /// Shutdown the CPU. That is, perform all steps required to safety shutdown the
     /// CPU.
     virtual void shutdown() = 0;
+
+  protected:
+    /// Fetch opcode from current program counter position, and store in instruction
+    /// register.
+    virtual void fetchOpcode() = 0;
+
+    /// Decode the opcode in the instruction register into an understandable Cpu
+    /// instruction.
+    virtual void decodeOpcode() = 0;
+
+    /// Execute the last decoded instruction.
+    virtual void executeOpcode() = 0;
 };
 
 } // namespace Cpu

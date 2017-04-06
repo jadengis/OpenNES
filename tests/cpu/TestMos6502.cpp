@@ -30,6 +30,11 @@ static MockMapper memMap;
 class TestMos6502 : public Cpu::Mos6502 {
   public:
     TestMos6502() : Mos6502(::memMap) {}
+    ~TestMos6502() {}
+  protected:
+    void fetchOpcodeImpl() override {}
+    void decodeOpcodeImpl() override {}
+    void executeOpcodeImpl() override {}
 };
 
 #define SET_OVERFLOW() \

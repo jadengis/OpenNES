@@ -31,6 +31,26 @@ InterpretedMos6502::InterpretedMos6502(Memory::Mapper<byte>& memMap) :
 
 InterpretedMos6502::~InterpretedMos6502() {}
 
+void InterpretedMos6502::fetchOpcodeImpl() {
+  // fetch the opcode at the current program counter
+  Vaddr vaddr;
+  vaddr.val = getRegPC();
+  Reference<byte> ref = getMmu().absolute(vaddr);
+  setRegIR(ref.read());
+  getDis().setReadPosition(ref);
+}
+
+void InterpretedMos6502::decodeOpcodeImpl() {
+  // decode instruction in the instruction register
+  currentInstruction = getDis().disassembleInstruction(getRegIR());
+}
+
+void InterpretedMos6502::executeOpcodeImpl() {
+  instructionMap[currentInstruction.opcode](currentInstruction);
+  incrementRegPC(static_cast<addr>(currentInstruction.type) + 1);
+  incrementCycles(currentInstruction.cycles);
+}
+
 using std::placeholders::_1;
 
 void InterpretedMos6502::initializeInstructionMap() {
