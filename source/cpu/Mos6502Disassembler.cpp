@@ -51,10 +51,7 @@ Mos6502Instruction Mos6502Disassembler::initInstruction(
   return instruction;
 }
 
-Mos6502Instruction Mos6502Disassembler::disassembleInstruction() {
-  // Read the opcode from the reference
-  byte opcode = readPosition.read();
-
+Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
   // Lookup the fetched opcode
   switch(opcode) {
     // HI-NIBBLE == 0x00

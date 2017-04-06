@@ -37,6 +37,11 @@ class Mos6502Mmu {
     Mos6502Mmu(const byte& regX, const byte& regY, const Memory::Mapper<byte>& memMap);
     ~Mos6502Mmu() {};
 
+    /// Retrieves the two byte vector whose low is pointed to by the input.
+    /// \param vaddr Address of low byte of vector in memory
+    /// \returns Vector stored in memory.
+    Vaddr loadVector(Vaddr vaddr) const; 
+
     // Addressing mode functions
     /// Absolute addressing mode, operand is at the address.
     /// \param vaddr The virtual address to provide a reference for.

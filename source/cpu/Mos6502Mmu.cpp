@@ -57,6 +57,10 @@ Reference<byte> Mos6502Mmu::zeropageImpl(Vaddr vaddr) const {
 //===---------------------------------------------------------------------===//
 // Mos6502Mmu member functions
 //===---------------------------------------------------------------------===//
+Vaddr Mos6502Mmu::loadVector(Vaddr vaddr) const {
+  return indirectImpl(vaddr);
+}
+
 Reference<byte> Mos6502Mmu::absolute(Vaddr vaddr) const {
   return absoluteImpl(vaddr);
 }

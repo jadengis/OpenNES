@@ -11,6 +11,8 @@
 /// Mos6502 class.
 ///
 //===----------------------------------------------------------------------===//
+#include "common/CommonTypes.h"
+
 #include "memory/Reference.h"
 #include "cpu/CpuException.h"
 #include "cpu/Mos6502.h"
@@ -25,7 +27,12 @@ void Mos6502::init() {
 void Mos6502::run() {
 }
 
+void Mos6502::step() {
+}
+
 void Mos6502::reset() {
+  // load RESET vector from memory
+  reg.pc = getMmu().loadVector(RESET_VECTOR);
 }
 
 void Mos6502::trace() {
@@ -34,51 +41,16 @@ void Mos6502::trace() {
 void Mos6502::shutdown() {
 }
 
-// Run-time Emulation functions
-byte Mos6502::fetchOpcode() {
-  // TODO: implement
-  return 0;
+void Mos6502::fetchOpcode() {
+  // call the implement of fetchOpcode
+  fetchOpcodeImpl();
 }
 
-Mos6502Instruction Mos6502::decodeOpcode(byte opcode) {
-   // TODO: implement
-   Mos6502Instruction inst;
-   inst.opcode = opcode;
-   return inst;
+void Mos6502::decodeOpcode() {
+  // call the implement of fetchOpcode
+  decodeOpcodeImpl();
 }
 
-void Mos6502::executeOpcode(Mos6502Instruction inst) {
-   // TODO: implement
-   byte opcode = inst.opcode;
-   printf("%hhu\n",opcode);
-   return;
-}
-
-// Cpu state inspection methods.
-int64 Mos6502::getCycleCount() const {
-  return cycleCount;
-}
-
-addr Mos6502::getRegPC() const {
-  return reg.pc.val;
-}
-
-byte Mos6502::getRegAC() const {
-  return reg.ac;
-}
-
-byte Mos6502::getRegX() const {
-  return reg.x;
-}
-
-byte Mos6502::getRegY() const {
-  return reg.y;
-}
-
-byte Mos6502::getRegSR() const {
-  return reg.sr;
-}
-
-byte Mos6502::getRegSP() const {
-  return reg.sp;
+void Mos6502::executeOpcode() {
+  executeOpcodeImpl();
 }

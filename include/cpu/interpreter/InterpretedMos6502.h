@@ -35,6 +35,10 @@ class InterpretedMos6502 : public Mos6502 {
     ~InterpretedMos6502();
 
   protected:
+    void fetchOpcodeImpl() override;
+    void decodeOpcodeImpl() override;
+    void executeOpcodeImpl() override;
+
     // Add with Carry
     /// Add memory to accumulator with carry, immediate addressing.
     /// \param inst Decoded instruction information.
@@ -563,6 +567,10 @@ class InterpretedMos6502 : public Mos6502 {
     /// This method will initialize the function objects and store them in the
     /// instruction map.
     void initializeInstructionMap();
+
+    /// The current instruction in the Cpu.
+    Mos6502Instruction currentInstruction;
+
     /// Map between opcode and their interpreted implementation.
     std::unordered_map<byte, std::function<void(const Mos6502Instruction&)>> instructionMap;
 };

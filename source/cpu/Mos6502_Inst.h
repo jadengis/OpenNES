@@ -37,7 +37,6 @@ enum class BitPosition {
 
 // Static Functions
 static inline byte checkZero(byte x);
-static inline byte checkNotZero(byte x);
 static inline byte checkNthBit(byte x, BitPosition n);
 static inline uint16 computeBranch(uint16 pc, byte m);
 
@@ -602,6 +601,8 @@ inline void Cpu::Mos6502::BRK() {
   stack.push(reg.pc.ll);
   stack.push(reg.sr);
   reg.srf.i = 1; // Set interrupt flag
+  reg.srf.b = 1; // Set break flag
+  reg.pc = getMmu().loadVector(IRQ_VECTOR);
   return;
 }
 
@@ -613,11 +614,6 @@ inline void Cpu::Mos6502::BRK() {
 static inline byte checkZero(byte x) {
   // Returns 1 if 0, 0 otherwise
   return x == 0;
-}
-
-static inline byte checkNotZero(byte x) {
-  // Returns 1 if not 0, 0 otherwise
-  return x != 0;
 }
 
 static inline byte checkNthBit(byte x, BitPosition n) {
