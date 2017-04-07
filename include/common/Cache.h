@@ -27,7 +27,7 @@ namespace Structure {
 /// \tparam Key The type to use for lookup keys.
 /// \tparam T The type to store.
 /// \tparam cacheSize The size of the cache.
-template <class Key, class T, unsigned long cacheSize = 20>
+template <class Key, class T, std::size_t cacheSize = 20>
 class Cache {
   public:
     /// Initialize and empty cache.
@@ -35,6 +35,14 @@ class Cache {
 
     /// Cache destructor.
     ~Cache();
+
+    /// Gets the current number of elements in the cache.
+    /// \returns The size of the cache.
+    inline std::size_t size();
+
+    /// Gets the maximum number of elements the cache can hold.
+    /// \returns The maximum size of the cache.
+    inline std::size_t maxSize();
 
     /// Add the keyed data to the cache.
     /// \param key Lookup key.
@@ -46,6 +54,10 @@ class Cache {
 
     /// Clears the entire cache.
     inline void clear();
+
+    /// Checks whether the cache is empty.
+    /// \returns True is cache is empty.
+    inline bool empty();
 
     /// Check to see if the input key is in the cache.
     /// \param key The key to lookup.
@@ -64,48 +76,64 @@ class Cache {
     std::unordered_map<Key, T> cache;
 };
 
-template <class Key, class T, unsigned long cacheSize>
-Cache::Cache() : keyQueue(), cache() {}
+template <class Key, class T, std::size_t cacheSize>
+Cache<Key, T, cacheSize>::Cache() : keyQueue(), cache() {}
 
-template <class Key, class T, unsigned long cacheSize>
-Cache::~Cache() {}
+template <class Key, class T, std::size_t cacheSize>
+Cache<Key, T, cacheSize>::~Cache() {}
 
-template <class Key, class T, unsigned long cacheSize>
-void Cache::add(Key key, T data) {
+template <class Key, class T, std::size_t cacheSize>
+std::size_t Cache<Key, T, cacheSize>::size() {
+  return keyQueue.size();
+}
+
+template <class Key, class T, std::size_t cacheSize>
+std::size_t Cache<Key, T, cacheSize>::maxSize() {
+  return cacheSize;;
+}
+
+template <class Key, class T, std::size_t cacheSize>
+void Cache<Key, T, cacheSize>::add(Key key, T data) {
   // push the key into the queue and add the data to the map
   keyQueue.push_back(key);
   cache[key] = data;
   if(keyQueue.size() > cacheSize) {
-    removeOldest();
+    remove();
   }
 }
 
-template <class Key, class T, unsigned long cacheSize>
-void Cache::remove() {
+template <class Key, class T, std::size_t cacheSize>
+void Cache<Key, T, cacheSize>::remove() {
     // pop the front element, and delete from the map.
-    cache.erase(keyQueue.pop_front());
+    cache.erase(keyQueue.front());
+    keyQueue.pop_front();
 }
 
-template <class Key, class T, unsigned long cacheSize>
-void Cache::clear() {
+template <class Key, class T, std::size_t cacheSize>
+void Cache<Key, T, cacheSize>::clear() {
   // clear the queue and map
   keyQueue.clear();
   cache.clear();
 }
 
-template <class Key, class T, unsigned long cacheSize>
-bool hasKey(const Key& key) const {
-  // check to see that the map count for key is greater
-  // than zero
-  return map.count(key) > 0;
+template <class Key, class T, std::size_t cacheSize>
+bool Cache<Key, T, cacheSize>::empty() {
+  return keyQueue.empty();
 }
 
-template <class Key, class T, unsigned long cacheSize>
-const T& lookup(const Key& key) const {
-  if(!hasKey()) {
-    throw KeyErrorException();
+template <class Key, class T, std::size_t cacheSize>
+bool Cache<Key, T, cacheSize>::hasKey(const Key& key) const {
+  // check to see that the map count for key is greater
+  // than zero
+  return cache.count(key) > 0;
+}
+
+template <class Key, class T, std::size_t cacheSize>
+const T& Cache<Key, T, cacheSize>::lookup(const Key& key) const {
+  if(!hasKey(key)) {
+    throw Exception::KeyErrorException();
   }
-  return cache[key];
+  return static_cast<const std::unordered_map<Key, T>&>(cache).at(key);
 }
 
 } // namespace Structure
