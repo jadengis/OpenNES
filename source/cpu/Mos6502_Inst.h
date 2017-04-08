@@ -510,7 +510,10 @@ inline void Cpu::Mos6502::JSR(const Vaddr vaddr) {
   // vaddr.ll and vaddr.hh.
   // vaddr.ll -> PCL
   // vaddr.hh -> PCH
-  reg.pc.val = reg.pc.val + 2;
+  // At this point, we should have read 3 bytes, and are pointing at the next
+  // instruction in memory. For correct program behaviour, we must decrement by
+  // one.
+  reg.pc.val = reg.pc.val - 1;
   stack.push(reg.pc.hh);
   stack.push(reg.pc.ll);
   reg.pc.val = vaddr.val;
@@ -596,7 +599,8 @@ inline void Cpu::Mos6502::NOP() {
 // Force Break
 inline void Cpu::Mos6502::BRK() {
   // interrupt, push PC+2, push SR
-  reg.pc.val = reg.pc.val + 2;
+  // increment pc by 1, because BRK needs to skip 1 byte.
+  reg.pc.val = reg.pc.val + 1;
   stack.push(reg.pc.hh);
   stack.push(reg.pc.ll);
   stack.push(reg.sr);

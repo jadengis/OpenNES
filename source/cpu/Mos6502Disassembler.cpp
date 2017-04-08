@@ -16,8 +16,6 @@
 #include "cpu/Mos6502Instruction.h"
 #include "cpu/Mos6502Disassembler.h"
 
-#define ADJUSTS_PC false
-
 using namespace Cpu;
 
 // Aliases for this file
@@ -28,8 +26,7 @@ Mos6502Instruction Mos6502Disassembler::initInstruction(
     std::string&& name, 
     std::string&& addr, 
     byte cycles,
-    Type type,
-    bool adjustRegPC) {
+    Type type) {
   // declare an empty Mos6502Instruction
   Mos6502Instruction instruction;
   instruction.opcode = opcode;
@@ -37,7 +34,6 @@ Mos6502Instruction Mos6502Disassembler::initInstruction(
   instruction.addr = addr;
   instruction.cycles = cycles;
   instruction.type = type;
-  instruction.adjustRegPC = adjustRegPC;
   switch(type) {
     case Type::NO_OP:
       instruction.operand.lo = 0;
@@ -60,7 +56,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
   switch(opcode) {
     // HI-NIBBLE == 0x00
     case Op::BRK_IMPL: 
-      return initInstruction(opcode, "BRK", "impl", 7, Type::NO_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "BRK", "impl", 7, Type::NO_OP);
     case Op::ORA_X_IND:
       return initInstruction(opcode, "ORA", "X,ind", 6, Type::ONE_OP);
     case Op::ORA_ZPG:
@@ -80,7 +76,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
 
     // HI-NIBBLE == 0x10
     case Op::BPL_REL:
-      return initInstruction(opcode, "BPL", "rel", 2, Type::ONE_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "BPL", "rel", 2, Type::ONE_OP);
     case Op::ORA_IND_Y:
       return initInstruction(opcode, "ORA", "ind,Y", 5, Type::ONE_OP);
     case Op::ORA_ZPG_X:
@@ -98,7 +94,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
 
     // HI-NIBBLE == 0x20
     case Op::JSR_ABS:
-      return initInstruction(opcode, "JSR", "abs", 6, Type::TWO_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "JSR", "abs", 6, Type::TWO_OP);
     case Op::AND_X_IND:
       return initInstruction(opcode, "AND", "X,ind", 6, Type::ONE_OP);
     case Op::BIT_ZPG:
@@ -122,7 +118,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
 
     // HI-NIBBLE == 0x30
     case Op::BMI_REL:
-      return initInstruction(opcode, "BMI", "rel", 2, Type::ONE_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "BMI", "rel", 2, Type::ONE_OP);
     case Op::AND_IND_Y:
       return initInstruction(opcode, "AND", "ind,Y", 5, Type::ONE_OP);
     case Op::AND_ZPG_X:
@@ -140,7 +136,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
 
     // HI-NIBBLE == 0x40
     case Op::RTI_IMPL:
-      return initInstruction(opcode, "RTI", "impl", 6, Type::NO_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "RTI", "impl", 6, Type::NO_OP);
     case Op::EOR_X_IND:
       return initInstruction(opcode, "EOR", "X,ind", 6, Type::ONE_OP);
     case Op::EOR_ZPG:
@@ -154,7 +150,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
     case Op::LSR_ACC:
       return initInstruction(opcode, "LSR", "A", 2, Type::NO_OP);
     case Op::JMP_ABS:
-      return initInstruction(opcode, "JMP", "abs", 3, Type::TWO_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "JMP", "abs", 3, Type::TWO_OP);
     case Op::EOR_ABS:
       return initInstruction(opcode, "EOR", "abs", 4, Type::TWO_OP);
     case Op::LSR_ABS:
@@ -162,7 +158,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
 
     // HI-NIBBLE == 0x50
     case Op::BVC_REL:
-      return initInstruction(opcode, "BVC", "rel", 2, Type::ONE_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "BVC", "rel", 2, Type::ONE_OP);
     case Op::EOR_IND_Y:
       return initInstruction(opcode, "EOR", "ind,Y", 5, Type::ONE_OP);
     case Op::EOR_ZPG_X:
@@ -180,7 +176,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
 
     // HI-NIBBLE == 0x60
     case Op::RTS_IMPL:
-      return initInstruction(opcode, "RTS", "impl", 6, Type::NO_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "RTS", "impl", 6, Type::NO_OP);
     case Op::ADC_X_IND:
       return initInstruction(opcode, "ADC", "X,ind", 6, Type::ONE_OP);
     case Op::ADC_ZPG:
@@ -194,7 +190,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
     case Op::ROR_ACC:
       return initInstruction(opcode, "ROR", "A", 2, Type::NO_OP);
     case Op::JMP_IND:
-      return initInstruction(opcode, "JMP", "ind", 5, Type::TWO_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "JMP", "ind", 5, Type::TWO_OP);
     case Op::ADC_ABS:
       return initInstruction(opcode, "ADC", "abs", 4, Type::TWO_OP);
     case Op::ROR_ABS:
@@ -202,7 +198,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
 
     // HI-NIBBLE == 0x70
     case Op::BVS_REL:
-      return initInstruction(opcode, "BVS", "rel", 2, Type::ONE_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "BVS", "rel", 2, Type::ONE_OP);
     case Op::ADC_IND_Y:
       return initInstruction(opcode, "ADC", "ind,Y", 5, Type::ONE_OP);
     case Op::ADC_ZPG_X:
@@ -240,7 +236,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
 
     // HI-NIBBLE == 0x90
     case Op::BCC_REL:
-      return initInstruction(opcode, "BCC", "rel", 2, Type::ONE_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "BCC", "rel", 2, Type::ONE_OP);
     case Op::STA_IND_Y:
       return initInstruction(opcode, "STA", "ind,Y", 6, Type::ONE_OP);
     case Op::STY_ZPG_X:
@@ -286,7 +282,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
 
     // HI-NIBBLE == 0xB0
     case Op::BCS_REL:
-      return initInstruction(opcode, "BCS", "rel", 2, Type::ONE_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "BCS", "rel", 2, Type::ONE_OP);
     case Op::LDA_IND_Y:
       return initInstruction(opcode, "LDA", "ind,Y", 5, Type::ONE_OP);
     case Op::LDY_ZPG_X:
@@ -334,7 +330,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
 
     // HI-NIBBLE == 0xD0
     case Op::BNE_REL:
-      return initInstruction(opcode, "BNE", "rel", 2, Type::ONE_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "BNE", "rel", 2, Type::ONE_OP);
     case Op::CMP_IND_Y:
       return initInstruction(opcode, "CMP", "ind,Y", 5, Type::ONE_OP);
     case Op::CMP_ZPG_X:
@@ -376,7 +372,7 @@ Mos6502Instruction Mos6502Disassembler::disassembleInstruction(byte opcode) {
 
     // HI-NIBBLE == 0xF0
     case Op::BEQ_REL:
-      return initInstruction(opcode, "BEQ", "rel", 2, Type::ONE_OP, ADJUSTS_PC);
+      return initInstruction(opcode, "BEQ", "rel", 2, Type::ONE_OP);
     case Op::SBC_IND_Y:
       return initInstruction(opcode, "SBC", "ind,Y", 5, Type::ONE_OP);
     case Op::SBC_ZPG_X:

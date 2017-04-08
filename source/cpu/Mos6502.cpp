@@ -48,24 +48,16 @@ void Mos6502::shutdown() {
 }
 
 void Mos6502::fetchOpcode() {
-  // call the implement of fetchOpcode
+  // call the implementation of fetchOpcode
   fetchOpcodeImpl();
 }
 
 void Mos6502::decodeOpcode() {
-  // call the implement of fetchOpcode
+  // call the implementation of decodeOpcode
   decodeOpcodeImpl();
 }
 
 void Mos6502::executeOpcode() {
+  // call the implementation of executeOpcode
   executeOpcodeImpl();
-}
-
-void Mos6502::incrementRegPC(const Mos6502Instruction& inst) {
-  // Certain instruction like jumps and branchs should not have the PC
-  // incremented upon completion of the instruction as the PC is already
-  // set to what it should be.
-  if(inst.adjustRegPC) {
-    incrementRegPC(static_cast<byte>(inst.type) + 1);
-  }
 }

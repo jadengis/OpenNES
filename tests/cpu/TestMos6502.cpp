@@ -877,7 +877,7 @@ TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 jump instructio
 
     // When you return from subroutine, add 3 to original pc
     RTS();
-    REQUIRE(getRegPC() == 0x1234 + 3);
+    REQUIRE(getRegPC() == 0x1234);
   }
 
 }
@@ -899,10 +899,11 @@ TEST_CASE_METHOD(TestMos6502, "Functionality testing for Mos6502 interrupts",
     // Break immediately
     BRK();
     REQUIRE((getRegSR() & Cpu::Mos6502::SR_I) != 0);
+    REQUIRE((getRegSR() & Cpu::Mos6502::SR_B) != 0);
     RTI();
     CHECK((getRegSR() & Cpu::Mos6502::SR_I) == 0);
     CHECK(getRegSR() == oldSR);
-    REQUIRE(getRegPC() == oldPC + 2);
+    REQUIRE(getRegPC() == oldPC + 1);
   }
 
 }

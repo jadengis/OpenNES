@@ -407,7 +407,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x0C);
     CHECK(inst.operand.hi == 0x00);
     CHECK(inst.cycles == 2);
-    CHECK(inst.adjustRegPC == false);
     
   }
 
@@ -423,7 +422,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x0C);
     CHECK(inst.operand.hi == 0x00);
     CHECK(inst.cycles == 2);
-    CHECK(inst.adjustRegPC == false);
     
   }
 
@@ -439,7 +437,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x0C);
     CHECK(inst.operand.hi == 0x00);
     CHECK(inst.cycles == 2);
-    CHECK(inst.adjustRegPC == false);
     
   }
 
@@ -455,7 +452,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x0C);
     CHECK(inst.operand.hi == 0x00);
     CHECK(inst.cycles == 2);
-    CHECK(inst.adjustRegPC == false);
     
   }
 
@@ -471,7 +467,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x0C);
     CHECK(inst.operand.hi == 0x00);
     CHECK(inst.cycles == 2);
-    CHECK(inst.adjustRegPC == false);
     
   }
 
@@ -487,7 +482,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x0C);
     CHECK(inst.operand.hi == 0x00);
     CHECK(inst.cycles == 2);
-    CHECK(inst.adjustRegPC == false);
     
   }
 
@@ -503,7 +497,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x0C);
     CHECK(inst.operand.hi == 0x00);
     CHECK(inst.cycles == 2);
-    CHECK(inst.adjustRegPC == false);
     
   }
 
@@ -519,7 +512,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x0C);
     CHECK(inst.operand.hi == 0x00);
     CHECK(inst.cycles == 2);
-    CHECK(inst.adjustRegPC == false);
     
   }
 
@@ -535,7 +527,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x00);
     CHECK(inst.operand.hi == 0x00);
     CHECK(inst.cycles == 7);
-    CHECK(inst.adjustRegPC == false);
     
   }
 
@@ -1106,7 +1097,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x0A);
     CHECK(inst.operand.hi == 0xA0);
     CHECK(inst.cycles == 3);
-    CHECK(inst.adjustRegPC == false);
     
   }
 
@@ -1122,7 +1112,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x0A);
     CHECK(inst.operand.hi == 0xA0);
     CHECK(inst.cycles == 5);
-    CHECK(inst.adjustRegPC == false);
     
   }
 
@@ -1138,7 +1127,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x0A);
     CHECK(inst.operand.hi == 0xA0);
     CHECK(inst.cycles == 6);
-    CHECK(inst.adjustRegPC == false);
     
   }
 
@@ -1904,7 +1892,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x00);
     CHECK(inst.operand.hi == 0x00);
     CHECK(inst.cycles == 6);
-    CHECK(inst.adjustRegPC == false);
     
   }
   
@@ -1920,7 +1907,6 @@ TEST_CASE("The Mos6502 disassembler has the correct functionality.",
     CHECK(inst.operand.lo == 0x00);
     CHECK(inst.operand.hi == 0x00);
     CHECK(inst.cycles == 6);
-    CHECK(inst.adjustRegPC == false);
     
   }
 

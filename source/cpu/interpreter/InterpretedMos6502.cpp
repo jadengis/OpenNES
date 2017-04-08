@@ -43,11 +43,15 @@ void InterpretedMos6502::fetchOpcodeImpl() {
 void InterpretedMos6502::decodeOpcodeImpl() {
   // decode instruction in the instruction register
   currentInstruction = getDis().disassembleInstruction(getRegIR());
+  // Increment the program counter by the number of operands + 1 for
+  // the opcode. It is important that we increment the program counter
+  // after we decode the instruction, as some instruction behaviour, like
+  // jumps and branchs depend on this behaviour.
+  incrementRegPC(static_cast<addr>(currentInstruction.type) + 1);
 }
 
 void InterpretedMos6502::executeOpcodeImpl() {
   instructionMap[currentInstruction.opcode](currentInstruction);
-  incrementRegPC(currentInstruction);
   incrementCycles(currentInstruction.cycles);
 }
 

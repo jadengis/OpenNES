@@ -47,9 +47,6 @@ struct Mos6502Instruction {
   } operand;
   /// Cycles to execute for the given instruction.
   byte cycles;
-  /// Whether or not the instruction needs to adjust the program counter after
-  /// execution.
-  bool adjustRegPC;
 };
 
 } // namespace Cpu
