@@ -36,7 +36,7 @@ class Mos6502 : public AbstractCpu {
   public:
     /// Default constructor. Bootstrap a Mos6502 CPU object.
     Mos6502(Memory::Mapper<byte>& memMap) :
-        stack(reg.sp),
+        stack(reg.sp, memMap),
         dis(),
         mmu(reg.x, reg.y, memMap) {
       this->cycleCount = 0;
@@ -273,10 +273,6 @@ class Mos6502 : public AbstractCpu {
     /// \param value Amount to increment the program counter.
     inline void incrementRegPC(const addr value);
 
-    /// Increment the program counter based on the input instruction.
-    /// \param inst The instruction to increment the program counter for.
-    void incrementRegPC(const Mos6502Instruction& inst);
-
     /// Get the current value of the accumulator.
     /// \returns The current value of the accumulator.
     inline byte getRegAC() const;
@@ -359,6 +355,9 @@ class Mos6502 : public AbstractCpu {
     /// LIFO, top down, 8 bit range, 0x0100 - 0x01FF.
     class Stack {
       public:
+        /// Base address of the Mos6502 stack.
+        static constexpr const Vaddr& BASE_ADDRESS = {0x0100};
+
         /// Push data onto the processor stack
         /// \param data Byte to push.
         inline void push(byte data) {
@@ -377,17 +376,12 @@ class Mos6502 : public AbstractCpu {
 
         Stack(
             byte& stackPointerRegister,
-            std::shared_ptr<Memory::Ram<byte>> bank = nullptr, 
-            std::size_t offset = 0) : stackPointer(stackPointerRegister) {
-          // If the memory Ram ptr passed in is null, create a new Ram to contain
-          // this stack.
-          if(bank == nullptr) {
-            bank = std::make_shared<Memory::Ram<byte>>(std::numeric_limits<byte>::max() + 1);
-            // if we built our own Ram, base is irrelevant, so set this to 0
-            offset = 0;
-          }
+            const Memory::Mapper<byte>& memMap) 
+            : stackPointer(stackPointerRegister) {
+          auto bankPtr = memMap.mapToHardware(BASE_ADDRESS);
           // Mos6502 stack is top-down, so we must offset top from base.
-          base = Memory::Reference<byte>(bank, offset);
+          base = Memory::Reference<byte>(bankPtr,
+              BASE_ADDRESS.val - bankPtr->getBaseAddress().val);
         }
 
         ~Stack() {}
