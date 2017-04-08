@@ -39,6 +39,7 @@ class Mos6502 : public AbstractCpu {
         stack(reg.sp),
         dis(),
         mmu(reg.x, reg.y, memMap) {
+      this->cycleCount = 0;
       this->reg.pc.val = 0;
       this->reg.ac = 0;
       this->reg.x = 0;
@@ -63,6 +64,9 @@ class Mos6502 : public AbstractCpu {
     /// Increment the cycle count by the input value
     /// \param value Number of cycles to add to the count.
     inline void incrementCycles(const byte value);
+    
+    /// Decrement the cycle count by one.
+    inline void decrementCycles();
 
     // Status register flag masks
     /// Status register negative flag mask
@@ -269,6 +273,10 @@ class Mos6502 : public AbstractCpu {
     /// \param value Amount to increment the program counter.
     inline void incrementRegPC(const addr value);
 
+    /// Increment the program counter based on the input instruction.
+    /// \param inst The instruction to increment the program counter for.
+    void incrementRegPC(const Mos6502Instruction& inst);
+
     /// Get the current value of the accumulator.
     /// \returns The current value of the accumulator.
     inline byte getRegAC() const;
@@ -407,6 +415,10 @@ byte Mos6502::getCycleCount() const {
 
 void Mos6502::incrementCycles(const byte value) {
   this->cycleCount += value;
+}
+
+void Mos6502::decrementCycles() {
+  this->cycleCount--;
 }
 
 byte Mos6502::getRegIR() const {

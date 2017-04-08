@@ -28,6 +28,12 @@ void Mos6502::run() {
 }
 
 void Mos6502::step() {
+  if(getCycleCount() == 0) {
+    fetchOpcode();
+    decodeOpcode();
+    executeOpcode();
+  }
+  decrementCycles();
 }
 
 void Mos6502::reset() {
@@ -53,4 +59,13 @@ void Mos6502::decodeOpcode() {
 
 void Mos6502::executeOpcode() {
   executeOpcodeImpl();
+}
+
+void Mos6502::incrementRegPC(const Mos6502Instruction& inst) {
+  // Certain instruction like jumps and branchs should not have the PC
+  // incremented upon completion of the instruction as the PC is already
+  // set to what it should be.
+  if(inst.adjustRegPC) {
+    incrementRegPC(static_cast<byte>(inst.type) + 1);
+  }
 }

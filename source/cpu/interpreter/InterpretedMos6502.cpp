@@ -47,7 +47,7 @@ void InterpretedMos6502::decodeOpcodeImpl() {
 
 void InterpretedMos6502::executeOpcodeImpl() {
   instructionMap[currentInstruction.opcode](currentInstruction);
-  incrementRegPC(static_cast<addr>(currentInstruction.type) + 1);
+  incrementRegPC(currentInstruction);
   incrementCycles(currentInstruction.cycles);
 }
 

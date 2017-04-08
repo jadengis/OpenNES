@@ -56,7 +56,8 @@ struct Mos6502Disassembler {
         std::string&& name,
         std::string&& addr,
         byte cycles,
-        Mos6502Instruction::InstructionType type);
+        Mos6502Instruction::InstructionType type,
+        bool adjustRegPC = true);
 
     /// Memory location to start reading bytes from.
     Memory::Reference<byte> readPosition;

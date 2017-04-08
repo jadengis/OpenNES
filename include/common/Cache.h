@@ -133,7 +133,7 @@ const T& Cache<Key, T, cacheSize>::lookup(const Key& key) const {
   if(!hasKey(key)) {
     throw Exception::KeyErrorException();
   }
-  return static_cast<const std::unordered_map<Key, T>&>(cache).at(key);
+  return const_cast<const decltype(cache)&>(cache).at(key);
 }
 
 } // namespace Structure
