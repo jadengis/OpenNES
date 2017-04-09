@@ -57,6 +57,28 @@ class ReadOnlyMemoryException : public MemoryException {
 
 };
 
+/// \class MirroringException
+/// \brief This is the exception to throw when there is an error building a mirrored
+/// memory.
+class MirroringException : public MemoryException {
+  public:
+    // Construction Methods
+    MirroringException() : MemoryException(
+        "There was an error building a mirrored memory.",
+        "MirroringException") {}
+    MirroringException(
+        std::string&& errorMessage,
+        std::string&& className = "MirroringException") :
+      MemoryException(std::move(errorMessage), std::move(className)) {}
+    MirroringException(const MirroringException& originalException) noexcept :
+        MemoryException(originalException) {}
+
+    // Destructors
+    ~MirroringException() {}
+
+};
+
+
 } // namespace Exception
 
 #endif // MEMORY_EXCEPTION_H //

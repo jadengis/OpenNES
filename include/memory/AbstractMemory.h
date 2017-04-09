@@ -18,6 +18,7 @@ namespace Memory {
 
 /// \class AbstractMemory
 /// \brief This class represents an abstract piece of memory.
+/// \tparam Wordsize Size of a memory word for the memory object.
 template<class Wordsize>
 class AbstractMemory {
   public:

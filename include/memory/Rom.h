@@ -22,11 +22,15 @@ namespace Memory {
 /// \class Rom
 /// \brief This class acts as a read only memory for an architecture of the given
 /// wordsize.
+/// \tparam Wordsize Size of a memory word for the memory object.
 template<class Wordsize> 
 class Rom : public Bank<Wordsize> {
   public:
-    // Constructors
-    Rom(std::size_t size) : Bank<Wordsize>(size) {};
+    /// Create a Rom of with the given number of words, at the given
+    /// base address.
+    /// \param size The number of words in the memory bank.
+    /// \param vaddr The base address of the memory bank.
+    Rom(std::size_t size, Vaddr vaddr = {0x0}) : Bank<Wordsize>(size, vaddr) {};
 
     // Destructor
     virtual ~Rom() {};
@@ -34,6 +38,7 @@ class Rom : public Bank<Wordsize> {
     /// Throw an error when trying to write to a ROM.
     /// We cannot write to a Rom, so throw a ReadOnlyMemoryException when
     /// this method is called.
+    /// \throws ReadOnlyMemoryException This is guaranteed.
     inline void write(std::size_t index, Wordsize data) override;
     virtual void load() = delete;
 };

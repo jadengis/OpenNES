@@ -22,12 +22,15 @@ namespace Memory {
 /// \class Ram
 /// \brief This class act as a random access memory for an architecture with the
 /// given wordsize.
+/// \tparam Wordsize Size of a memory word for the memory object.
 template<class Wordsize> 
 class Ram : public Bank<Wordsize> {
   public:
-    // Constructors
-    Ram(std::size_t size) : Bank<Wordsize>(size) {};
-    Ram(std::size_t size, Vaddr vaddr) : Bank<Wordsize>(size, vaddr) {};
+    /// Create a Ram of with the given number of words, at the given
+    /// base address.
+    /// \param size The number of words in the memory bank.
+    /// \param vaddr The base address of the memory bank.
+    Ram(std::size_t size, Vaddr vaddr = {0x0}) : Bank<Wordsize>(size, vaddr) {};
 
     // Destructor
     virtual ~Ram() {};

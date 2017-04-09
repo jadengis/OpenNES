@@ -6,5 +6,7 @@
 #
 # ===----------------------------------------------------------------------=== #
 set(SRCS TestReference.cpp
-         TestRam.cpp)
+         TestRam.cpp
+         TestMirroredRam.cpp
+         )
 add_test_suite(MemoryTests "${SRCS}")

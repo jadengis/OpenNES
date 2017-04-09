@@ -25,12 +25,15 @@ namespace Memory {
 /// \brief This class serves as the abstract base class for linear memory banks.
 /// This class provides some common implementation details, but leaves the write
 /// method unimplemented, as this tends to be implementation specific.
+/// \tparam Wordsize Size of a memory word for the memory object.
 template<class Wordsize> 
 class Bank : public AbstractMemory<Wordsize> {
   public:
-    // Constructors and Destructors
-    inline Bank(std::size_t size);
-    inline Bank(std::size_t size, Vaddr vaddr);
+    /// Create a memory bank of with the given number of words, at the given
+    /// base address.
+    /// \param size The number of words in the memory bank.
+    /// \param vaddr The base address of the memory bank.
+    inline Bank(std::size_t size, Vaddr vaddr = {0x0});
     virtual ~Bank() {};
 
     /// Read word from \p index into the memory bank.
@@ -58,13 +61,6 @@ class Bank : public AbstractMemory<Wordsize> {
     /// The base virtual address of this memory bank
     Vaddr baseAddress;
 };
-
-template<class Wordsize>
-Bank<Wordsize>::Bank(std::size_t size) {
-  // Initialize the memory bank
-  this->dataBank.resize(size);
-  this->baseAddress.val = 0;
-}
 
 template<class Wordsize>
 Bank<Wordsize>::Bank(std::size_t size, Vaddr vaddr) {
