@@ -20,9 +20,24 @@ matrix:
           packages:
             - g++-6
       env:
-        - COMPILER=g++-6
+        - C_COMPILER=gcc-6
+        - CXX_COMPILER=g++-6
         - COV=gcov-6
         - BUILD_TYPE="Debug"
+
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - C_COMPILER=gcc-6
+        - CXX_COMPILER=g++-6
+        - COV=gcov-6
+        - BUILD_TYPE="Release"
+
     - compiler: clang
       addons:
         apt:
@@ -33,16 +48,33 @@ matrix:
             - libstdc++6
             - clang-3.9
       env: 
-        - COMPILER=clang++-3.9
+        - C_COMPILER=clang-3.9
+        - CXX_COMPILER=clang++-3.9
         - COV="llvm-cov gcov"
         - BUILD_TYPE="Debug"
+
+    - compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.9
+          packages:
+            - libstdc++6
+            - clang-3.9
+      env: 
+        - C_COMPILER=clang-3.9
+        - CXX_COMPILER=clang++-3.9
+        - COV="llvm-cov gcov"
+        - BUILD_TYPE="Release"
 
 # Prepare the Build environments
 before_install:
   - sudo add-apt-repository ppa:george-edison55/cmake-3.x --yes
   - sudo apt-get update -qq
   # - if [ "$CXX" == "clang++" ]; then a=$(sudo find / -name llvm-cov | grep 3.8 | head -1); sudo ln -sfn ${a} /usr/bin/llvm-cov; fi
-  - export CXX=${COMPILER}
+  - export CC=${C_COMPILER}
+  - export CXX=${CXX_COMPILER}
   - ${CXX} --version
   - ${COV} --version
 
@@ -53,7 +85,7 @@ install:
 script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+  - cmake -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_C_COMPILER=${C_COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
   - make
   - make CTEST_OUTPUT_ON_FAILURE=1 unittests
 
