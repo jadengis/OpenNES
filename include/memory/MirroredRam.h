@@ -79,7 +79,6 @@ void MirroredRam<Wordsize>::write(std::size_t index, Wordsize data) {
   auto baseIndex = mirrorSizeIsPow2 ? index & (mirrorSize - 1) : index % mirrorSize;
   // write the data in all mirrors.
   for(std::size_t i = 0; i < mirrors; i++) {
-    printf("%016lX\n", i*mirrorSize + baseIndex);
     this->getDataBank()[i*mirrorSize + baseIndex] = data;
   }
 }
