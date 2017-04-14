@@ -22,7 +22,7 @@ using namespace Exception;
 // default constructor
 BaseException::BaseException() noexcept : className(CLASS_NAME) {
   // Populate this exception with some default values.
-  this->errorMessage = this->className + ": " +
+  this->errorMessage = printClassName() + ": " +
     "An uncaught exception was thrown during runtime.\n";
   obtainStackTrace();
 }
@@ -33,7 +33,7 @@ BaseException::BaseException(
     std::string&& errorMessage, 
     std::string&& newClassName) noexcept : className(newClassName) {
   // Populate this exception with some default values.
-  this->errorMessage = this->className + ": " + errorMessage + "\n";
+  this->errorMessage = printClassName() + ": " + errorMessage + "\n";
   obtainStackTrace();
 }
 
@@ -53,7 +53,7 @@ BaseException& BaseException::operator=(const BaseException& originalException) 
 } 
 
 // Public methods
-const std::string& BaseException::printClassName() const {
+const std::string BaseException::printClassName() const {
   return this->className;
 }
 

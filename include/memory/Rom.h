@@ -30,9 +30,9 @@ class Rom : public Bank<Wordsize> {
     /// base address.
     /// \param size The number of words in the memory bank.
     /// \param vaddr The base address of the memory bank.
-    Rom(std::size_t size, Vaddr vaddr = {0x0}) : Bank<Wordsize>(size, vaddr) {};
+    Rom(std::size_t size = 0, Vaddr vaddr = {0x0}) : Bank<Wordsize>(size, vaddr) {};
 
-    // Destructor
+    /// Destroy a Rom
     virtual ~Rom() {};
 
     /// Throw an error when trying to write to a ROM.
@@ -40,13 +40,37 @@ class Rom : public Bank<Wordsize> {
     /// this method is called.
     /// \throws ReadOnlyMemoryException This is guaranteed.
     inline void write(std::size_t index, Wordsize data) override;
-    virtual void load() = delete;
+
+    /// Load data into this Rom object. This can only be done once.
+    /// \tparam InputIterator Type of input iterator to use.
+    /// \param start Data import start position.
+    /// \param end Data import end position.
+    /// \throws Exception::ReadOnlyMemoryException if Rom has been loaded already.
+    template<class InputIterator>
+    inline void load(InputIterator start, InputIterator end);
+
+  private:
+    /// Roms may only be loaded once. This value is true if this rom has been
+    /// loaded.
+    bool isLoaded = false;
 };
 
 template <class Wordsize>
 void Rom<Wordsize>::write(std::size_t index, Wordsize data) {
   // Cannot write to a Rom, so throw a ReadOnlyMemory exception
   throw Exception::ReadOnlyMemoryException();
+}
+
+template<class Wordsize> 
+template<class InputIterator>
+void Rom<Wordsize>::load(InputIterator start, InputIterator end) {
+  // If this Rom has been loaded, throw a ROM exception
+  if(isLoaded) {
+    throw Exception::ReadOnlyMemoryException("Loaded ROM is trying to be overwritten");
+  }
+  // replace the internal dataBank with a new one containing the loaded data.
+  this->getDataBank() = std::vector<byte>(start, end);
+  isLoaded = true;
 }
 
 } // namespace Memory

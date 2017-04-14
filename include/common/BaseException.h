@@ -43,7 +43,7 @@ class BaseException {
     /// Return the name of the current exception class. Must be overwritten
     /// in inherited exception classes.
     /// \return Name of the current exception class.
-    virtual const std::string& printClassName() const final;
+    virtual const std::string printClassName() const;
 
     /// Return the error message from the event that caused this exception.
     /// \return The internal error message.

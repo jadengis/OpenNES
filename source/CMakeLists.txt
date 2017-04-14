@@ -7,6 +7,7 @@
 # ===----------------------------------------------------------------------=== #
 # Subsystem build directories
 add_subdirectory(common)
+add_subdirectory(nes)
 add_subdirectory(cpu)
 
 

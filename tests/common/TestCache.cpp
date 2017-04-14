@@ -18,8 +18,8 @@
 
 #include "tests/catch.hpp"
 #include "common/CommonTypes.h"
-#include "common/Cache.h"
-#include "common/StructureException.h"
+#include "common/structures/Cache.h"
+#include "common/structures/StructureException.h"
 
 using namespace Structure;
 
