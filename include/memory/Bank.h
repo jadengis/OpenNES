@@ -45,9 +45,17 @@ class Bank : public AbstractMemory<Wordsize> {
     /// \returns The size of this memory bank.
     inline std::size_t getSize() const;
 
+    /// Resize the Memory::Bank object.
+    /// \param size The new size of the memory bank.
+    inline void resize(std::size_t size);
+
     /// Get the base address of this memory bank.
     /// \returns The base address of this memory bank.
     inline Vaddr getBaseAddress() const;
+
+    /// Set the base address of this memory bank.
+    /// \param vaddr The base address to give this memory bank.
+    inline void setBaseAddress(const Vaddr vaddr);
   
   protected:
     /// Get a reference to the internal dataBank.
@@ -81,8 +89,18 @@ std::size_t Bank<Wordsize>::getSize() const {
 }
 
 template<class Wordsize>
+void Bank<Wordsize>::resize(std::size_t size) {
+  dataBank.resize(size);
+}
+
+template<class Wordsize>
 Vaddr Bank<Wordsize>::getBaseAddress() const {
   return baseAddress;
+}
+
+template<class Wordsize>
+void Bank<Wordsize>::setBaseAddress(const Vaddr vaddr) {
+  this.baseAddress.val = vaddr.val;
 }
 
 template<class Wordsize>

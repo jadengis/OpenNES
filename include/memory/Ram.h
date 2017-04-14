@@ -30,7 +30,7 @@ class Ram : public Bank<Wordsize> {
     /// base address.
     /// \param size The number of words in the memory bank.
     /// \param vaddr The base address of the memory bank.
-    Ram(std::size_t size, Vaddr vaddr = {0x0}) : Bank<Wordsize>(size, vaddr) {};
+    Ram(std::size_t size = 0, Vaddr vaddr = {0x0}) : Bank<Wordsize>(size, vaddr) {};
 
     // Destructor
     virtual ~Ram() {};

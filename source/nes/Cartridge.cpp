@@ -41,8 +41,11 @@ Cartridge::Cartridge(CartridgeOptions options, const std::vector<byte>& romFile)
     romFileItr += SIZE_512B;
   }
 
-  // resize the number of RAMs
+  // resize the number of RAMs, and resize each RAM to 8k.
   prgRams.resize(options.num8kRam);
+  for(auto ram : prgRams) {
+    ram.resize(SIZE_8KB);
+  }
 
   // populate all 16k PRG ROMs
   prgRoms.resize(options.num16kRom);
@@ -53,8 +56,8 @@ Cartridge::Cartridge(CartridgeOptions options, const std::vector<byte>& romFile)
 
   // populate all 8k CHR ROMS
   chrRoms.resize(options.num8kVRom);
-  for(auto rom : chrRoms) {
-    rom.load(romFileItr, romFileItr + SIZE_8KB);
+  for(auto vrom : chrRoms) {
+    vrom.load(romFileItr, romFileItr + SIZE_8KB);
     romFileItr += SIZE_8KB;
   }
 
