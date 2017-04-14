@@ -16,7 +16,7 @@
 #include <deque>
 #include <unordered_map>
 
-#include "common/StructureException.h"
+#include "common/structures/StructureException.h"
 
 namespace Structure {
 
