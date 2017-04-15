@@ -18,10 +18,12 @@
 #include "common/CommonTypes.h"
 #include "memory/Ram.h"
 
+using namespace Memory;
+
 TEST_CASE("Ram write and read functionality", "[Memory][Ram]") {
   // Build a Ram object
   std::size_t size = 100;
-  Memory::Ram<byte> ram(size);
+  Ram<byte> ram(size);
   REQUIRE(ram.getSize() == size);
 
   SECTION("Write to index and read back") {
@@ -31,4 +33,27 @@ TEST_CASE("Ram write and read functionality", "[Memory][Ram]") {
     ram.write(index, data);
     REQUIRE(ram.read(index) == data);
   }
+}
+
+TEST_CASE("Getting and Setting base address works correcty.", "[Memory][Ram]") {
+  // Build a Ram object
+  std::size_t size = 100;
+  Vaddr vaddr = {0x200};
+  Ram<byte> ram(size, vaddr);
+  REQUIRE(ram.getSize() == size);
+  REQUIRE(ram.getBaseAddress().val == 0x200);
+
+  // set the base address to something else
+  vaddr.val = 0x1111;
+  ram.setBaseAddress(vaddr);
+  REQUIRE(ram.getBaseAddress().val == 0x1111);
+}
+
+TEST_CASE("Rams are correctly resizable.", "[Memory][Ram]") {
+  // Build a default Ram object
+  Ram<byte> ram;
+  REQUIRE(ram.getSize() == 0);
+  ram.resize(0x200);
+  REQUIRE(ram.getSize() == 0x200);
+  
 }

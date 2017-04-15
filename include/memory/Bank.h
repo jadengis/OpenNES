@@ -100,7 +100,7 @@ Vaddr Bank<Wordsize>::getBaseAddress() const {
 
 template<class Wordsize>
 void Bank<Wordsize>::setBaseAddress(const Vaddr vaddr) {
-  this.baseAddress.val = vaddr.val;
+  this->baseAddress.val = vaddr.val;
 }
 
 template<class Wordsize>

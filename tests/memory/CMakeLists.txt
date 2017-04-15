@@ -6,6 +6,7 @@
 #
 # ===----------------------------------------------------------------------=== #
 set(SRCS TestReference.cpp
+         TestRom.cpp
          TestRam.cpp
          TestMirroredRam.cpp
          )
