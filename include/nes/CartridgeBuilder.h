@@ -11,7 +11,7 @@
 ///
 //===----------------------------------------------------------------------===//
 #ifndef NES_CARTRIDGE_BUILDER_H
-#define NES_CARTRIDGE_H
+#define NES_CARTRIDGE_BUILDER_H
 
 #include <fstream>
 #include <memory>
@@ -51,8 +51,8 @@ class CartridgeBuilder : public Pattern::Builder<Cartridge>{
     /// The number of bytes in the iNES file header.
     static constexpr const std::size_t& INES_HEADER_SIZE = 16;
     /// The array of bytes designating the .nes format: NES^Z
-    static constexpr const std::array<byte, 4> NES_TOKEN 
-      = {0x4E, 0x45, 0x53, 0x1A};
+    static constexpr const std::array<byte, 4>& NES_TOKEN 
+      = { {0x4E, 0x45, 0x53, 0x1A} };
     
     /// Read the iNES file header of the input file and convert these
     /// input cartridge building options. This file parses the iNES header
