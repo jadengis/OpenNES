@@ -22,17 +22,20 @@ namespace Exception {
 class CpuException : public BaseException {
   public:
     CpuException() : BaseException(
-        "A Cpu error occured at runtime.",
-        "CpuException") {}
-    CpuException(
-        std::string&& errorMessage,
-        std::string&& className = "CpuException") :
-      BaseException(std::move(errorMessage), std::move(className)) {}
+        "A Cpu error occured at runtime.") {}
+    CpuException(std::string&& errorMessage) 
+      : BaseException(std::move(errorMessage)) {}
     CpuException(const CpuException& originalException) noexcept :
         BaseException(originalException) {}
 
     // Destructors
     ~CpuException() {}
+
+    /// Print the name of this exception class.
+    /// \returns The name of this exception class as a string.
+    const std::string printClassName() const override {
+      return "CpuException";
+    }
 
 };
 
@@ -41,16 +44,23 @@ class CpuException : public BaseException {
 class InvalidOpcodeException : public CpuException {
   public:
     // Construction Methods
+    /// Build an InvalidOpcodeException.
+    /// \param opcode The opcode that was determined invalid.
     InvalidOpcodeException(byte opcode) noexcept : 
         CpuException(
           "The following invalid opcode was encountered at runtime: " +
-          std::to_string(static_cast<uint64>(opcode)),
-          "InvalidOpcodeException") {}
+          std::to_string(static_cast<uint64>(opcode))) {}
     InvalidOpcodeException(const InvalidOpcodeException& originalException) noexcept :
         CpuException(originalException) {}
 
     // Destructors
     ~InvalidOpcodeException() {}
+
+    /// Print the name of this exception class.
+    /// \returns The name of this exception class as a string.
+    const std::string printClassName() const override {
+      return "InvalidOpcodeException";
+    }
 
 };
 

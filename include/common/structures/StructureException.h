@@ -22,17 +22,21 @@ namespace Exception {
 class StructureException : public BaseException {
   public:
     StructureException() : BaseException(
-        "A data structure error occured at runtime.",
-        "StructureException") {}
+        "A data structure error occured at runtime.") {}
     StructureException(
-        std::string&& errorMessage,
-        std::string&& className = "StructureException") :
-      BaseException(std::move(errorMessage), std::move(className)) {}
+        std::string&& errorMessage) :
+      BaseException(std::move(errorMessage)) {}
     StructureException(const StructureException& originalException) noexcept :
         BaseException(originalException) {}
 
     // Destructors
     ~StructureException() {}
+
+    /// Print the name of this exception class.
+    /// \returns The name of this exception class as a string.
+    const std::string printClassName() const override {
+      return "StructureException";
+    }
 
 };
 
@@ -43,19 +47,23 @@ class KeyErrorException : public StructureException {
     // Construction Methods
     KeyErrorException() noexcept : 
         StructureException(
-          "An unknown key was used in a data structure.",
-          "KeyErrorException") {}
+          "An unknown key was used in a data structure.") {}
     KeyErrorException(
         std::string&& errorMessage) :
-      StructureException(std::move(errorMessage), "KeyErrorException") {}
+      StructureException(std::move(errorMessage)) {}
     KeyErrorException(const KeyErrorException& originalException) noexcept :
         StructureException(originalException) {}
 
     // Destructors
     ~KeyErrorException() {}
 
-};
+    /// Print the name of this exception class.
+    /// \returns The name of this exception class as a string.
+    const std::string printClassName() const override {
+      return "KeyErrorException";
+    }
 
+};
 
 }
 

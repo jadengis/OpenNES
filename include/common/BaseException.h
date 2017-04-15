@@ -15,6 +15,7 @@
 
 #include <execinfo.h>
 #include <string.h>
+#include <exception>
 #include <iostream>
 #include <sstream>
 
@@ -27,13 +28,12 @@ namespace Exception {
 /// functionality for exceptions used in the project. Inheritors should be
 /// simples extensions of this class, providing only the convenience of a
 /// more specific type (and perhaps an informative message).
-class BaseException {
+class BaseException : public std::exception {
   public:
     // Construction Methods
     /// Default exception constructor. Bootstrap the exception.
     BaseException() noexcept;
-    BaseException(std::string&& errorMessage,
-        std::string&& className = "BaseException") noexcept;
+    BaseException(std::string&& errorMessage) noexcept;
     BaseException(const BaseException&) noexcept;
     virtual BaseException& operator= (const BaseException&) noexcept;
 
@@ -43,7 +43,9 @@ class BaseException {
     /// Return the name of the current exception class. Must be overwritten
     /// in inherited exception classes.
     /// \return Name of the current exception class.
-    virtual const std::string printClassName() const;
+    virtual const std::string printClassName() const {
+      return "BaseException";
+    }
 
     /// Return the error message from the event that caused this exception.
     /// \return The internal error message.
@@ -52,15 +54,16 @@ class BaseException {
     /// Return the stack trace acquired when the exception was created.
     /// \return The stack trace from throw time.
     virtual const std::string& printStackTrace() const final;
-    
+
+    /// Inherited method from the libstdc++ exception class.
+    /// \returns Full description of this exception.
+    const char * what() const noexcept final;
 
   private:
     /// Method for acquiring a stack trace,and storing it in this object.
     /// \param skip Number of frames to skip during formatting. defaults to 1.
     void obtainStackTrace(uint64 skip = 1);
 
-    /// Name of the exception class
-    const std::string className;
     /// Error message from throw time
     std::string errorMessage;
     /// The stack trace at the time of calling

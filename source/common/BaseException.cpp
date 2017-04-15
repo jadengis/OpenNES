@@ -15,12 +15,11 @@
 
 using namespace Exception;
 
-#define CLASS_NAME "BaseException"
 #define MAX_NUM_FRAMES 128
 #define MAX_BUF_LENGTH 512
 
 // default constructor
-BaseException::BaseException() noexcept : className(CLASS_NAME) {
+BaseException::BaseException() noexcept {
   // Populate this exception with some default values.
   this->errorMessage = printClassName() + ": " +
     "An uncaught exception was thrown during runtime.\n";
@@ -29,17 +28,14 @@ BaseException::BaseException() noexcept : className(CLASS_NAME) {
 
 // main constructor, use this constructor with inherited classes to
 // populate class properties.
-BaseException::BaseException(
-    std::string&& errorMessage, 
-    std::string&& newClassName) noexcept : className(newClassName) {
+BaseException::BaseException(std::string&& errorMessage) noexcept {
   // Populate this exception with some default values.
   this->errorMessage = printClassName() + ": " + errorMessage + "\n";
   obtainStackTrace();
 }
 
 // copy constructor
-BaseException::BaseException(const BaseException& originalException) noexcept :
-    className(originalException.className) {
+BaseException::BaseException(const BaseException& originalException) noexcept {
   this->errorMessage = originalException.errorMessage;
   this->stackTrace = originalException.stackTrace;
 }
@@ -53,16 +49,16 @@ BaseException& BaseException::operator=(const BaseException& originalException) 
 } 
 
 // Public methods
-const std::string BaseException::printClassName() const {
-  return this->className;
-}
-
 const std::string& BaseException::printErrorMessage() const {
   return this->errorMessage;
 }
 
 const std::string& BaseException::printStackTrace() const {
   return this->stackTrace;
+}
+
+const char * BaseException::what() const noexcept {
+  return (printErrorMessage() + printStackTrace()).c_str();
 }
 
 // Private methods

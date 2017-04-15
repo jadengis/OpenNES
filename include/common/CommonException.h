@@ -33,6 +33,8 @@ class InvalidFormatException : public BaseException {
     // Destructors
     ~InvalidFormatException() {}
 
+    /// Print the name of this exception class.
+    /// \returns The name of this exception class as a string.
     const std::string printClassName() const override {
       return "InvalidFormatException";
     }
@@ -56,12 +58,13 @@ class RuntimeException : public BaseException {
     // Destructors
     ~RuntimeException() {}
 
+    /// Print the name of this exception class.
+    /// \returns The name of this exception class as a string.
     const std::string printClassName() const override {
       return "RuntimeException";
     }
 
 };
-
 
 }
 

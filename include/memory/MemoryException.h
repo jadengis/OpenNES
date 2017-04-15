@@ -22,17 +22,21 @@ namespace Exception {
 class MemoryException : public BaseException {
   public:
     MemoryException() : BaseException(
-        "A Memory error occured at runtime.",
-        "MemoryException") {}
+        "A Memory error occured at runtime.") {}
     MemoryException(
-        std::string&& errorMessage,
-        std::string&& className = "MemoryException") :
-      BaseException(std::move(errorMessage), std::move(className)) {}
+        std::string&& errorMessage) :
+      BaseException(std::move(errorMessage)) {}
     MemoryException(const MemoryException& originalException) noexcept :
         BaseException(originalException) {}
 
     // Destructors
     ~MemoryException() {}
+
+    /// Print the name of this exception class.
+    /// \returns The name of this exception class as a string.
+    const std::string printClassName() const override {
+      return "MemoryException";
+    }
 
 };
 
@@ -43,17 +47,21 @@ class ReadOnlyMemoryException : public MemoryException {
   public:
     // Construction Methods
     ReadOnlyMemoryException() : MemoryException(
-        "Attempted write to read only memory at runtime.",
-        "ReadOnlyMemoryException") {}
+        "Attempted write to read only memory at runtime.") {}
     ReadOnlyMemoryException(
-        std::string&& errorMessage,
-        std::string&& className = "ReadOnlyMemoryException") :
-      MemoryException(std::move(errorMessage), std::move(className)) {}
+        std::string&& errorMessage) :
+      MemoryException(std::move(errorMessage)) {}
     ReadOnlyMemoryException(const ReadOnlyMemoryException& originalException) noexcept :
         MemoryException(originalException) {}
 
     // Destructors
     ~ReadOnlyMemoryException() {}
+
+    /// Print the name of this exception class.
+    /// \returns The name of this exception class as a string.
+    const std::string printClassName() const override {
+      return "ReadOnlyMemoryException";
+    }
 
 };
 
@@ -64,20 +72,23 @@ class MirroringException : public MemoryException {
   public:
     // Construction Methods
     MirroringException() : MemoryException(
-        "There was an error building a mirrored memory.",
-        "MirroringException") {}
+        "There was an error building a mirrored memory.") {}
     MirroringException(
-        std::string&& errorMessage,
-        std::string&& className = "MirroringException") :
-      MemoryException(std::move(errorMessage), std::move(className)) {}
+        std::string&& errorMessage) :
+      MemoryException(std::move(errorMessage)) {}
     MirroringException(const MirroringException& originalException) noexcept :
         MemoryException(originalException) {}
 
     // Destructors
     ~MirroringException() {}
 
-};
+    /// Print the name of this exception class.
+    /// \returns The name of this exception class as a string.
+    const std::string printClassName() const override {
+      return "MirroringException";
+    }
 
+};
 
 } // namespace Exception
 

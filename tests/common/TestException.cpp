@@ -65,3 +65,9 @@ TEST_CASE("Throwing and catching BaseExceptions works correctly",
   }
 
 }
+
+TEST_CASE("BaseExceptions can be caught as stl std::exception.",
+    "[Common][Exception]") {
+  REQUIRE_THROWS_AS(level_one(), std::exception);
+  REQUIRE_THROWS_WITH(level_one(), Catch::Contains("BaseException"));
+}
