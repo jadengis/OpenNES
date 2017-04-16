@@ -31,7 +31,7 @@ if (NOT DEFINED OPENNES_VERSION_MINOR)
   set (OPENNES_VERSION_MINOR 1)
 endif()
 if (NOT DEFINED OPENNES_VERSION_PATCH)
-  set (OPENNES_VERSION_MINOR 0)
+  set (OPENNES_VERSION_PATCH 0)
 endif()
 
 # Check if a build configuration was selected
@@ -39,7 +39,6 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "No build type selected, default to Debug")
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (default Debug)" FORCE)
 endif()
-
 
 # Determine properties of the current build machine
 message(STATUS "Detected Architecture: ${CMAKE_SYSTEM_PROCESSOR}")
@@ -91,6 +90,15 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
 endif()
+
+# Create a configuration header to pass CMake variables to program
+configure_file(
+  "${PROJECT_SOURCE_DIR}/include/OpenNESConfig.h.in"
+  "${PROJECT_BINARY_DIR}/OpenNESConfig.h"
+  )
+
+# include the Project build directory to include CMake generated headers
+include_directories("${PROJECT_BINARY_DIR}")
 
 # project include directory
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

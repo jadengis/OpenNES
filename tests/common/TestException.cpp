@@ -13,6 +13,7 @@
 /// Test cases for the BaseException class
 ///
 //===----------------------------------------------------------------------===//
+#include "OpenNESConfig.h"
 
 #include <iostream>
 
@@ -40,7 +41,11 @@ void level_one() {
 // will mess with the expected stack frames. This isn't mission critical
 // as we shouldn't be throwing exceptions in Release builds anyway.
 TEST_CASE("Throwing and catching BaseExceptions works correctly", 
+#ifdef __RELEASE__
     "[Common][Exception][!mayfail]") {
+#else
+    "[Common][Exception]") {
+#endif
   // try and catch the exception
   try {
     level_one();

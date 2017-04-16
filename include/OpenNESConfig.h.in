@@ -1,0 +1,31 @@
+//===-- OpenNESConfig.h - OpenNES Project Configuration ---------*- C++ -*-===//
+//
+//                           The OpenNES Project
+//
+// This file is distributed under GPL v2. See LICENSE.md for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// This file contains macros pertaining to the current project build
+/// configuration.
+///
+//===----------------------------------------------------------------------===//
+#ifndef OPENNES_CONFIG_H
+#define OPENNES_CONFIG_H
+
+// Project version macros
+#define OPENNES_VERSION_MAJOR @OPENNES_VERSION_MAJOR@
+#define OPENNES_VERSION_MINOR @OPENNES_VERSION_MINOR@
+#define OPENNES_VERSION_PATCH @OPENNES_VERSION_PATCH@
+
+// Build type macros. This can be used for enabling and disabling code.
+#define __@CMAKE_BUILD_TYPE@__ 1
+#ifdef __Debug__
+  #define __DEBUG__ 1
+#else
+  #define __RELEASE__ 1
+#endif
+#undef __@CMAKE_BUILD_TYPE@__
+
+#endif // OPENNES_CONFIG_H
