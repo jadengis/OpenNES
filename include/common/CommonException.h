@@ -17,6 +17,31 @@
 
 namespace Exception {
 
+/// \class UnsupportedFeatureException
+/// \brief This is the exception to throw when attempting to access an
+/// unsupported feature. This can include unsupported memory mappers
+class UnsupportedFeatureException : public BaseException {
+  public:
+    UnsupportedFeatureException() : BaseException(
+        "An input file had an invalid format.") {}
+    UnsupportedFeatureException(
+        std::string&& errorMessage) :
+      BaseException(std::move(errorMessage)) {}
+    UnsupportedFeatureException(
+        const UnsupportedFeatureException& originalException) noexcept :
+        BaseException(originalException) {}
+
+    // Destructors
+    ~UnsupportedFeatureException() {}
+
+    /// Print the name of this exception class.
+    /// \returns The name of this exception class as a string.
+    const std::string printClassName() const override {
+      return "UnsupportedFeatureException";
+    }
+
+};
+
 /// \class InvalidFormatException
 /// \brief This is the exception to throw when encountering a file with an 
 /// unexpected or invalid format.

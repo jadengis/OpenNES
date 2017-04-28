@@ -27,9 +27,9 @@
 
 namespace Nes {
 
-/// \class Cartridge
-/// \brief This class represents an Nes cartridge. It contains all cartridge
-/// specific information related to the game being emulated.
+/// \class CartridgeBuilder
+/// \brief This class is the builder class for the Nes Cartridge. Cartridge
+/// objects can only be constructed by this class.
 class CartridgeBuilder : public Pattern::Builder<Cartridge>{
   public:
     /// Construct an empty CartridgeBuilder.
