@@ -37,7 +37,7 @@ struct CartridgeOptions {
   /// The number of 8kB Video Rom banks.
   byte num8kVRom;
   /// iNes mapper index.
-  byte mapperIndex;
+  std::size_t mapperIndex;
 
   // various flags
   /// True if use vertical mirroring, otherwise use horizontal mirroring.
@@ -93,16 +93,16 @@ class Cartridge {
     std::unique_ptr<Memory::Mapper<byte>> mapperPtr;  
 
     /// The array of PRG RAMs for this cartridge.
-    std::vector<Memory::Ram<byte>> prgRams;
+    std::vector<std::shared_ptr<Memory::Ram<byte>>> prgRams;
 
     /// The array of PRG ROMs for this cartridge.
-    std::vector<Memory::Rom<byte>> prgRoms;
+    std::vector<std::shared_ptr<Memory::Rom<byte>>> prgRoms;
 
     /// The array of CHR ROMs for this cartdige.
-    std::vector<Memory::Rom<byte>> chrRoms;
+    std::vector<std::shared_ptr<Memory::Rom<byte>>> chrRoms;
 
     /// 512 byte trainer.
-    Memory::Rom<byte> trainer;
+    std::shared_ptr<Memory::Rom<byte>> trainer;
 };
 
 const Memory::Mapper<byte>& Cartridge::getMapper() const {

@@ -8,6 +8,8 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 set(SRCS Cartridge.cpp
          CartridgeBuilder.cpp
+         CartridgeMapper.cpp
+         CartridgeMapperBuilder.cpp
          )
 
 add_library(nes ${SRCS})
