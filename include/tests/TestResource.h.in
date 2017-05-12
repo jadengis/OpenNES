@@ -1,0 +1,21 @@
+//===-- TestResource.h - Test Resource Configuration -- ---------*- C++ -*-===//
+//
+//                           The OpenNES Project
+//
+// This file is distributed under GPL v2. See LICENSE.md for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// This file contains macros pertaining to the testing resources.
+///
+//===----------------------------------------------------------------------===//
+#ifndef TEST_RESOURCE_H
+#define TEST_RESOURCE_H
+#include <string>
+
+#define TEST_RESOURCE_PATH "@TEST_RESOURCE_PATH@"
+#define GET_RESOURCE_PATH(resource) static_cast<std::string>(TEST_RESOURCE_PATH)\
+  + resource
+
+#endif // TEST_RESOURCE_H

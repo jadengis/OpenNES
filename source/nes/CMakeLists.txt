@@ -10,6 +10,7 @@ set(SRCS Cartridge.cpp
          CartridgeBuilder.cpp
          CartridgeMapper.cpp
          CartridgeMapperBuilder.cpp
+         mappers/NRom.cpp
          )
 
 add_library(nes ${SRCS})

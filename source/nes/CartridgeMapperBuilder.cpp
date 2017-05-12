@@ -26,7 +26,12 @@ std::unique_ptr<CartridgeMapper> CartridgeMapperBuilder::build() {
   // throw UnsupportedException if the mapper id is unsupported.
   switch(iNesIndex) {
     case NRom::iNesIndex:
-      mapperPtr = std::unique_ptr<CartridgeMapper>(new NRom(prgRams, prgRoms, chrRoms));
+      mapperPtr = 
+        std::unique_ptr<CartridgeMapper>(new NRom(
+              *prgRamsPtr, 
+              *prgRomsPtr, 
+              *chrRomsPtr));
+      break;
     default:
       // mapper is unsupported.
       throw Exception::UnsupportedFeatureException("iNES mapper index "
@@ -45,22 +50,22 @@ CartridgeMapperBuilder& CartridgeMapperBuilder::setiNESIndex(std::size_t iNesInd
 }
 
 CartridgeMapperBuilder& CartridgeMapperBuilder::setPrgRams(
-    std::vector<std::shared_ptr<Memory::Ram<byte>>>& prgRams) { 
+    std::vector<std::shared_ptr<Memory::Ram<byte>>>* prgRamsPtr) { 
   // Set the prgRams and return a reference for chaining.
-  this->prgRams = prgRams;
+  this->prgRamsPtr = prgRamsPtr;
   return *this;
 }
 
 CartridgeMapperBuilder& CartridgeMapperBuilder::setPrgRoms(
-    std::vector<std::shared_ptr<Memory::Rom<byte>>>& prgRoms) { 
+    std::vector<std::shared_ptr<Memory::Rom<byte>>>* prgRomsPtr) { 
   // Set the prgRams and return a reference for chaining.
-  this->prgRoms = prgRoms;
+  this->prgRomsPtr = prgRomsPtr;
   return *this;
 }
 
 CartridgeMapperBuilder& CartridgeMapperBuilder::setChrRoms(
-    std::vector<std::shared_ptr<Memory::Rom<byte>>>& chrRoms) { 
+    std::vector<std::shared_ptr<Memory::Rom<byte>>>* chrRomsPtr) { 
   // Set the prgRams and return a reference for chaining.
-  this->chrRoms = chrRoms;
+  this->chrRomsPtr = chrRomsPtr;
   return *this;
 }

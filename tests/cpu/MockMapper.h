@@ -30,6 +30,7 @@ class MockMapper : public Memory::Mapper<byte> {
   public:
     inline MockMapper();
     inline ~MockMapper() {}
+    inline const std::string getName() const override;
     inline std::shared_ptr<Memory::Bank<byte>> mapToHardware(Vaddr vaddr) const override;
   private:
     /// An array of ptrs to Ram banks that can be mapped to
@@ -43,6 +44,10 @@ MockMapper::MockMapper() {
     vaddr.val = i * BANK_SIZE;
     dataBanks[i] = std::make_shared<Memory::Ram<byte>>(BANK_SIZE, vaddr);
   }
+}
+
+const std::string MockMapper::getName() const {
+  return "MockMapper";
 }
 
 std::shared_ptr<Memory::Bank<byte>> MockMapper::mapToHardware(Vaddr vaddr) const {

@@ -57,7 +57,7 @@ class BaseException : public std::exception {
 
     /// Inherited method from the libstdc++ exception class.
     /// \returns Full description of this exception.
-    const char * what() const noexcept final;
+    virtual const char * what() const noexcept final;
 
   private:
     /// Method for acquiring a stack trace,and storing it in this object.

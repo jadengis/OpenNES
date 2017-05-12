@@ -91,14 +91,16 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
 endif()
 
+# Create an include directory for generated headers
+file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/include")
 # Create a configuration header to pass CMake variables to program
 configure_file(
   "${PROJECT_SOURCE_DIR}/include/OpenNESConfig.h.in"
-  "${PROJECT_BINARY_DIR}/OpenNESConfig.h"
+  "${PROJECT_BINARY_DIR}/include/OpenNESConfig.h"
   )
 
-# include the Project build directory to include CMake generated headers
-include_directories("${PROJECT_BINARY_DIR}")
+# include the project build include directory to include CMake generated headers
+include_directories("${PROJECT_BINARY_DIR}/include")
 
 # project include directory
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

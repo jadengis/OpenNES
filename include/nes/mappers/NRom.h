@@ -38,6 +38,12 @@ class NRom : public CartridgeMapper {
     /// Destroy an NRom
     ~NRom() {}
 
+    /// Get the name of this Mapper.
+    /// \returns NRom
+    const std::string getName() const override {
+      return "NRom";
+    }
+
     /// Map an address from the Cpu to a piece of hardware in the Cartridge.
     /// \param vaddr Virtual address from the Cpu.
     /// \returns shared_ptr to the hardware on the Cartridge.

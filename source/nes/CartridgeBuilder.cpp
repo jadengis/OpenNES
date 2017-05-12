@@ -44,7 +44,6 @@ std::unique_ptr<Cartridge> CartridgeBuilder::build() {
   return std::move(cartridgePtr);
 }
 
-
 void CartridgeBuilder::parseiNesHeader(std::array<byte, INES_HEADER_SIZE> header) {
   // Check if the file is in the valid fomart by checking the first 4 bytes
   bool isInvalid = false;
@@ -63,7 +62,7 @@ void CartridgeBuilder::parseiNesHeader(std::array<byte, INES_HEADER_SIZE> header
   options.num8kVRom = header.at(5);
   // Byte 8 is number of 8kB Rams. If zero, we assume 1 for compatibility with
   // old version of the iNES standard.
-  options.num8kVRom = (header.at(8) == 0) ? 1 : header.at(8);
+  options.num8kRam = (header.at(8) == 0) ? 1 : header.at(8);
   // iNES mapper index = byte6[4-7]|byte7[4-7]
   options.mapperIndex = (header.at(6) >> 4) | (header.at(7) & 0xF0);
 

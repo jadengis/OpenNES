@@ -1,4 +1,4 @@
-//===-- source/nes/Cartridge.cpp - Cartridge --------------------*- C++ -*-===//
+//===-- source/nes/CartridgeMapper.cpp - Cartridge Mapper -------*- C++ -*-===//
 //
 //                           The OpenNES Project
 //
@@ -7,68 +7,59 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// This file contains the implementation of the Cartridge class.
+/// This file contains the implementation of the CartridgeMapper class.
 ///
 //===----------------------------------------------------------------------===//
 
-#include <iterator>
-
 #include "common/CommonTypes.h"
-#include "common/CommonException.h"
-#include "nes/Cartridge.h"
+#include "memory/Ram.h"
+#include "memory/Rom.h"
+#include "nes/CartridgeMapper.h"
 
 using namespace Nes;
 using namespace Memory;
 
-Cartridge& Cartridge::operator=(Cartridge&& otherCartridge) {
-  if(this != &otherCartridge) {
-    mapperPtr = std::move(otherCartridge.mapperPtr);
-    trainer = std::move(otherCartridge.trainer);
-    prgRams = std::move(otherCartridge.prgRams);
-    prgRoms = std::move(otherCartridge.prgRoms);
-    chrRoms = std::move(otherCartridge.chrRoms);
-  }
-  return *this;
+CartridgeMapper::CartridgeMapper(
+    std::vector<std::shared_ptr<Ram<byte>>>& prgRams,
+    std::vector<std::shared_ptr<Rom<byte>>>& prgRoms,
+    std::vector<std::shared_ptr<Rom<byte>>>& chrRoms) :
+  prgRams(prgRams),
+  prgRoms(prgRoms),
+  chrRoms(chrRoms) { }
+
+// Get and Set methods.
+std::weak_ptr<Ram<byte>> CartridgeMapper::getPrgRam() const {
+  return prgRam;
 }
 
-Cartridge::Cartridge(CartridgeOptions options, const std::vector<byte>& romFile) {
-  // Iterate thourgh the list of options, building the cartridge internals. 
-  // Acquire an iterator to the begining of the romFile.
-  auto romFileItr = std::begin(romFile);
-  // populate the 512 byte trainer if necessary.
-  if(options.hasTrainer) {
-    trainer = std::make_shared<Rom<byte>>();
-    trainer->load(romFileItr, romFileItr + SIZE_512B);
-    romFileItr += SIZE_512B;
-  }
+void CartridgeMapper::setPrgRam(std::size_t index) {
+  prgRam = prgRams.at(index);
+}
 
-  // resize the number of RAMs, and resize each RAM to 8k.
-  prgRams.resize(options.num8kRam);
-  for(auto ram : prgRams) {
-    ram->resize(SIZE_8KB);
-  }
+std::weak_ptr<Rom<byte>> CartridgeMapper::getLowerPrgRom() const {
+  return lowerPrgRom;
+}
 
-  // populate all 16k PRG ROMs
-  prgRoms.reserve(options.num16kRom);
-  for(std::size_t i = 0; i < options.num16kRom; i++) {
-    prgRoms.emplace_back(std::make_shared<Rom<byte>>());
-    prgRoms.back()->load(romFileItr, romFileItr + SIZE_16KB);
-    romFileItr += SIZE_16KB;
-  }
+void CartridgeMapper::setLowerPrgRom(std::size_t index) {
+  lowerPrgRom = prgRoms.at(index);
+}
 
-  // populate all 8k CHR ROMS
-  chrRoms.reserve(options.num8kVRom);
-  for(std::size_t i = 0; i < options.num8kVRom; i++) {
-    chrRoms.emplace_back(std::make_shared<Rom<byte>>());
-    chrRoms.back()->load(romFileItr, romFileItr + SIZE_8KB);
-    romFileItr += SIZE_8KB;
-  }
+std::weak_ptr<Rom<byte>> CartridgeMapper::getUpperPrgRom() const {
+  return upperPrgRom;
+}
 
-  // Check to make sure that the entire romFile was read
-  if(romFileItr != std::end(romFile)) {
-    throw Exception::InvalidFormatException("Input ROM file had an unexpected number of bytes.");
-  }
+void CartridgeMapper::setUpperPrgRom(std::size_t index) {
+  upperPrgRom = prgRoms.at(index);
+}
 
-  // determine the kind of memory mapper and build it.
-  
+std::vector<std::shared_ptr<Ram<byte>>>& CartridgeMapper::getPrgRams() {
+  return prgRams;
+}
+
+std::vector<std::shared_ptr<Rom<byte>>>& CartridgeMapper::getPrgRoms() {
+  return prgRoms;
+}
+
+std::vector<std::shared_ptr<Rom<byte>>>& CartridgeMapper::getChrRoms() {
+  return chrRoms;
 }

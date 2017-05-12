@@ -17,6 +17,8 @@
 
 #include "common/CommonTypes.h"
 #include "memory/Mapper.h"
+#include "memory/Ram.h"
+#include "memory/Rom.h"
 
 namespace Nes {
 // Forward Declarations
@@ -45,27 +47,51 @@ class CartridgeMapper : public Memory::Mapper<byte> {
         std::vector<std::shared_ptr<Memory::Rom<byte>>>& chrRoms
         );
 
-    /// Get the internal reference to the PRG ROM array.
-    /// \returns The internal reference to the PRG ROM array.
+    /// Get the currently loaded PRG RAM.
+    /// \returns The loaded PRG RAM.
+    std::weak_ptr<Memory::Ram<byte>> getPrgRam() const;
+
+    /// Set the currently loaded PRG RAM.
+    /// \param index Index into the RAM array.
+    void setPrgRam(std::size_t index);
+    
+    /// Get the currently loaded lower PRG ROM.
+    /// \returns The loaded lower PRG ROM.
+    std::weak_ptr<Memory::Rom<byte>> getLowerPrgRom() const;
+
+    /// Set the currently loaded lower PRG ROM.
+    /// \param index Index into the ROM array.
+    void setLowerPrgRom(std::size_t index);
+    
+    /// Get the currently loaded upper PRG ROM.
+    /// \returns The loaded upper PRG ROM.
+    std::weak_ptr<Memory::Rom<byte>> getUpperPrgRom() const;
+
+    /// Set the currently loaded upper PRG ROM.
+    /// \param index Index into the ROM array.
+    void setUpperPrgRom(std::size_t index);
+    
+    /// Get the internal reference to the PRG RAM array.
+    /// \returns The internal reference to the PRG RAM array.
     std::vector<std::shared_ptr<Memory::Ram<byte>>>& getPrgRams();
 
     /// Get the internal reference to the PRG ROM array.
     /// \returns The internal reference to the PRG ROM array.
-    std::vector<std::shared_ptr<Memory::Ram<byte>>>& getPrgRams();
+    std::vector<std::shared_ptr<Memory::Rom<byte>>>& getPrgRoms();
 
-    /// Get the internal reference to the PRG ROM array.
-    /// \returns The internal reference to the PRG ROM array.
-    std::vector<std::shared_ptr<Memory::Ram<byte>>>& getPrgRams();
+    /// Get the internal reference to the CHR ROM array.
+    /// \returns The internal reference to the CHR ROM array.
+    std::vector<std::shared_ptr<Memory::Rom<byte>>>& getChrRoms();
 
   private:
     /// The PRG RAM currently at base address 0x6000.
-    std::shared_ptr<Memory::Ram<byte>> prgRam;
+    std::weak_ptr<Memory::Ram<byte>> prgRam;
 
     /// The PRG ROM currently as base address 0x8000.
-    std::shared_ptr<Memory::Rom<byte>> lowerPrgRom;
+    std::weak_ptr<Memory::Rom<byte>> lowerPrgRom;
 
     /// The CHR ROM currently as base address 0xC000.
-    std::shared_ptr<Memory::Rom<byte>> upperPrgRom;
+    std::weak_ptr<Memory::Rom<byte>> upperPrgRom;
 
     /// A reference to the PRG RAMs for this mappers Cartridge.
     std::vector<std::shared_ptr<Memory::Ram<byte>>>& prgRams;
