@@ -16,6 +16,7 @@
 #include "common/CommonTypes.h"
 #include "common/CommonException.h"
 #include "nes/Cartridge.h"
+#include "nes/CartridgeMapperBuilder.h"
 
 using namespace Nes;
 using namespace Memory;
@@ -43,9 +44,10 @@ Cartridge::Cartridge(CartridgeOptions options, const std::vector<byte>& romFile)
   }
 
   // resize the number of RAMs, and resize each RAM to 8k.
-  prgRams.resize(options.num8kRam);
-  for(auto ram : prgRams) {
-    ram->resize(SIZE_8KB);
+  prgRams.reserve(options.num8kRam);
+  for(std::size_t i = 0; i < options.num8kRam; i++) {
+    prgRams.emplace_back(std::make_shared<Ram<byte>>());
+    prgRams.back()->resize(SIZE_8KB);
   }
 
   // populate all 16k PRG ROMs
@@ -65,10 +67,16 @@ Cartridge::Cartridge(CartridgeOptions options, const std::vector<byte>& romFile)
   }
 
   // Check to make sure that the entire romFile was read
-  if(romFileItr != std::end(romFile)) {
-    throw Exception::InvalidFormatException("Input ROM file had an unexpected number of bytes.");
-  }
+  //if(romFileItr != std::end(romFile)) {
+  //  throw Exception::InvalidFormatException("Input ROM file had an unexpected number of bytes.");
+  //}
 
   // determine the kind of memory mapper and build it.
+  CartridgeMapperBuilder mapperBuilder;
+  mapperBuilder.setiNESIndex(options.mapperIndex)
+    .setPrgRams(&prgRams)
+    .setPrgRoms(&prgRoms)
+    .setChrRoms(&chrRoms);
+  mapperPtr = mapperBuilder.build();
   
 }

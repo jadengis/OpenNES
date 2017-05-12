@@ -49,19 +49,19 @@ class CartridgeMapperBuilder : public Pattern::Builder<CartridgeMapper>{
     /// \param Reference to the vector of Ram to use.
     /// \returns This builder for chaining.
     CartridgeMapperBuilder& setPrgRams(
-        std::vector<std::shared_ptr<Memory::Ram<byte>>>& prgRams);
+        std::vector<std::shared_ptr<Memory::Ram<byte>>>* prgRamsPtr);
 
     /// Set the vector of PRG ROMS to build the mapper with.
     /// \param Reference to the vector of Rom to use.
     /// \returns This builder for chaining.
     CartridgeMapperBuilder& setPrgRoms(
-        std::vector<std::shared_ptr<Memory::Rom<byte>>>& prgRoms);
+        std::vector<std::shared_ptr<Memory::Rom<byte>>>* prgRomsPtr);
 
     /// Set the vector of CHR ROMS to build the mapper with.
     /// \param Reference to the vector of Rom to use.
     /// \returns This builder for chaining.
     CartridgeMapperBuilder& setChrRoms(
-        std::vector<std::shared_ptr<Memory::Rom<byte>>>& chrRoms);
+        std::vector<std::shared_ptr<Memory::Rom<byte>>>* chrRomsPtr);
 
   private:
     /// Temporary storage for a constructed cartridge pointer.
@@ -71,13 +71,13 @@ class CartridgeMapperBuilder : public Pattern::Builder<CartridgeMapper>{
     std::size_t iNesIndex;
 
     /// A reference to the PRG RAMs for this mappers Cartridge.
-    std::vector<std::shared_ptr<Memory::Ram<byte>>>& prgRams;
+    std::vector<std::shared_ptr<Memory::Ram<byte>>>* prgRamsPtr;
 
     /// A reference to the PRG ROMs for this mappers Cartridge.
-    std::vector<std::shared_ptr<Memory::Rom<byte>>>& prgRoms;
+    std::vector<std::shared_ptr<Memory::Rom<byte>>>* prgRomsPtr;
 
     /// A reference to the CHR ROMs for this mappers Cartridge.
-    std::vector<std::shared_ptr<Memory::Rom<byte>>>& chrRoms;
+    std::vector<std::shared_ptr<Memory::Rom<byte>>>* chrRomsPtr;
 
 };
 

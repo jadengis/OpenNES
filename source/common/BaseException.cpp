@@ -21,7 +21,7 @@ using namespace Exception;
 // default constructor
 BaseException::BaseException() noexcept {
   // Populate this exception with some default values.
-  this->errorMessage = printClassName() + ": " +
+  this->errorMessage = this->printClassName() + ": " +
     "An uncaught exception was thrown during runtime.\n";
   obtainStackTrace();
 }
@@ -58,7 +58,7 @@ const std::string& BaseException::printStackTrace() const {
 }
 
 const char * BaseException::what() const noexcept {
-  return (printErrorMessage() + printStackTrace()).c_str();
+  return (this->printErrorMessage() + printStackTrace()).c_str();
 }
 
 // Private methods

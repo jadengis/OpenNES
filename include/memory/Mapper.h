@@ -28,6 +28,10 @@ template<class Wordsize>
 class Mapper {
   public:
     virtual ~Mapper() {}
+    /// Get the name of this Mapper. This is abstract for this class
+    /// and must be overridden by inheritors.
+    /// \returns The name of this Mapper.
+    virtual const std::string getName() const = 0;
 
     /// This function maps a virtual address to its associated hardware unit.
     /// \param address Address to find the hardware for.
