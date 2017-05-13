@@ -43,7 +43,7 @@ std::shared_ptr<Bank<byte>> NRom::mapToHardware(Vaddr vaddr) const {
   if(0x8000 <= address && address < 0xC000) {
     return getLowerPrgRom().lock();
   }
-  if(0xC000 <= address && address <= 0xFFFF) {
+  if(0xC000 <= address) {
     return getUpperPrgRom().lock();
   }
   return nullptr;
