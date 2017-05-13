@@ -21,8 +21,7 @@ using namespace Exception;
 // default constructor
 BaseException::BaseException() noexcept {
   // Populate this exception with some default values.
-  this->errorMessage = this->printClassName() + ": " +
-    "An uncaught exception was thrown during runtime.\n";
+  this->errorMessage = "An uncaught exception was thrown during runtime.\n";
   obtainStackTrace();
 }
 
@@ -30,7 +29,7 @@ BaseException::BaseException() noexcept {
 // populate class properties.
 BaseException::BaseException(std::string&& errorMessage) noexcept {
   // Populate this exception with some default values.
-  this->errorMessage = printClassName() + ": " + errorMessage + "\n";
+  this->errorMessage = errorMessage + "\n";
   obtainStackTrace();
 }
 
@@ -49,8 +48,8 @@ BaseException& BaseException::operator=(const BaseException& originalException) 
 } 
 
 // Public methods
-const std::string& BaseException::printErrorMessage() const {
-  return this->errorMessage;
+const std::string BaseException::printErrorMessage() const {
+  return (printClassName() + ": " + this->errorMessage);
 }
 
 const std::string& BaseException::printStackTrace() const {
@@ -58,7 +57,7 @@ const std::string& BaseException::printStackTrace() const {
 }
 
 const char * BaseException::what() const noexcept {
-  return (this->printErrorMessage() + printStackTrace()).c_str();
+  return (printErrorMessage() + printStackTrace()).c_str();
 }
 
 // Private methods
