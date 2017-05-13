@@ -20,6 +20,7 @@
 #include "tests/catch.hpp"
 #include "common/CommonTypes.h"
 #include "common/BaseException.h"
+#include "common/CommonException.h"
 
 #define ERROR_MESSAGE "This is an error message"
 
@@ -35,6 +36,10 @@ void level_two() {
 
 void level_one() {
   level_two();
+}
+
+void throwsRuntimeError() {
+  throw Exception::RuntimeException(ERROR_MESSAGE);
 }
 
 // This test case may fail for Release builds, because the optimizer
@@ -75,4 +80,10 @@ TEST_CASE("BaseExceptions can be caught as stl std::exception.",
     "[Common][Exception]") {
   REQUIRE_THROWS_AS(level_one(), std::exception);
   REQUIRE_THROWS_WITH(level_one(), Catch::Contains("BaseException"));
+}
+
+TEST_CASE("Errors are correct for inheritors of BaseException.",
+    "[Common][Exception]") {
+  REQUIRE_THROWS_AS(throwsRuntimeError(), Exception::RuntimeException);
+  REQUIRE_THROWS_WITH(throwsRuntimeError(), Catch::Contains("RuntimeException: "));
 }

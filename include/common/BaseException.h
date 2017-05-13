@@ -49,7 +49,7 @@ class BaseException : public std::exception {
 
     /// Return the error message from the event that caused this exception.
     /// \return The internal error message.
-    virtual const std::string& printErrorMessage() const;
+    virtual const std::string printErrorMessage() const;
 
     /// Return the stack trace acquired when the exception was created.
     /// \return The stack trace from throw time.
