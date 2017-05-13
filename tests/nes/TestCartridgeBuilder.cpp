@@ -19,6 +19,7 @@
 #include "tests/catch.hpp"
 #include "tests/TestResource.h"
 #include "common/CommonTypes.h"
+#include "common/BaseException.h"
 #include "nes/Cartridge.h"
 #include "nes/CartridgeBuilder.h"
 
