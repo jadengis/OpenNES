@@ -84,6 +84,15 @@ class CartridgeMapper : public Memory::Mapper<byte> {
     std::vector<std::shared_ptr<Memory::Rom<byte>>>& getChrRoms();
 
   private:
+    /// The base address reserved for PRG RAM.
+    static constexpr const Vaddr& PRG_RAM_ADDR = {0x6000};
+
+    /// The base address reserved for Lower PRG ROM.
+    static constexpr const Vaddr& LOWER_PRG_ROM_ADDR = {0x8000};
+
+    /// The base address reserved for Upper PRG ROM.
+    static constexpr const Vaddr& UPPER_PRG_ROM_ADDR = {0xC000};
+
     /// The PRG RAM currently at base address 0x6000.
     std::weak_ptr<Memory::Ram<byte>> prgRam;
 

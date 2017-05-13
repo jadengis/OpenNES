@@ -33,7 +33,10 @@ std::weak_ptr<Ram<byte>> CartridgeMapper::getPrgRam() const {
 }
 
 void CartridgeMapper::setPrgRam(std::size_t index) {
-  prgRam = prgRams.at(index);
+  // Set the baseAddress of the Ram to load, then load it.
+  auto prgRamPtr = prgRams.at(index);
+  prgRamPtr->setBaseAddress(PRG_RAM_ADDR);
+  prgRam = prgRamPtr;
 }
 
 std::weak_ptr<Rom<byte>> CartridgeMapper::getLowerPrgRom() const {
@@ -41,7 +44,10 @@ std::weak_ptr<Rom<byte>> CartridgeMapper::getLowerPrgRom() const {
 }
 
 void CartridgeMapper::setLowerPrgRom(std::size_t index) {
-  lowerPrgRom = prgRoms.at(index);
+  // Set the baseAddress of the Rom to load, then load it.
+  auto lowerPrgRomPtr = prgRoms.at(index);
+  lowerPrgRomPtr->setBaseAddress(LOWER_PRG_ROM_ADDR);
+  lowerPrgRom = lowerPrgRomPtr;
 }
 
 std::weak_ptr<Rom<byte>> CartridgeMapper::getUpperPrgRom() const {
@@ -49,6 +55,9 @@ std::weak_ptr<Rom<byte>> CartridgeMapper::getUpperPrgRom() const {
 }
 
 void CartridgeMapper::setUpperPrgRom(std::size_t index) {
+  // Set the baseAddress of the Rom to load, then load it.
+  auto upperPrgRomPtr = prgRoms.at(index);
+  upperPrgRomPtr->setBaseAddress(UPPER_PRG_ROM_ADDR);
   upperPrgRom = prgRoms.at(index);
 }
 

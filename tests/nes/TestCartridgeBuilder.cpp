@@ -24,16 +24,35 @@
 
 using namespace Nes;
 
-TEST_CASE("Building Cartridges from Rom files works correctly",
+TEST_CASE("Building Cartridges from Rom files works correctly.",
     "[Nes][Cartridge]") {
   // Create a cartridge builder
   CartridgeBuilder builder;
-  SECTION("Build a cartridge from dummy romFile") {
+  SECTION("Build a cartridge from dummy romFile, and check properties") {
+    // Build a cartridge from testRom.nes and assert it has the right mapper.
     builder.setInputFile(GET_RESOURCE_PATH("testRom.nes"));
     auto cartridgePtr = builder.build();
     auto& mapper = cartridgePtr->getMapper();
     std::string name = mapper.getName();
     REQUIRE(name == "NRom");
+    
+    // This address should be a Ram of size 0x2000, base address == 0x8000
+    Vaddr vaddr = {0x7000};
+    auto bankPtr = mapper.mapToHardware(vaddr);
+    CHECK((bankPtr->getSize()) == 0x2000);
+    CHECK((bankPtr->getBaseAddress().val) == 0x6000);
+
+    // This address should be a Rom of size 0x4000, base address == 0x8000
+    vaddr.val = 0x9000;
+    bankPtr = mapper.mapToHardware(vaddr);
+    CHECK((bankPtr->getSize()) == 0x4000);
+    CHECK((bankPtr->getBaseAddress().val) == 0x8000);
+
+    // This address should be a Rom of size 0x4000, base address == 0xC000
+    vaddr.val = 0xD000;
+    bankPtr = mapper.mapToHardware(vaddr);
+    CHECK((bankPtr->getSize()) == 0x4000);
+    CHECK((bankPtr->getBaseAddress().val) == 0xC000);
 
   } 
 }
